@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, type ComponentType } from 'react';
+import { useState, useEffect, type ComponentType } from 'react';
 import './InvestorLayers.css';
 
 interface LayerCard {
