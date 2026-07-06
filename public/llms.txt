@@ -1,0 +1,26 @@
+# Productica
+
+Productica is an AI-powered market intelligence platform designed to help founders and builders validate business ideas before investing time or money. It specializes in Product-Market Fit (PMF) analysis with a focus on the Indian market ecosystem.
+
+## Key Features
+- **Instant PMF Scoring**: Real-time validation of business concepts.
+- **Market Signal Analysis**: Synthesizing data from search, social, and funding platforms.
+- **Competitive Mapping**: Visualizing the ecosystem and identifying growth vectors.
+- **Demand Forecasting**: Understanding audience intent through qualitative and quantitative signals.
+
+## Target Audience
+- Pre-seed and Seed-stage founders.
+- Product managers shipping new features.
+- Indian market entrepreneurs seeking localized insights.
+
+## Pricing
+- Starter: $29/mo (Core access)
+- Pro: $99/mo (Advanced AI + API)
+- Enterprise: $299/mo (Custom models + White-label)
+
+## Contact & Socials
+- Website: https://productica.in
+- Agents Platform: https://agents.productica.in
+- Twitter/X: https://x.com/Productica_in
+- LinkedIn: https://linkedin.com/company/productica-ai/
+- Email: info@productica.in

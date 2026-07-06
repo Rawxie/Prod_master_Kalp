@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://productica.in/sitemap.xml

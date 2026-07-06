@@ -1,0 +1,418 @@
+/* ═══════════════════════════════════════════════════════════
+   Investor Intelligence Layers
+   Premium 3D stack component for investors
+   ═══════════════════════════════════════════════════════════ */
+
+.investor-layers-section {
+  position: relative;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 4rem 1.5rem;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ── Background Patterns ── */
+.investor-layers-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.investor-layers-bg-grid {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(circle at center, rgba(0,0,0,1) 10%, rgba(0,0,0,0) 80%);
+  -webkit-mask-image: radial-gradient(circle at center, rgba(0,0,0,1) 10%, rgba(0,0,0,0) 80%);
+}
+
+/* ── Container ── */
+.investor-layers-container {
+  position: relative;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+  z-index: 10;
+}
+
+/* ── Left Panel: List ── */
+.investor-layers-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.investor-layers-item {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 16px;
+  padding: 1.25rem 1.5rem;
+  cursor: pointer;
+  transition: all 400ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.investor-layers-item:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.investor-layers-item.active {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255,255,255,0.05);
+  transform: translateX(8px);
+}
+
+.investor-layers-item.dimmed {
+  opacity: 0.4;
+  filter: grayscale(100%);
+}
+
+.investor-layers-item-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.investor-layers-item-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: rgba(255, 255, 255, 0.6);
+  transition: color 400ms ease;
+}
+
+.investor-layers-item.active .investor-layers-item-icon {
+  color: #fff;
+  filter: drop-shadow(0 0 4px rgba(255,255,255,0.5));
+}
+
+.investor-layers-item-title {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #e4e4e7;
+  margin: 0;
+  letter-spacing: 0.02em;
+  transition: color 400ms ease;
+}
+
+.investor-layers-item.active .investor-layers-item-title {
+  color: #fff;
+}
+
+.investor-layers-item-desc-wrapper {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transform: translateY(4px);
+  transition: all 400ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.investor-layers-item.active .investor-layers-item-desc-wrapper {
+  max-height: 80px;
+  opacity: 1;
+  transform: translateY(0);
+  margin-top: 0.75rem;
+}
+
+.investor-layers-item-desc {
+  font-size: 0.85rem;
+  color: #a1a1aa;
+  line-height: 1.5;
+  margin: 0;
+  padding-left: 2.25rem; /* align with text */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ── Right Panel: 3D Visualization ── */
+.investor-layers-visual {
+  width: 100%;
+  height: 600px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 1400px;
+}
+
+.investor-layers-stack-wrapper {
+  position: relative;
+  width: 400px;
+  height: 400px;
+  animation: stack-breathe 12s ease-in-out infinite alternate;
+}
+
+/* ── Core Light Beam ── */
+.investor-layers-beam {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 80px;
+  height: 600px;
+  background: linear-gradient(to top, rgba(255,255,255,0) 0%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0) 100%);
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  filter: blur(25px);
+  transition: background 400ms ease, filter 400ms ease;
+  pointer-events: none;
+}
+
+.investor-layers-beam.active {
+  background: linear-gradient(to top, rgba(255,255,255,0) 0%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0) 100%);
+  filter: blur(35px);
+}
+
+/* ── Isometric Solid Cylinder Discs ── */
+.investor-layers-disc-container {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.investor-layers-disc {
+  position: relative;
+  width: 100%;
+  height: 120px;
+  transition: all 400ms ease;
+}
+
+/* The solid side wall of the cylinder */
+.investor-layers-disc-side {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 24px;
+  background: linear-gradient(to right, 
+    #18181b 0%, 
+    #3f3f46 15%, 
+    #09090b 50%, 
+    #52525b 85%, 
+    #18181b 100%
+  );
+  border-left: 1px solid rgba(255, 255, 255, 0.05);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 400ms ease;
+}
+
+/* Bottom Base Ellipse */
+.investor-layers-disc-bottom {
+  position: absolute;
+  top: 24px;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: #09090b;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+  transition: all 400ms ease;
+}
+
+/* Top Face Ellipse (Solid) */
+.investor-layers-disc-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: #18181b;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: inset 0 0 40px rgba(255, 255, 255, 0.02);
+  transition: all 400ms ease;
+  overflow: hidden;
+}
+
+/* Hover States */
+.investor-layers-disc-container.active .investor-layers-disc-top {
+  background: #27272a;
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: inset 0 0 60px rgba(255, 255, 255, 0.06);
+}
+
+.investor-layers-disc-container.active .investor-layers-disc-side {
+  background: linear-gradient(to right, 
+    #27272a 0%, 
+    #71717a 15%, 
+    #18181b 50%, 
+    #a1a1aa 85%, 
+    #27272a 100%
+  );
+  box-shadow: 0 40px 80px rgba(0, 0, 0, 0.9);
+}
+
+.investor-layers-disc-container.dimmed .investor-layers-disc {
+  opacity: 0.2;
+}
+
+/* Ripple */
+.investor-layers-disc-ripple {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  opacity: 0;
+}
+
+.investor-layers-disc-container.active .investor-layers-disc-ripple {
+  animation: disc-ripple-anim 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ── Keyframes ── */
+@keyframes stack-breathe {
+  0% { transform: translateY(120px); }
+  100% { transform: translateY(100px); }
+}
+
+@keyframes disc-ripple-anim {
+  0% {
+    transform: translate(-50%, -50%) scale(0.2);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.2);
+    opacity: 0;
+  }
+}
+
+/* ── Responsive ── */
+/* Hide mobile by default */
+.inv-m {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  .investor-layers-container {
+    gap: 2rem;
+  }
+  .investor-layers-stack-wrapper {
+    width: 320px;
+    height: 320px;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Override overflow to allow sticky positioning */
+  .investor-layers-section {
+    overflow: visible !important;
+    padding: 0;
+  }
+
+  /* Hide desktop layout completely */
+  .investor-layers-desktop {
+    display: none;
+  }
+  
+  /* Show mobile layout */
+  .inv-m {
+    display: block;
+    width: 100%;
+  }
+
+  .inv-m__container {
+    position: relative;
+  }
+
+  /* Sticky Viewport */
+  .inv-m__sticky {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 4rem; /* Safe area from top */
+    overflow: hidden;
+    z-index: 1;
+    pointer-events: none; /* Let scrolls pass through */
+  }
+
+  .inv-m__visual {
+    width: 100%;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* Scale down the stack to fit vertically with title and cards */
+    transform: scale(0.55);
+    transform-origin: center center;
+    margin-top: -3rem; /* pull up */
+    transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1), margin-top 600ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .inv-m__visual.intro {
+    transform: scale(0.85);
+    margin-top: 4rem;
+  }
+
+  /* Interactive Elements */
+  .inv-m__cards {
+    position: relative;
+    height: 40vh;
+    width: 100%;
+    padding: 0 1.5rem;
+    pointer-events: auto;
+    display: flex;
+    justify-content: center;
+  }
+
+  .inv-m__card {
+    position: absolute;
+    top: 0;
+    left: 1.5rem;
+    right: 1.5rem;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 400ms cubic-bezier(0.22, 1, 0.36, 1);
+    pointer-events: none;
+  }
+
+  .inv-m__card.active {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+    z-index: 20;
+  }
+
+  .inv-m__card .investor-layers-item {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255,255,255,0.05);
+  }
+
+  .inv-m__card .investor-layers-item-icon {
+    color: #fff;
+    filter: drop-shadow(0 0 4px rgba(255,255,255,0.5));
+  }
+
+  .inv-m__card .investor-layers-item-title {
+    color: #fff;
+  }
+
+  /* Triggers are now purely invisible elements to drive scroll */
+  .inv-m__trigger {
+    width: 100%;
+    height: 90vh; /* Each scroll step is roughly viewport height */
+  }
+}

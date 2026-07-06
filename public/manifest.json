@@ -1,0 +1,21 @@
+{
+  "name": "Productica - AI-Powered Market Analysis",
+  "short_name": "Productica",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "description": "Validate your business ideas with Productica's AI-powered market analysis.",
+  "icons": [
+    {
+      "src": "/8.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/8.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

@@ -1,0 +1,1934 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Living Arts of India™ — Master Venture Report</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,600;0,900;1,300;1,600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --midnight: #0C1520;
+    --ink: #1A2332;
+    --gold: #C9A84C;
+    --gold-light: #E8C97A;
+    --gold-dim: rgba(201,168,76,0.12);
+    --gold-border: rgba(201,168,76,0.28);
+    --cream: #FBF8F1;
+    --warm-white: #FFFFFF;
+    --text: #1A2332;
+    --text-mid: #4A5568;
+    --text-soft: #718096;
+    --border: #E8E2D6;
+    --border-soft: #F0EBE0;
+    --green: #2D6A4F;
+    --green-bg: rgba(45,106,79,0.1);
+    --amber: #92400E;
+    --amber-bg: rgba(146,64,14,0.1);
+    --red: #9B2335;
+    --red-bg: rgba(155,35,53,0.1);
+    --teal: #0F4C5C;
+    --teal-bg: rgba(15,76,92,0.1);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  /* ─── HERO ─── */
+  .hero {
+    background: var(--midnight);
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-texture {
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(ellipse 80% 60% at 70% -10%, rgba(201,168,76,0.08) 0%, transparent 60%),
+      repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 39px,
+        rgba(201,168,76,0.04) 39px,
+        rgba(201,168,76,0.04) 40px
+      );
+    pointer-events: none;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 1;
+    padding: 64px 56px 56px;
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 48px;
+    align-items: end;
+  }
+
+  .hero-eyebrow {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .hero-eyebrow::before {
+    content: '';
+    width: 28px;
+    height: 1px;
+    background: var(--gold);
+    display: inline-block;
+  }
+
+  .hero-title {
+    font-family: 'Fraunces', serif;
+    font-size: 58px;
+    font-weight: 900;
+    color: #fff;
+    line-height: 0.95;
+    margin-bottom: 12px;
+    letter-spacing: -1px;
+  }
+
+  .hero-title em {
+    font-style: italic;
+    color: var(--gold);
+  }
+
+  .hero-sub {
+    font-size: 13px;
+    color: rgba(255,255,255,0.45);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 32px;
+  }
+
+  .hero-tagline {
+    font-size: 15px;
+    color: rgba(255,255,255,0.7);
+    line-height: 1.7;
+    max-width: 440px;
+    font-weight: 300;
+  }
+
+  .hero-scorecard {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 12px;
+    padding: 28px;
+    text-align: center;
+  }
+
+  .verdict-pill {
+    display: inline-block;
+    background: rgba(45,106,79,0.2);
+    border: 1px solid rgba(45,106,79,0.35);
+    color: #6FCF97;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+  }
+
+  .big-score {
+    font-family: 'Fraunces', serif;
+    font-size: 72px;
+    font-weight: 900;
+    color: var(--gold);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .big-score-denom {
+    font-size: 12px;
+    color: rgba(255,255,255,0.35);
+    margin-bottom: 20px;
+  }
+
+  .pipeline-steps {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 16px;
+  }
+
+  .pip {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.3);
+    padding: 4px 10px;
+    border-radius: 4px;
+  }
+
+  .pip.active {
+    background: var(--gold-dim);
+    border: 1px solid var(--gold-border);
+    color: var(--gold);
+  }
+
+  .pip-arrow {
+    color: rgba(255,255,255,0.2);
+    font-size: 10px;
+  }
+
+  .hero-footer {
+    background: rgba(0,0,0,0.3);
+    border-top: 1px solid rgba(255,255,255,0.06);
+    padding: 16px 56px;
+    display: flex;
+    align-items: center;
+    gap: 32px;
+  }
+
+  .meta-tag {
+    font-size: 11px;
+    color: rgba(255,255,255,0.35);
+    letter-spacing: 1px;
+  }
+
+  .meta-tag strong {
+    color: rgba(255,255,255,0.65);
+    font-weight: 600;
+  }
+
+  .meta-sep {
+    width: 1px;
+    height: 16px;
+    background: rgba(255,255,255,0.1);
+  }
+
+  /* ─── SECTION WRAPPER ─── */
+  .section {
+    padding: 56px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section:last-child { border-bottom: none; }
+
+  .section-alt {
+    background: var(--warm-white);
+  }
+
+  .sec-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .sec-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .sec-title {
+    font-family: 'Fraunces', serif;
+    font-size: 30px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 32px;
+    line-height: 1.1;
+  }
+
+  /* ─── DISPLACEMENT PIPELINE ─── */
+  .displacement-wrap {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .disp-col-head {
+    background: var(--ink);
+    color: rgba(255,255,255,0.5);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    padding: 14px 22px;
+  }
+
+  .disp-col-head.gold-head {
+    background: var(--gold);
+    color: var(--ink);
+  }
+
+  .disp-arrow-col {
+    background: var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 8px;
+    font-size: 18px;
+    color: var(--gold);
+    border-left: 1px solid rgba(255,255,255,0.06);
+    border-right: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .disp-item {
+    padding: 14px 22px;
+    font-size: 13px;
+    border-top: 1px solid var(--border);
+    color: var(--text-mid);
+    line-height: 1.4;
+  }
+
+  .disp-item.to {
+    color: var(--text);
+    font-weight: 500;
+    background: rgba(201,168,76,0.04);
+  }
+
+  .disp-arrow-row {
+    border-top: 1px solid rgba(255,255,255,0.06);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 8px;
+    color: var(--gold);
+    font-size: 16px;
+  }
+
+  /* ─── IQ SCORECARD ─── */
+  .iq-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .iq-card {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+    background: var(--warm-white);
+  }
+
+  .iq-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--gold), var(--gold-light));
+  }
+
+  .iq-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-soft);
+    margin-bottom: 12px;
+  }
+
+  .iq-score-row {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    margin-bottom: 12px;
+  }
+
+  .iq-score {
+    font-family: 'Fraunces', serif;
+    font-size: 40px;
+    font-weight: 700;
+    color: var(--gold);
+    line-height: 1;
+  }
+
+  .iq-denom {
+    font-size: 13px;
+    color: var(--text-soft);
+  }
+
+  .iq-bar-bg {
+    height: 4px;
+    background: var(--border-soft);
+    border-radius: 2px;
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+
+  .iq-bar {
+    height: 4px;
+    border-radius: 2px;
+    background: linear-gradient(90deg, var(--gold), var(--gold-light));
+  }
+
+  .iq-points {
+    list-style: none;
+  }
+
+  .iq-points li {
+    font-size: 12px;
+    color: var(--text-mid);
+    padding: 4px 0 4px 16px;
+    position: relative;
+    line-height: 1.4;
+  }
+
+  .iq-points li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: var(--gold);
+    font-size: 10px;
+    top: 5px;
+  }
+
+  .consolidated-bar {
+    margin-top: 28px;
+    background: var(--ink);
+    border-radius: 10px;
+    padding: 24px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+
+  .consol-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+  }
+
+  .consol-score {
+    font-family: 'Fraunces', serif;
+    font-size: 36px;
+    font-weight: 900;
+    color: var(--gold);
+    white-space: nowrap;
+  }
+
+  .consol-insight {
+    font-size: 12px;
+    color: rgba(255,255,255,0.55);
+    line-height: 1.6;
+    max-width: 380px;
+  }
+
+  /* ─── SWOT ─── */
+  .swot-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .swot-cell {
+    background: var(--warm-white);
+    padding: 24px;
+  }
+
+  .swot-head {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .swot-badge {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 4px;
+    letter-spacing: 1px;
+  }
+
+  .badge-s { background: var(--green-bg); color: var(--green); }
+  .badge-w { background: var(--amber-bg); color: var(--amber); }
+  .badge-o { background: var(--teal-bg); color: var(--teal); }
+  .badge-t { background: var(--red-bg); color: var(--red); }
+
+  .swot-item {
+    font-size: 12.5px;
+    color: var(--text-mid);
+    padding: 5px 0 5px 16px;
+    position: relative;
+    line-height: 1.5;
+  }
+
+  .swot-item::before {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 12px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--border);
+  }
+
+  .swot-scores {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-top: 20px;
+  }
+
+  .swot-score-card {
+    background: var(--warm-white);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+  }
+
+  .swot-score-val {
+    font-family: 'Fraunces', serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .swot-score-lbl {
+    font-size: 10px;
+    color: var(--text-soft);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 4px;
+  }
+
+  /* ─── BMC ─── */
+  .bmc-wrap {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .bmc-row {
+    display: grid;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .bmc-row:last-child { border-bottom: none; }
+
+  .bmc-top { grid-template-columns: 1fr 1fr 1.3fr 1fr; }
+  .bmc-bottom { grid-template-columns: 1fr 1fr; }
+
+  .bmc-cell {
+    padding: 20px;
+    border-right: 1px solid var(--border);
+  }
+
+  .bmc-cell:last-child { border-right: none; }
+
+  .bmc-cell-title {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-soft);
+    margin-bottom: 12px;
+  }
+
+  .bmc-cell.vp {
+    background: var(--ink);
+  }
+
+  .bmc-cell.vp .bmc-cell-title {
+    color: rgba(255,255,255,0.4);
+  }
+
+  .vp-text {
+    font-family: 'Fraunces', serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--gold);
+    line-height: 1.3;
+    margin-bottom: 8px;
+    font-style: italic;
+  }
+
+  .vp-sub {
+    font-size: 11.5px;
+    color: rgba(255,255,255,0.55);
+    line-height: 1.6;
+  }
+
+  .bmc-item {
+    font-size: 12px;
+    color: var(--text-mid);
+    padding: 3px 0 3px 14px;
+    position: relative;
+    line-height: 1.4;
+  }
+
+  .bmc-item::before {
+    content: '·';
+    position: absolute;
+    left: 3px;
+    color: var(--gold);
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 1.2;
+  }
+
+  /* ─── COMPONENT AUDIT ─── */
+  .audit-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .audit-table th {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-soft);
+    padding: 10px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    background: var(--cream);
+  }
+
+  .audit-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border-soft);
+    vertical-align: top;
+  }
+
+  .audit-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .audit-table td:first-child {
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .audit-score-badge {
+    display: inline-block;
+    background: var(--ink);
+    color: var(--gold);
+    font-family: 'Fraunces', serif;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+
+  /* ─── COMPETITIVE TABLE ─── */
+  .comp-wrap { overflow-x: auto; }
+
+  .comp-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    min-width: 680px;
+  }
+
+  .comp-table th {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-soft);
+    padding: 10px 12px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    background: var(--cream);
+  }
+
+  .comp-table th:first-child { text-align: left; }
+
+  .comp-table td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid var(--border-soft);
+    color: var(--text-mid);
+  }
+
+  .comp-table td:first-child {
+    text-align: left;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .comp-table tr.lai-row td {
+    background: var(--ink);
+    color: rgba(255,255,255,0.8);
+  }
+
+  .comp-table tr.lai-row td:first-child {
+    color: var(--gold);
+    font-family: 'Fraunces', serif;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .heat-yes { color: var(--green); font-weight: 700; font-size: 15px; }
+  .heat-partial { color: var(--gold); font-weight: 600; }
+  .heat-no { color: var(--red); }
+
+  /* ─── MARKET POSITIONING MAP ─── */
+  .map-wrap {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 28px;
+    background: var(--warm-white);
+  }
+
+  /* ─── FINANCIALS ─── */
+  .fin-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .fin-card {
+    background: var(--warm-white);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px;
+  }
+
+  .fin-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-soft);
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-soft);
+  }
+
+  .fin-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .fin-label {
+    font-size: 12.5px;
+    color: var(--text-mid);
+    flex: 1;
+    min-width: 0;
+  }
+
+  .fin-bar-bg {
+    width: 100px;
+    height: 5px;
+    background: var(--border-soft);
+    border-radius: 3px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .fin-bar {
+    height: 5px;
+    border-radius: 3px;
+    background: linear-gradient(90deg, var(--gold), var(--gold-light));
+  }
+
+  .fin-pct {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ink);
+    width: 32px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* ─── RISK HEATMAP ─── */
+  .risk-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+
+  .risk-card {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px;
+    background: var(--warm-white);
+  }
+
+  .risk-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+
+  .risk-meta {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .risk-pill {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    padding: 2px 8px;
+    border-radius: 3px;
+  }
+
+  .risk-high { background: var(--red-bg); color: var(--red); }
+  .risk-med { background: var(--amber-bg); color: var(--amber); }
+  .risk-low { background: var(--green-bg); color: var(--green); }
+
+  .risk-desc {
+    font-size: 11.5px;
+    color: var(--text-soft);
+    line-height: 1.5;
+  }
+
+  /* ─── FUNDING LANDSCAPE ─── */
+  .funding-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .funding-card {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--warm-white);
+  }
+
+  .funding-head {
+    background: var(--ink);
+    padding: 12px 18px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+
+  .funding-body {
+    padding: 14px 18px;
+  }
+
+  .funding-item {
+    font-size: 12px;
+    color: var(--text-mid);
+    padding: 4px 0 4px 14px;
+    position: relative;
+    line-height: 1.4;
+  }
+
+  .funding-item::before {
+    content: '·';
+    position: absolute;
+    left: 3px;
+    color: var(--gold);
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 1.1;
+  }
+
+  /* ─── PHASE FLOW ─── */
+  .phase-flow {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 20px;
+  }
+
+  .phase-node {
+    flex: 1;
+    padding: 22px 20px;
+    border-right: 1px solid var(--border);
+    position: relative;
+  }
+
+  .phase-node:last-child { border-right: none; }
+
+  .phase-num {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--gold);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .phase-name {
+    font-family: 'Fraunces', serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+
+  .phase-desc {
+    font-size: 11.5px;
+    color: var(--text-soft);
+    line-height: 1.5;
+  }
+
+  .phase-source {
+    margin-top: 10px;
+    font-size: 11px;
+    color: var(--gold);
+    font-weight: 600;
+  }
+
+  /* ─── FINAL SCORECARD ─── */
+  .final-card {
+    background: var(--ink);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .final-head {
+    padding: 28px 36px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .final-head-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.35);
+    margin-bottom: 6px;
+  }
+
+  .final-head-title {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .sc-rows {
+    padding: 8px 0;
+  }
+
+  .sc-row {
+    display: flex;
+    align-items: center;
+    padding: 13px 36px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+
+  .sc-row:last-child { border-bottom: none; }
+
+  .sc-dim {
+    font-size: 13px;
+    color: rgba(255,255,255,0.6);
+    flex: 1;
+  }
+
+  .sc-bar-wrap {
+    width: 150px;
+    height: 3px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 2px;
+    overflow: hidden;
+    margin: 0 24px;
+  }
+
+  .sc-bar {
+    height: 3px;
+    background: linear-gradient(90deg, var(--gold), var(--gold-light));
+    border-radius: 2px;
+  }
+
+  .sc-score {
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--gold);
+    width: 55px;
+    text-align: right;
+  }
+
+  .sc-total {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 36px;
+    background: rgba(201,168,76,0.07);
+    border-top: 1px solid rgba(201,168,76,0.2);
+  }
+
+  .sc-total-left {}
+
+  .sc-total-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 4px;
+  }
+
+  .sc-total-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(45,106,79,0.2);
+    border: 1px solid rgba(111,207,151,0.3);
+    color: #6FCF97;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 12px;
+    margin-top: 8px;
+  }
+
+  .sc-total-tag::before {
+    content: '●';
+    font-size: 8px;
+  }
+
+  .sc-total-score {
+    font-family: 'Fraunces', serif;
+    font-size: 64px;
+    font-weight: 900;
+    color: var(--gold);
+    line-height: 1;
+  }
+
+  .sc-total-sub {
+    font-size: 11px;
+    color: rgba(255,255,255,0.3);
+    text-align: right;
+    margin-top: 4px;
+  }
+
+  /* ─── VERDICT ─── */
+  .verdict-section {
+    background: var(--cream);
+    padding: 56px;
+    border-top: 1px solid var(--border);
+  }
+
+  .verdict-inner {
+    max-width: 700px;
+  }
+
+  .verdict-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--green-bg);
+    border: 1px solid rgba(45,106,79,0.25);
+    color: var(--green);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+  }
+
+  .verdict-title {
+    font-family: 'Fraunces', serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.2;
+    margin-bottom: 18px;
+  }
+
+  .verdict-body {
+    font-size: 14px;
+    color: var(--text-mid);
+    line-height: 1.8;
+    margin-bottom: 16px;
+  }
+
+  /* ─── FOOTER ─── */
+  .report-footer {
+    background: var(--midnight);
+    padding: 32px 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .footer-brand {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--gold);
+  }
+
+  .footer-tagline {
+    font-size: 10px;
+    color: rgba(255,255,255,0.35);
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  .footer-right {
+    text-align: right;
+  }
+
+  .footer-contact {
+    font-size: 11.5px;
+    color: rgba(255,255,255,0.45);
+    line-height: 1.6;
+  }
+
+  .footer-contact strong {
+    color: rgba(255,255,255,0.75);
+    display: block;
+    margin-bottom: 2px;
+    font-size: 12px;
+  }
+
+  /* ─── DIVIDER ─── */
+  .section-divider {
+    height: 4px;
+    background: linear-gradient(90deg, var(--gold), var(--gold-light), var(--cream));
+  }
+
+  /* ─── INSIGHT BOX ─── */
+  .insight-callout {
+    background: var(--ink);
+    border-radius: 10px;
+    padding: 24px 28px;
+    margin-top: 24px;
+  }
+
+  .insight-callout-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 12px;
+  }
+
+  .insight-callout-text {
+    font-size: 13px;
+    color: rgba(255,255,255,0.7);
+    line-height: 1.7;
+  }
+
+  @media (max-width: 700px) {
+    .hero-content { grid-template-columns: 1fr; }
+    .hero-title { font-size: 36px; }
+    .section, .verdict-section, .report-footer { padding: 32px 24px; }
+    .iq-grid, .swot-grid, .bmc-top, .bmc-bottom, .fin-grid, .funding-grid, .risk-grid, .swot-scores { grid-template-columns: 1fr; }
+    .phase-flow { flex-direction: column; }
+    .phase-node { border-right: none; border-bottom: 1px solid var(--border); }
+    .sc-bar-wrap { display: none; }
+    .sc-total-score { font-size: 44px; }
+    .bmc-top, .bmc-bottom { grid-template-columns: 1fr; }
+    .displacement-wrap { grid-template-columns: 1fr; }
+    .disp-arrow-col { display: none; }
+    .hero-footer { flex-wrap: wrap; gap: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════ HERO ══════════ -->
+<section class="hero">
+  <div class="hero-texture"></div>
+  <div class="hero-content">
+    <div>
+      <div class="hero-eyebrow">Productica Venture Lab · Syncoro IQ Validation Index</div>
+      <h1 class="hero-title">Living Arts<br>of <em>India™</em></h1>
+      <p class="hero-sub">CultureTech · Experiential Heritage IP</p>
+      <p class="hero-tagline">Transforming endangered craft heritage into modular, experiential consumer IP — physical kits paired with AR masterclasses, aligned to NEP 2020 and built for institutional scale.</p>
+    </div>
+    <div class="hero-scorecard">
+      <div class="verdict-pill">🟢 High Potential Idea</div>
+      <div class="big-score">7.9</div>
+      <div class="big-score-denom">Consolidated Venture Score / 10</div>
+      <div style="height:1px;background:rgba(201,168,76,0.15);margin:16px 0;"></div>
+      <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:10px;">Execution Pipeline</div>
+      <div class="pipeline-steps">
+        <span class="pip active">Idea</span>
+        <span class="pip-arrow">▶</span>
+        <span class="pip">Pilot</span>
+        <span class="pip-arrow">▶</span>
+        <span class="pip">Revenue</span>
+        <span class="pip-arrow">▶</span>
+        <span class="pip">Scale</span>
+      </div>
+    </div>
+  </div>
+  <div class="hero-footer">
+    <span class="meta-tag"><strong>Ecosystem</strong> CultureTech / Experiential Heritage IP</span>
+    <div class="meta-sep"></div>
+    <span class="meta-tag"><strong>Studio</strong> Productica Venture Lab</span>
+    <div class="meta-sep"></div>
+    <span class="meta-tag"><strong>Framework</strong> Syncoro IQ Validation Index</span>
+    <div class="meta-sep"></div>
+    <span class="meta-tag"><strong>Status</strong> Approved for Pilot Validation</span>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ══════════ EXECUTIVE SUMMARY ══════════ -->
+<section class="section section-alt">
+  <div class="sec-label">01 — Executive Summary</div>
+  <h2 class="sec-title">The Structural Gap &amp; Solution Engine</h2>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:32px;">
+    <div style="border:1px solid var(--border);border-radius:10px;padding:24px;background:var(--cream);">
+      <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text-soft);margin-bottom:12px;">The Systemic Gap</div>
+      <p style="font-size:13.5px;color:var(--text-mid);line-height:1.7;">Modern cultural preservation models are built almost exclusively on observation (museum curation) or theory (academic papers). This system fails to transfer actual craft mechanics to younger demographics, threatening thousands of indigenous folk forms with total erasure.</p>
+    </div>
+    <div style="border:1px solid var(--border);border-radius:10px;padding:24px;background:var(--cream);">
+      <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text-soft);margin-bottom:12px;">The Solution Engine</div>
+      <p style="font-size:13.5px;color:var(--text-mid);line-height:1.7;">Living Arts of India™ transforms cultural heritage into modular, experiential consumer IP. Tactile craft kits containing authentic raw materials paired with artisan-led digital masterclasses and AR tracking create a new category — <strong>CultureTech</strong>.</p>
+    </div>
+  </div>
+
+  <div style="background:var(--gold-dim);border:1px solid var(--gold-border);border-radius:10px;padding:20px 24px;">
+    <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">Regulatory Alignment</div>
+    <p style="font-size:13px;color:var(--text-mid);line-height:1.7;">Capitalizes directly on India's mandatory <strong style="color:var(--ink);">National Education Policy (NEP) 2020</strong> structural guidelines, which explicitly require hands-on, experiential art forms within core school curriculums — creating a statutory enterprise acquisition pathway.</p>
+  </div>
+</section>
+
+<!-- ══════════ MACRO DISPLACEMENT ══════════ -->
+<section class="section">
+  <div class="sec-label">02 — Macro Displacement Pipeline</div>
+  <h2 class="sec-title">From Passive Observation to Active Creation</h2>
+
+  <div class="displacement-wrap">
+    <div class="disp-col-head">Status Quo Traffic</div>
+    <div class="disp-arrow-col" style="background:var(--ink);padding:0 12px;">→</div>
+    <div class="disp-col-head gold-head">Living Arts of India™ Ecosystem</div>
+
+    <div class="disp-item">Static Museum Exhibits</div>
+    <div class="disp-arrow-row" style="background:var(--ink);border-top:1px solid rgba(255,255,255,0.06);">→</div>
+    <div class="disp-item to">Dynamic, Tactile Creation Experiences</div>
+
+    <div class="disp-item">Fragmented YouTube Videos</div>
+    <div class="disp-arrow-row" style="background:var(--ink);border-top:1px solid rgba(255,255,255,0.06);">→</div>
+    <div class="disp-item to">Standardized, Certified Learning Tracks</div>
+
+    <div class="disp-item">Mass-Produced Synthetic Hobbies</div>
+    <div class="disp-arrow-row" style="background:var(--ink);border-top:1px solid rgba(255,255,255,0.06);">→</div>
+    <div class="disp-item to">Sourced Organic Regional Raw Materials</div>
+
+    <div class="disp-item">Grant-Dependent NGO Ecosystems</div>
+    <div class="disp-arrow-row" style="background:var(--ink);border-top:1px solid rgba(255,255,255,0.06);">→</div>
+    <div class="disp-item to">Scalable Multi-Channel Commercial Model</div>
+  </div>
+</section>
+
+<!-- ══════════ IQ SCORECARD ══════════ -->
+<section class="section section-alt">
+  <div class="sec-label">03 — Syncoro IQ Scorecard</div>
+  <h2 class="sec-title">Four-Dimensional Performance Gauges</h2>
+
+  <div class="iq-grid">
+    <div class="iq-card">
+      <div class="iq-label">Innovation Quotient</div>
+      <div class="iq-score-row">
+        <span class="iq-score">8.5</span><span class="iq-denom">/ 10</span>
+      </div>
+      <div class="iq-bar-bg"><div class="iq-bar" style="width:85%"></div></div>
+      <ul class="iq-points">
+        <li>Uncontested physical-digital model</li>
+        <li>Scalable motif tracing via AR overlays</li>
+        <li>Behavioral lock-in via Art Passport™</li>
+      </ul>
+    </div>
+    <div class="iq-card">
+      <div class="iq-label">Value Quotient</div>
+      <div class="iq-score-row">
+        <span class="iq-score">8.0</span><span class="iq-denom">/ 10</span>
+      </div>
+      <div class="iq-bar-bg"><div class="iq-bar" style="width:80%"></div></div>
+      <ul class="iq-points">
+        <li>Direct, auditable artisan wealth return</li>
+        <li>Built-in alignment with UN SDG mandates</li>
+        <li>Institutional educational credentials</li>
+      </ul>
+    </div>
+    <div class="iq-card">
+      <div class="iq-label">Market Quotient</div>
+      <div class="iq-score-row">
+        <span class="iq-score">7.5</span><span class="iq-denom">/ 10</span>
+      </div>
+      <div class="iq-bar-bg"><div class="iq-bar" style="width:75%"></div></div>
+      <ul class="iq-points">
+        <li>Capitalizes on domestic craft CAGR</li>
+        <li>Compulsory NEP curriculum requirements</li>
+        <li>High-premium international diaspora</li>
+      </ul>
+    </div>
+    <div class="iq-card">
+      <div class="iq-label">Profitability Quotient</div>
+      <div class="iq-score-row">
+        <span class="iq-score">6.5</span><span class="iq-denom">/ 10</span>
+      </div>
+      <div class="iq-bar-bg"><div class="iq-bar" style="width:65%"></div></div>
+      <ul class="iq-points">
+        <li>Multi-tiered B2B &amp; B2C margins</li>
+        <li>Sizable upfront content tooling costs</li>
+        <li>Pilot testing required to fix CAC loops</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="consolidated-bar">
+    <div>
+      <div class="consol-label">Consolidated Syncoro IQ Index</div>
+      <div class="consol-insight" style="margin-top:6px;">The venture possesses high structural differentiation and an expanding market opportunity window. Commercial proof of concept relies on stabilizing customer acquisition costs via early school pilots.</div>
+    </div>
+    <div class="consol-score">7.6 / 10</div>
+  </div>
+</section>
+
+<!-- ══════════ SWOT ══════════ -->
+<section class="section">
+  <div class="sec-label">04 — SWOT Matrix</div>
+  <h2 class="sec-title">Strategic Capability vs. Environmental Reality</h2>
+
+  <div class="swot-grid">
+    <div class="swot-cell">
+      <div class="swot-head"><span class="swot-badge badge-s">STRENGTHS</span></div>
+      <div class="swot-item">First-mover title across CultureTech formats</div>
+      <div class="swot-item">Clean regulatory compliance to NEP 2020 mandates</div>
+      <div class="swot-item">Deep, proprietary artisan cluster network moat</div>
+      <div class="swot-item">Highly diversified multi-channel revenue split</div>
+    </div>
+    <div class="swot-cell">
+      <div class="swot-head"><span class="swot-badge badge-w">WEAKNESSES</span></div>
+      <div class="swot-item">Pre-revenue phase with untested pricing bounds</div>
+      <div class="swot-item">Operational complexity regarding rural logistics</div>
+      <div class="swot-item">Sizable initial 4K content production layout</div>
+      <div class="swot-item">Single-founder organizational dependency</div>
+    </div>
+    <div class="swot-cell" style="border-top:1px solid var(--border);">
+      <div class="swot-head"><span class="swot-badge badge-o">OPPORTUNITIES</span></div>
+      <div class="swot-item">B2B contract acquisition in private schools</div>
+      <div class="swot-item">Growing corporate allocation of ESG/CSR budgets</div>
+      <div class="swot-item">High-margin monetization of Western diaspora</div>
+      <div class="swot-item">Premium displacement of generic corporate gifting</div>
+    </div>
+    <div class="swot-cell" style="border-top:1px solid var(--border);">
+      <div class="swot-head"><span class="swot-badge badge-t">THREATS</span></div>
+      <div class="swot-item">Rapid platform expansion by major EdTech giants</div>
+      <div class="swot-item">Price anchoring from free online streaming tubes</div>
+      <div class="swot-item">Volume &amp; quality variance in rural art guilds</div>
+      <div class="swot-item">Consumer spending contractions in macro downturns</div>
+    </div>
+  </div>
+
+  <div class="swot-scores">
+    <div class="swot-score-card">
+      <div class="swot-score-val" style="color:var(--green);">8.8</div>
+      <div class="swot-score-lbl">Strength Score</div>
+    </div>
+    <div class="swot-score-card">
+      <div class="swot-score-val" style="color:var(--teal);">8.5</div>
+      <div class="swot-score-lbl">Opportunity Score</div>
+    </div>
+    <div class="swot-score-card">
+      <div class="swot-score-val" style="color:var(--amber);">6.0</div>
+      <div class="swot-score-lbl">Weakness / Threat</div>
+    </div>
+    <div class="swot-score-card" style="border-color:var(--gold-border);background:var(--gold-dim);">
+      <div class="swot-score-val" style="color:var(--gold);">7.9</div>
+      <div class="swot-score-lbl" style="color:var(--gold);">Strategic Position</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ BUSINESS MODEL CANVAS ══════════ -->
+<section class="section section-alt">
+  <div class="sec-label">05 — Business Model Canvas</div>
+  <h2 class="sec-title">Architecture Strength Score: 7.8 / 10</h2>
+
+  <div class="bmc-wrap">
+    <div class="bmc-row bmc-top">
+      <div class="bmc-cell">
+        <div class="bmc-cell-title">Key Partners</div>
+        <div class="bmc-item">Zonal Cultural Centres</div>
+        <div class="bmc-item">UNESCO India</div>
+        <div class="bmc-item">Sangeet Natak Akademi</div>
+        <div class="bmc-item">National Crafts Museum</div>
+        <div class="bmc-item">Artisan Cooperatives</div>
+        <div class="bmc-item">Amazon India (Karigar)</div>
+        <div class="bmc-item">Corporate CSR Foundations</div>
+      </div>
+      <div class="bmc-cell">
+        <div class="bmc-cell-title">Key Activities</div>
+        <div class="bmc-item">Endangered Art Indexing</div>
+        <div class="bmc-item">4K Artisan Media Tooling</div>
+        <div class="bmc-item">Kit Supply Chain Assembly</div>
+        <div class="bmc-item">B2B Institutional Sales</div>
+        <div style="margin-top:14px;" class="bmc-cell-title">Key Resources</div>
+        <div class="bmc-item">Proprietary Artisan Base</div>
+        <div class="bmc-item">Media Asset Catalog</div>
+        <div class="bmc-item">Art Passport™ Gamification</div>
+      </div>
+      <div class="bmc-cell vp">
+        <div class="bmc-cell-title">Value Proposition</div>
+        <div class="vp-text">"Learn Culture by Creating Culture"</div>
+        <div class="vp-sub">Tactile, certified heritage systems displacing sterile observation models.</div>
+      </div>
+      <div class="bmc-cell">
+        <div class="bmc-cell-title">Customer Segments</div>
+        <div class="bmc-item" style="font-weight:600;color:var(--ink);">B2B Primary</div>
+        <div class="bmc-item">Premium K-12 Networks</div>
+        <div class="bmc-item">Private School Boards</div>
+        <div class="bmc-item" style="font-weight:600;color:var(--ink);margin-top:8px;">B2C Secondary</div>
+        <div class="bmc-item">Urban Parents</div>
+        <div class="bmc-item">Heritage Enthusiasts</div>
+        <div class="bmc-item" style="font-weight:600;color:var(--ink);margin-top:8px;">Enterprise Tertiary</div>
+        <div class="bmc-item">Corporate ESG Buyers</div>
+        <div class="bmc-item">Global NRI Diaspora</div>
+      </div>
+    </div>
+    <div class="bmc-row bmc-bottom">
+      <div class="bmc-cell">
+        <div class="bmc-cell-title">Cost Structure Drivers</div>
+        <div class="bmc-item">Content Production &amp; Asset Curation — 40%</div>
+        <div class="bmc-item">Raw Material Extraction &amp; Box SCM — 25%</div>
+        <div class="bmc-item">Logistics &amp; Third-Party Fulfillment — 15%</div>
+        <div class="bmc-item">Tech Infrastructure &amp; AR Maintenance — 10%</div>
+        <div class="bmc-item">Marketing, Sales &amp; Client Retainers — 10%</div>
+      </div>
+      <div class="bmc-cell">
+        <div class="bmc-cell-title">Revenue Model Flows</div>
+        <div class="bmc-item">Institutional B2B School Licensing — 40%</div>
+        <div class="bmc-item">Direct B2C Monthly Subscription — 25%</div>
+        <div class="bmc-item">Premium Corporate Gifting — 15%</div>
+        <div class="bmc-item">Corporate Sustainable CSR Contracts — 10%</div>
+        <div class="bmc-item">Experiential Corporate Team Workshops — 10%</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ COMPONENT AUDIT ══════════ -->
+<section class="section">
+  <div class="sec-label">06 — Granular Component Audit</div>
+  <h2 class="sec-title">Dimension-by-Dimension Scoring</h2>
+
+  <table class="audit-table">
+    <thead>
+      <tr>
+        <th style="width:30%">BMC Component</th>
+        <th style="width:12%">Score</th>
+        <th>Key Insight</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Key Partners</td>
+        <td><span class="audit-score-badge">8.5</span></td>
+        <td style="font-size:12.5px;color:var(--text-mid);">Strategic validation via Zonal Cultural Centres, Sangeet Natak Akademi, IGNCA. Direct, non-replicable commercial relationships with rural artisan cooperatives and tribal guilds.</td>
+      </tr>
+      <tr>
+        <td>Key Activities</td>
+        <td><span class="audit-score-badge">8.0</span></td>
+        <td style="font-size:12.5px;color:var(--text-mid);">High-fidelity digital preservation of tribal art methodologies. End-to-end physical supply chain management. Continuous institutional B2B development targeting school districts and multinational CSR boards.</td>
+      </tr>
+      <tr>
+        <td>Key Resources</td>
+        <td><span class="audit-score-badge">7.5</span></td>
+        <td style="font-size:12.5px;color:var(--text-mid);">Exclusive database of verified national master artisans. Proprietary physical-to-digital curriculum matched to school frameworks. Art Passport™ gamification IP.</td>
+      </tr>
+      <tr>
+        <td>Value Proposition</td>
+        <td><span class="audit-score-badge" style="background:var(--gold);color:var(--ink);">9.0</span></td>
+        <td style="font-size:12.5px;color:var(--text-mid);">Strongest dimension. Multi-layered experience: tactile execution with regional raw materials, AR-guided digital mentorship, and verifiable Art Passport™ credentials satisfying school requirements.</td>
+      </tr>
+      <tr>
+        <td>Customer Relationships</td>
+        <td><span class="audit-score-badge">7.5</span></td>
+        <td style="font-size:12.5px;color:var(--text-mid);">Programmatic milestone retention via Art Passport track. Live master Q&A spaces and corporate impact transparency interfaces tracking real-time artisan wealth generation.</td>
+      </tr>
+      <tr>
+        <td>Channels</td>
+        <td><span class="audit-score-badge">7.5</span></td>
+        <td style="font-size:12.5px;color:var(--text-mid);">Institutional B2B pipeline into premium school networks. High-conversion web + native mobile. Strategic placement in international airport gift shops and national heritage sites.</td>
+      </tr>
+      <tr>
+        <td>Customer Segments</td>
+        <td><span class="audit-score-badge">8.0</span></td>
+        <td style="font-size:12.5px;color:var(--text-mid);">Progressive K-12 boards + affluent urban parents (screen-detox demand). Corporate HR + sustainability leads. Global Indian diaspora seeking premium cultural anchoring for next generation.</td>
+      </tr>
+      <tr>
+        <td>Cost Structure</td>
+        <td><span class="audit-score-badge">6.5</span></td>
+        <td style="font-size:12.5px;color:var(--text-mid);">Considerable complexity in early lifecycle due to physical inventory. Scale mitigation: expenses compress drastically as content libraries stabilize, shifting margins toward classic software profiles.</td>
+      </tr>
+      <tr>
+        <td>Revenue Streams</td>
+        <td><span class="audit-score-badge">8.0</span></td>
+        <td style="font-size:12.5px;color:var(--text-mid);">Independent business lines insulate cash from single-channel contractions: B2B licensing (40%), B2C subscriptions (25%), corporate gifting (15%), CSR contracts (10%), workshops (10%).</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ══════════ COMPETITIVE BENCHMARK ══════════ -->
+<section class="section section-alt">
+  <div class="sec-label">07 — Competitive Benchmark Matrix</div>
+  <h2 class="sec-title">Why We Win — Competitive Positioning Score: 8.3 / 10</h2>
+
+  <div class="comp-wrap">
+    <table class="comp-table">
+      <thead>
+        <tr>
+          <th>Competitor</th>
+          <th>Heritage Depth</th>
+          <th>Technology</th>
+          <th>Learning</th>
+          <th>Artisan Livelihood</th>
+          <th>Institutional</th>
+          <th>Scalability</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="lai-row">
+          <td>Living Arts of India™</td>
+          <td><span class="heat-yes">✓</span></td>
+          <td><span class="heat-yes">✓</span></td>
+          <td><span class="heat-yes">✓</span></td>
+          <td><span class="heat-yes">✓</span></td>
+          <td><span class="heat-yes">✓</span></td>
+          <td><span class="heat-yes">✓</span></td>
+        </tr>
+        <tr>
+          <td>Rooftop</td>
+          <td><span class="heat-partial">◐</span></td>
+          <td><span class="heat-yes">✓</span></td>
+          <td><span class="heat-yes">✓</span></td>
+          <td><span class="heat-no">✗</span></td>
+          <td><span class="heat-partial">◐</span></td>
+          <td><span class="heat-partial">◐</span></td>
+        </tr>
+        <tr>
+          <td>Smartivity</td>
+          <td><span class="heat-no">✗</span></td>
+          <td><span class="heat-yes">✓</span></td>
+          <td><span class="heat-yes">✓</span></td>
+          <td><span class="heat-no">✗</span></td>
+          <td><span class="heat-partial">◐</span></td>
+          <td><span class="heat-yes">✓</span></td>
+        </tr>
+        <tr>
+          <td>Potli</td>
+          <td><span class="heat-yes">✓</span></td>
+          <td><span class="heat-no">✗</span></td>
+          <td><span class="heat-partial">◐</span></td>
+          <td><span class="heat-partial">◐</span></td>
+          <td><span class="heat-no">✗</span></td>
+          <td><span class="heat-partial">◐</span></td>
+        </tr>
+        <tr>
+          <td>Kitsters</td>
+          <td><span class="heat-partial">◐</span></td>
+          <td><span class="heat-no">✗</span></td>
+          <td><span class="heat-partial">◐</span></td>
+          <td><span class="heat-no">✗</span></td>
+          <td><span class="heat-no">✗</span></td>
+          <td><span class="heat-partial">◐</span></td>
+        </tr>
+        <tr>
+          <td>The Brown Box</td>
+          <td><span class="heat-no">✗</span></td>
+          <td><span class="heat-no">✗</span></td>
+          <td><span class="heat-partial">◐</span></td>
+          <td><span class="heat-no">✗</span></td>
+          <td><span class="heat-no">✗</span></td>
+          <td><span class="heat-partial">◐</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="insight-callout">
+    <div class="insight-callout-label">Most Important Insight</div>
+    <div class="insight-callout-text">No competitor currently combines Heritage Preservation + AR Technology + School Integration + Artisan Livelihood Creation + Certification + Community Gamification + Physical DIY Kits + Digital Platform + CSR Alignment. This creates a <strong style="color:var(--gold);">defensible white-space opportunity</strong>, positioning Living Arts of India™ as a category creator in the emerging CultureTech sector.</div>
+  </div>
+</section>
+
+<!-- ══════════ MARKET POSITIONING ══════════ -->
+<section class="section">
+  <div class="sec-label">08 — Market Positioning Map</div>
+  <h2 class="sec-title">Heritage Depth × Platform Sophistication</h2>
+
+  <div class="map-wrap">
+    <svg viewBox="0 0 600 380" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:640px;display:block;margin:0 auto;">
+      <!-- Axes -->
+      <line x1="60" y1="20" x2="60" y2="340" stroke="#E8E2D6" stroke-width="1.5"/>
+      <line x1="60" y1="190" x2="560" y2="190" stroke="#E8E2D6" stroke-width="1.5"/>
+
+      <!-- Axis labels -->
+      <text x="56" y="15" font-size="10" fill="#718096" font-family="Inter" text-anchor="middle" letter-spacing="1">HIGH HERITAGE</text>
+      <text x="56" y="355" font-size="10" fill="#718096" font-family="Inter" text-anchor="middle" letter-spacing="1">LOW HERITAGE</text>
+      <text x="110" y="210" font-size="10" fill="#718096" font-family="Inter" letter-spacing="1">LOW PLATFORM</text>
+      <text x="430" y="210" font-size="10" fill="#718096" font-family="Inter" letter-spacing="1">HIGH PLATFORM</text>
+
+      <!-- Quadrant shading -->
+      <rect x="60" y="20" width="250" height="170" fill="rgba(201,168,76,0.03)"/>
+      <rect x="310" y="20" width="250" height="170" fill="rgba(201,168,76,0.06)"/>
+
+      <!-- LAI — top right = high heritage, high platform -->
+      <circle cx="450" cy="70" r="32" fill="#C9A84C" opacity="0.15"/>
+      <circle cx="450" cy="70" r="22" fill="#C9A84C"/>
+      <text x="450" y="74" font-size="11" fill="#1A2332" font-family="Fraunces, serif" font-weight="900" text-anchor="middle">LAI™</text>
+      <text x="450" y="115" font-size="9" fill="#C9A84C" font-family="Inter" font-weight="700" text-anchor="middle" letter-spacing="1">LIVING ARTS OF INDIA</text>
+
+      <!-- Competitors -->
+      <circle cx="390" cy="120" r="9" fill="#4A5568" opacity="0.6"/>
+      <text x="390" y="140" font-size="9" fill="#4A5568" font-family="Inter" text-anchor="middle">Rooftop</text>
+
+      <circle cx="480" cy="270" r="9" fill="#718096" opacity="0.5"/>
+      <text x="480" y="288" font-size="9" fill="#718096" font-family="Inter" text-anchor="middle">Smartivity</text>
+
+      <circle cx="145" cy="85" r="9" fill="#718096" opacity="0.5"/>
+      <text x="145" y="104" font-size="9" fill="#718096" font-family="Inter" text-anchor="middle">Potli</text>
+
+      <circle cx="320" cy="290" r="9" fill="#718096" opacity="0.5"/>
+      <text x="320" y="308" font-size="9" fill="#718096" font-family="Inter" text-anchor="middle">Kitsters</text>
+
+      <circle cx="175" cy="260" r="9" fill="#718096" opacity="0.5"/>
+      <text x="175" y="278" font-size="9" fill="#718096" font-family="Inter" text-anchor="middle">Itsy Bitsy</text>
+
+      <circle cx="240" cy="310" r="9" fill="#718096" opacity="0.5"/>
+      <text x="240" y="328" font-size="9" fill="#718096" font-family="Inter" text-anchor="middle">The Brown Box</text>
+
+      <!-- Legend: uncontested zone -->
+      <rect x="352" y="28" width="170" height="130" rx="6" fill="none" stroke="#C9A84C" stroke-width="1" stroke-dasharray="4,3"/>
+      <text x="440" y="158" font-size="8" fill="#C9A84C" font-family="Inter" font-weight="700" letter-spacing="1" text-anchor="middle">UNCONTESTED ZONE</text>
+    </svg>
+  </div>
+</section>
+
+<!-- ══════════ FINANCIALS ══════════ -->
+<section class="section section-alt">
+  <div class="sec-label">09 — Financial Viability</div>
+  <h2 class="sec-title">₹50 Lakh Capital Runway · Financial Score: 7.6 / 10</h2>
+
+  <div class="fin-grid">
+    <div class="fin-card">
+      <div class="fin-title">Capital Allocation (₹50L)</div>
+      <div class="fin-row">
+        <span class="fin-label">4K Content Production</span>
+        <div class="fin-bar-bg"><div class="fin-bar" style="width:60%"></div></div>
+        <span class="fin-pct">₹15L</span>
+      </div>
+      <div class="fin-row">
+        <span class="fin-label">Core Architecture Platform</span>
+        <div class="fin-bar-bg"><div class="fin-bar" style="width:40%"></div></div>
+        <span class="fin-pct">₹10L</span>
+      </div>
+      <div class="fin-row">
+        <span class="fin-label">Software Systems Build</span>
+        <div class="fin-bar-bg"><div class="fin-bar" style="width:40%"></div></div>
+        <span class="fin-pct">₹10L</span>
+      </div>
+      <div class="fin-row">
+        <span class="fin-label">Institutional Pilot Launch</span>
+        <div class="fin-bar-bg"><div class="fin-bar" style="width:40%"></div></div>
+        <span class="fin-pct">₹10L</span>
+      </div>
+      <div class="fin-row">
+        <span class="fin-label">Working Capital Reserve</span>
+        <div class="fin-bar-bg"><div class="fin-bar" style="width:20%"></div></div>
+        <span class="fin-pct">₹5L</span>
+      </div>
+    </div>
+
+    <div class="fin-card">
+      <div class="fin-title">Revenue Stream Mix</div>
+      <div class="fin-row">
+        <span class="fin-label">Institutional B2B Licensing</span>
+        <div class="fin-bar-bg"><div class="fin-bar" style="width:100%"></div></div>
+        <span class="fin-pct">40%</span>
+      </div>
+      <div class="fin-row">
+        <span class="fin-label">Direct B2C Subscriptions</span>
+        <div class="fin-bar-bg"><div class="fin-bar" style="width:62.5%"></div></div>
+        <span class="fin-pct">25%</span>
+      </div>
+      <div class="fin-row">
+        <span class="fin-label">Premium Corporate Gifting</span>
+        <div class="fin-bar-bg"><div class="fin-bar" style="width:37.5%"></div></div>
+        <span class="fin-pct">15%</span>
+      </div>
+      <div class="fin-row">
+        <span class="fin-label">Enterprise CSR Contracts</span>
+        <div class="fin-bar-bg"><div class="fin-bar" style="width:25%"></div></div>
+        <span class="fin-pct">10%</span>
+      </div>
+      <div class="fin-row">
+        <span class="fin-label">Team-Building Workshops</span>
+        <div class="fin-bar-bg"><div class="fin-bar" style="width:25%"></div></div>
+        <span class="fin-pct">10%</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="insight-callout" style="margin-top:20px;">
+    <div class="insight-callout-label">Financial Model Logic</div>
+    <div class="insight-callout-text">The model converts upfront asset production spending into recurring enterprise contract values. Operating expenses compress dramatically as content libraries stabilize — shifting long-term margin profiles closer to classic SaaS economics. Prioritize B2B private school pre-sales to generate predictable cash flow offsetting early consumer acquisition costs.</div>
+  </div>
+</section>
+
+<!-- ══════════ RISK HEATMAP ══════════ -->
+<section class="section">
+  <div class="sec-label">10 — Risk Assessment Heatmap</div>
+  <h2 class="sec-title">5×5 Probability × Impact Matrix · Risk Score: 6.3 / 10 🟡 Moderate</h2>
+
+  <div class="risk-grid">
+    <div class="risk-card">
+      <div class="risk-title">Customer Adoption</div>
+      <div class="risk-meta">
+        <span class="risk-pill risk-high">Probability: High</span>
+        <span class="risk-pill risk-high">Impact: High</span>
+      </div>
+      <div class="risk-desc">Consumer market appreciates cultural preservation, but conversion to premium paid tracks relies on shifting behavioral defaults. Mitigation: B2B school pre-sales provide predictable cashflow while consumer awareness builds.</div>
+    </div>
+    <div class="risk-card">
+      <div class="risk-title">Artisan Scaling Friction</div>
+      <div class="risk-meta">
+        <span class="risk-pill risk-high">Probability: High</span>
+        <span class="risk-pill risk-med">Impact: Med-High</span>
+      </div>
+      <div class="risk-desc">Volume and quality variance in rural art guilds poses supply chain risk. Mitigation: Develop certified artisan cooperatives as registered SHG partners with quality protocols.</div>
+    </div>
+    <div class="risk-card">
+      <div class="risk-title">Revenue Verification</div>
+      <div class="risk-meta">
+        <span class="risk-pill risk-high">Probability: Med-High</span>
+        <span class="risk-pill risk-high">Impact: High</span>
+      </div>
+      <div class="risk-desc">Dominant friction point: validating conversion velocity across institutional and D2C channels before scale. Mitigation: Localized pilot programs in urban school test beds.</div>
+    </div>
+    <div class="risk-card">
+      <div class="risk-title">Team / Org Setup</div>
+      <div class="risk-meta">
+        <span class="risk-pill risk-med">Probability: Med</span>
+        <span class="risk-pill risk-med">Impact: Med-High</span>
+      </div>
+      <div class="risk-desc">Single-founder dependency creates key-person risk. Mitigation: Early co-founder or specialist hires across operations, content, and institutional sales.</div>
+    </div>
+    <div class="risk-card">
+      <div class="risk-title">Tech / AR Build</div>
+      <div class="risk-meta">
+        <span class="risk-pill risk-med">Probability: Med</span>
+        <span class="risk-pill risk-med">Impact: Med-High</span>
+      </div>
+      <div class="risk-desc">AR infrastructure requires sustained investment. Mitigation: Asset-light tech stack, phased AR rollout starting with guided video before full AR overlay deployment.</div>
+    </div>
+    <div class="risk-card">
+      <div class="risk-title">Regulatory Changes</div>
+      <div class="risk-meta">
+        <span class="risk-pill risk-low">Probability: Low</span>
+        <span class="risk-pill risk-med">Impact: Med</span>
+      </div>
+      <div class="risk-desc">Low risk: NEP 2020 is deeply embedded in national policy and unlikely to reverse. Any changes in curriculum mandates would require multi-year transition periods.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ FUNDING LANDSCAPE ══════════ -->
+<section class="section section-alt">
+  <div class="sec-label">11 — Institutional Funding Landscape</div>
+  <h2 class="sec-title">Non-Dilutive, CSR &amp; Impact Capital Pathways</h2>
+
+  <div class="funding-grid">
+    <div class="funding-card">
+      <div class="funding-head">Government Grants</div>
+      <div class="funding-body">
+        <div class="funding-item">Startup India Seed Fund Scheme (SISFS)</div>
+        <div class="funding-item">Ministry of Culture — Heritage Preservation Grants</div>
+        <div class="funding-item">National Mission on Cultural Mapping (NMCM)</div>
+        <div class="funding-item">MSME Innovative Scheme &amp; Atal Innovation Mission</div>
+      </div>
+    </div>
+    <div class="funding-card">
+      <div class="funding-head">Corporate CSR Funding</div>
+      <div class="funding-body">
+        <div class="funding-item">Tata Trusts, Reliance Foundation, Infosys Foundation</div>
+        <div class="funding-item">Wipro Foundation, HCL Foundation, Mahindra Group CSR</div>
+        <div class="funding-item">JSW Foundation, Adani Foundation ESG Portfolios</div>
+      </div>
+    </div>
+    <div class="funding-card">
+      <div class="funding-head">Impact Capital Networks</div>
+      <div class="funding-body">
+        <div class="funding-item">Aavishkaar Capital, Acumen Fund, Omidyar Network India</div>
+        <div class="funding-item">Villgro Systems, Upaya Social Ventures</div>
+        <div class="funding-item">Ankur Capital — Social Impact Mandates</div>
+      </div>
+    </div>
+    <div class="funding-card">
+      <div class="funding-head">Angel Investor Networks</div>
+      <div class="funding-body">
+        <div class="funding-item">Indian Angel Network (IAN), Mumbai Angels</div>
+        <div class="funding-item">LetsVenture, TiE Angels</div>
+        <div class="funding-item">AngelList India Synergy Pools</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-bottom:8px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text-soft);">Scaled Capital Sequence Strategy</div>
+  <div class="phase-flow">
+    <div class="phase-node">
+      <div class="phase-num">Phase 01 — De-Risking</div>
+      <div class="phase-name">Non-Dilutive Entry</div>
+      <div class="phase-desc">Secure government grants and targeted corporate CSR frameworks to fund content production and pilot infrastructure without equity dilution.</div>
+      <div class="phase-source">Source: Gov. Grants + CSR</div>
+    </div>
+    <div class="phase-node">
+      <div class="phase-num">Phase 02 — Validation</div>
+      <div class="phase-name">Proof of Traction</div>
+      <div class="phase-desc">Leverage pilot school data and initial subscription metrics to engage elite angel networks and specialized social impact investment funds.</div>
+      <div class="phase-source">Source: Angels + Impact Funds</div>
+    </div>
+    <div class="phase-node">
+      <div class="phase-num">Phase 03 — Expansion</div>
+      <div class="phase-name">Institutional Scale</div>
+      <div class="phase-desc">Unlock institutional capital consortiums and large-scale strategic partnerships with EdTech platforms, heritage organizations, and global distribution networks.</div>
+      <div class="phase-source">Source: Institutional Capital</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ FINAL SCORECARD ══════════ -->
+<section class="section">
+  <div class="sec-label">12 — Consolidated Final Scorecard</div>
+  <h2 class="sec-title">Valuation Audit Dimensions</h2>
+
+  <div class="final-card">
+    <div class="final-head">
+      <div class="final-head-label">Productica Venture Lab · Syncoro IQ Validation Index</div>
+      <div class="final-head-title">Living Arts of India™ — Multi-Dimensional Performance Matrix</div>
+    </div>
+    <div class="sc-rows">
+      <div class="sc-row">
+        <span class="sc-dim">Problem–Solution Fit Index</span>
+        <div class="sc-bar-wrap"><div class="sc-bar" style="width:88%"></div></div>
+        <span class="sc-score">8.8</span>
+      </div>
+      <div class="sc-row">
+        <span class="sc-dim">Innovation &amp; Technology Potential</span>
+        <div class="sc-bar-wrap"><div class="sc-bar" style="width:85%"></div></div>
+        <span class="sc-score">8.5</span>
+      </div>
+      <div class="sc-row">
+        <span class="sc-dim">Addressable Market Opportunity</span>
+        <div class="sc-bar-wrap"><div class="sc-bar" style="width:80%"></div></div>
+        <span class="sc-score">8.0</span>
+      </div>
+      <div class="sc-row">
+        <span class="sc-dim">Core Business Model Architecture</span>
+        <div class="sc-bar-wrap"><div class="sc-bar" style="width:78%"></div></div>
+        <span class="sc-score">7.8</span>
+      </div>
+      <div class="sc-row">
+        <span class="sc-dim">Defensible Competitive Positioning</span>
+        <div class="sc-bar-wrap"><div class="sc-bar" style="width:83%"></div></div>
+        <span class="sc-score">8.3</span>
+      </div>
+      <div class="sc-row">
+        <span class="sc-dim">Ecosystem Financial Viability</span>
+        <div class="sc-bar-wrap"><div class="sc-bar" style="width:76%"></div></div>
+        <span class="sc-score">7.6</span>
+      </div>
+      <div class="sc-row">
+        <span class="sc-dim">Commercialization Execution Scale</span>
+        <div class="sc-bar-wrap"><div class="sc-bar" style="width:70%"></div></div>
+        <span class="sc-score">7.0</span>
+      </div>
+    </div>
+    <div class="sc-total">
+      <div class="sc-total-left">
+        <div class="sc-total-label">Consolidated Venture Score</div>
+        <div class="sc-total-tag">Approved for Pilot Validation</div>
+      </div>
+      <div>
+        <div class="sc-total-score">7.9</div>
+        <div class="sc-total-sub">/ 10 · Syncoro IQ Index</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ FINAL VERDICT ══════════ -->
+<section class="verdict-section">
+  <div class="verdict-inner">
+    <div class="verdict-tag">🟢 Investment Committee Verdict</div>
+    <h2 class="verdict-title">Approved for Immediate Pilot Validation</h2>
+    <p class="verdict-body">Living Arts of India™ presents a highly defensible approach to cultural preservation by converting endangered legacy assets into commercial interactive property. Unlike legacy non-profits dependent on erratic public grants, this model creates an active product ecosystem where physical materials drive digital user engagement.</p>
+    <p class="verdict-body">The strategy effectively leverages macroeconomic trends — specifically the statutory experiential education requirements introduced by India's NEP 2020 framework. This structural transition creates an immediate, enterprise-level customer acquisition pathway across private school networks, insulating early operations from volatile D2C marketing costs.</p>
+    <p class="verdict-body" style="margin-bottom:0;">While the underlying multi-regional material supply line introduces clear execution and logistical complexities, the venture's high innovation index, robust competitive defensibility, and strong ESG indicators justify near-term commitment. <strong style="color:var(--ink);">The venture is cleared to progress into localized pilot programs to verify transactional conversion velocity across urban school test beds.</strong></p>
+  </div>
+</section>
+
+<!-- ══════════ FOOTER ══════════ -->
+<footer class="report-footer">
+  <div>
+    <div class="footer-brand">Syncoro Ventures</div>
+    <div class="footer-tagline">Validate · Build · Scale</div>
+  </div>
+  <div class="footer-right">
+    <div class="footer-contact">
+      <strong>Productica Venture Lab · Lab Architecture Suite 2026</strong>
+      inquiries@syncoro.ventures
+    </div>
+    <div style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;letter-spacing:1px;">CONFIDENTIAL PORTFOLIO COPY // NOT FOR REDISTRIBUTION</div>
+  </div>
+</footer>
+
+</body>
+</html>

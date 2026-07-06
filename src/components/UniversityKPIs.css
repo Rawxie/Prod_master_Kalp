@@ -1,0 +1,520 @@
+/* ═══════════════════════════════════════════════════════════
+   Productica OS Screenshot Layout (University KPIs)
+   ═══════════════════════════════════════════════════════════ */
+
+:root {
+  --app-bg: #ffffff;
+  --app-text: #000000;
+  --app-text-muted: #666666;
+  --app-text-faint: #999999;
+  --app-border: #eaeaea;
+  --app-sidebar-bg: #f9f9f9;
+  --app-sidebar-hover: #f1f1f1;
+}
+
+.ud-section {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 4rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.ud-window {
+  width: 100%;
+  background: var(--app-bg);
+  border: 1px solid var(--app-border);
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+  opacity: 0;
+  transform: translateY(40px);
+  animation: ud-fade-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.ud-dashboard-ui {
+  width: 100%;
+  display: flex;
+  min-height: 800px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: var(--app-text);
+}
+
+@keyframes ud-fade-in {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Sidebar ── */
+.ud-sidebar {
+  width: 260px;
+  border-right: 1px solid var(--app-border);
+  display: flex;
+  flex-direction: column;
+  padding: 1rem 0;
+  flex-shrink: 0;
+}
+
+.ud-logo-area {
+  padding: 0.5rem 1.5rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.ud-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ud-nav-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0 0.5rem;
+}
+
+.ud-nav-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  color: var(--app-text-muted);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.ud-nav-item:hover {
+  background: var(--app-sidebar-hover);
+}
+
+.ud-nav-item.active {
+  background: var(--app-sidebar-hover);
+  color: var(--app-text);
+  font-weight: 500;
+}
+
+.ud-nav-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.ud-nav-dot {
+  width: 4px;
+  height: 4px;
+  background: #000;
+  border-radius: 50%;
+}
+
+/* ── Main Content Area ── */
+.ud-main-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* ── Topbar ── */
+.ud-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+  border-bottom: 1px solid var(--app-border);
+}
+
+.ud-search-box {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--app-border);
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  width: 400px;
+  color: var(--app-text-faint);
+  font-size: 0.875rem;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+}
+
+.ud-search-box svg {
+  margin-right: 0.5rem;
+}
+
+.ud-search-shortcut {
+  margin-left: auto;
+  border: 1px solid var(--app-border);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 0.7rem;
+  background: #fafafa;
+  color: var(--app-text-muted);
+}
+
+.ud-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.ud-action-btn {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--app-border);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--app-text);
+  cursor: pointer;
+  background: #fff;
+  position: relative;
+}
+
+.ud-action-btn .ud-badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 8px;
+  height: 8px;
+  background: #000;
+  border-radius: 50%;
+  border: 2px solid #fff;
+}
+
+.ud-profile-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid var(--app-border);
+  border-radius: 20px;
+  padding: 4px 10px 4px 4px;
+  cursor: pointer;
+  background: #fff;
+}
+
+.ud-avatar {
+  width: 24px;
+  height: 24px;
+  background: #000;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* ── Ticker ── */
+.ud-ticker {
+  display: flex;
+  align-items: center;
+  padding: 1rem 2rem;
+  border-bottom: 1px solid var(--app-border);
+  font-size: 0.875rem;
+  color: var(--app-text-muted);
+  gap: 1.5rem;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.ud-ticker-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--app-text-faint);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* ── Dashboard Content ── */
+.ud-content {
+  padding: 3rem 2rem 5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.ud-hero {
+  margin-bottom: 4rem;
+}
+
+.ud-greeting {
+  font-size: 1rem;
+  color: var(--app-text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.ud-hero-name {
+  font-size: 4rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  margin-bottom: 1rem;
+}
+
+.ud-hero-sub {
+  font-size: 1rem;
+  color: var(--app-text-muted);
+}
+
+/* ── KPIs (Borderless) ── */
+.ud-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3rem 1.5rem;
+  margin-bottom: 5rem;
+}
+
+.ud-kpi-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.ud-kpi-val {
+  font-size: 4rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  margin-bottom: 0.5rem;
+}
+
+.ud-kpi-label-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 0.25rem;
+}
+
+.ud-kpi-sub {
+  font-size: 0.65rem;
+  color: var(--app-text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-family: monospace;
+}
+
+/* ── Split Layout (Pinned & Black Card) ── */
+.ud-split {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 2rem;
+}
+
+.ud-split-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.ud-split-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.ud-split-link {
+  font-size: 0.875rem;
+  color: var(--app-text-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  cursor: pointer;
+}
+.ud-split-link:hover {
+  color: var(--app-text);
+}
+
+/* Pinned Area (White Card) */
+.ud-pinned-card {
+  border: 1px solid var(--app-border);
+  border-radius: 12px;
+  padding: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+}
+
+/* Pipeline styles for pinned card */
+.ud-mini-pipeline {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  margin-bottom: 2rem;
+}
+
+.ud-mini-line {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--app-border);
+  z-index: 1;
+}
+
+.ud-mini-stage {
+  position: relative;
+  z-index: 2;
+  background: #fff;
+  padding: 0 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ud-mini-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #000;
+}
+
+.ud-mini-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+.ud-mini-count {
+  font-size: 0.7rem;
+  color: var(--app-text-muted);
+}
+
+/* Analytics Row in Pinned Card */
+.ud-mini-analytics {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  border-top: 1px solid var(--app-border);
+  padding-top: 2rem;
+}
+
+.ud-mini-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.ud-mini-chart-title {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--app-text-muted);
+}
+.ud-mini-chart-area {
+  height: 60px;
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+}
+.ud-mini-bar {
+  flex: 1;
+  background: var(--app-border);
+  border-radius: 2px 2px 0 0;
+}
+.ud-mini-bar:nth-child(even) {
+  background: #000;
+}
+
+/* Black Card (Recommended Next) */
+.ud-black-card {
+  background: #000;
+  color: #fff;
+  border-radius: 12px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.ud-bc-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.6);
+  margin-bottom: 1.5rem;
+}
+
+.ud-bc-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.02em;
+}
+
+.ud-bc-desc {
+  font-size: 0.875rem;
+  color: rgba(255,255,255,0.7);
+  line-height: 1.5;
+  margin-bottom: 2rem;
+}
+
+.ud-bc-btn {
+  background: #fff;
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  align-self: flex-start;
+  transition: transform 0.2s;
+}
+
+.ud-bc-btn:hover {
+  transform: scale(1.02);
+}
+
+.ud-bc-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 2rem;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  padding-top: 1.5rem;
+}
+
+.ud-bc-list-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.8);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .ud-split {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .ud-section {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .ud-window {
+    min-width: 1024px;
+  }
+}
+

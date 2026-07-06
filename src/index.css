@@ -1,0 +1,52 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-white text-black font-sans antialiased overflow-x-clip;
+  }
+}
+
+/* Hide native scrollbar */
+::-webkit-scrollbar {
+  display: none;
+}
+html {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+
+/* Lenis smooth scroll recommended CSS */
+html.lenis, html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+
+/* GPU Hardware Acceleration for heavy GSAP/Framer animations */
+.contact-word, .split-word, .split-line, [data-animate="true"] {
+  will-change: transform, opacity;
+  transform: translateZ(0); /* Force GPU composite layer */
+  backface-visibility: hidden;
+}
+
+/* Custom global font weight override to increase legibility of subheadings and body copy */
+.font-light {
+  font-weight: 400 !important;
+}

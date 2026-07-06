@@ -1,0 +1,444 @@
+/* ═══════════════════════════════════════════════════════════
+   Research Intelligence Network - Redesign
+   Premium monochrome · Full-width dense network
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── CSS Custom Properties ── */
+:root {
+  --rn-node-stroke: rgba(255, 255, 255, 0.15);
+  --rn-node-stroke-hover: rgba(255, 255, 255, 1);
+  --rn-connection-stroke: rgba(255, 255, 255, 0.1);
+  --rn-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --rn-transition: 400ms var(--rn-ease);
+}
+
+/* ── Section Container ── */
+.rn-section {
+  position: relative;
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  margin-right: calc(-50vw + 50%);
+  padding: 0;
+  margin-top: -2rem;
+  margin-bottom: -6rem; /* offsets the gap-32 from main container */
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #050505;
+}
+
+.rn-section-title {
+  text-align: center;
+  position: relative;
+  z-index: 10;
+  margin-bottom: 2rem;
+  font-size: 1.875rem;
+  font-weight: 300;
+  letter-spacing: -0.015em;
+  color: #fff;
+}
+
+/* ── Network Canvas ── */
+.rn-canvas-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 1600px;
+  height: 600px;
+  z-index: 5;
+}
+
+.rn-canvas-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  display: block;
+}
+
+/* ── SVG Connection Lines ── */
+.rn-connection {
+  stroke: var(--rn-connection-stroke);
+  transition: stroke var(--rn-transition), opacity var(--rn-transition);
+}
+
+.rn-connection.drawing {
+  stroke-dasharray: var(--path-length, 2000);
+  stroke-dashoffset: var(--path-length, 2000);
+  animation: rn-draw-path 1.5s var(--rn-ease) forwards;
+  animation-delay: var(--draw-delay, 0ms);
+}
+
+@keyframes rn-draw-path {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* ── SVG Hub Nodes (Small visual dots) ── */
+.rn-hub-node {
+  fill: #fff;
+  opacity: 0;
+  transform: scale(0);
+  transition: opacity var(--rn-transition), transform var(--rn-transition);
+}
+
+.rn-section.in-view .rn-hub-node {
+  opacity: 0.8;
+  transform: scale(1);
+  animation: rn-node-fade 0.6s var(--rn-ease) forwards;
+  animation-delay: var(--entry-delay, 0ms);
+}
+
+/* ── Feature Nodes (HTML within foreignObject) ── */
+.rn-node-html {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transform: translateY(20px);
+  pointer-events: auto;
+}
+
+.rn-section.in-view .rn-node-html {
+  animation: rn-node-slide-up 0.8s var(--rn-ease) forwards;
+  animation-delay: var(--entry-delay, 0ms);
+}
+
+.rn-node-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #0a0a0c;
+  border: 1px solid var(--rn-node-stroke);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  flex-shrink: 0;
+  transition:
+    background var(--rn-transition),
+    border-color var(--rn-transition),
+    transform var(--rn-transition),
+    color var(--rn-transition);
+  cursor: pointer;
+  position: relative;
+  z-index: 2;
+}
+
+.rn-node-icon {
+  width: 20px;
+  height: 20px;
+  opacity: 0.8;
+  transition: opacity var(--rn-transition);
+}
+
+.rn-node-html:hover .rn-node-circle,
+.rn-node-html.active .rn-node-circle {
+  background: #fff;
+  border-color: #fff;
+  color: #000;
+  transform: scale(1.1);
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+}
+
+.rn-node-html:hover .rn-node-icon,
+.rn-node-html.active .rn-node-icon {
+  opacity: 1;
+}
+
+.rn-node-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-top: 12px;
+  background: rgba(5, 5, 5, 0.8);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  transition: border-color var(--rn-transition), background var(--rn-transition);
+}
+
+.rn-node-html:hover .rn-node-text {
+  border-color: rgba(255, 255, 255, 0.1);
+  background: rgba(15, 15, 18, 0.9);
+}
+
+.rn-node-title {
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin: 0;
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+}
+
+.rn-node-desc {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.8rem;
+  margin: 0;
+  line-height: 1.4;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height var(--rn-transition), opacity var(--rn-transition), margin-top var(--rn-transition);
+}
+
+.rn-node-html:hover .rn-node-desc {
+  max-height: 100px;
+  opacity: 1;
+  margin-top: 6px;
+}
+
+/* ── Animations ── */
+@keyframes rn-node-fade {
+  from {
+    opacity: 0;
+    transform: scale(0);
+  }
+
+  to {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+}
+
+@keyframes rn-node-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Mobile Overlay Card ── */
+.rn-mobile-card {
+  display: none;
+}
+
+/* ── Responsive ── */
+@media (max-width: 1024px) {
+  .rn-canvas-wrap {
+    height: 600px;
+  }
+}
+
+@media (max-width: 768px) {
+  .rn-section {
+    display: block; /* The scroll track handles the height */
+    padding: 0; 
+    overflow: visible; /* Let the sticky element stick relative to document */
+  }
+
+  .rn-m-container {
+    position: relative;
+    width: 100%;
+  }
+
+  .rn-m-sticky {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 3rem 0 0 0;
+    overflow: hidden;
+  }
+
+  .rn-m-track {
+    position: relative;
+    width: 100%;
+    pointer-events: none;
+    padding-bottom: 50vh; /* extra scroll space at the end */
+  }
+
+  .rn-m-trigger {
+    width: 100%;
+    height: 100vh;
+  }
+
+  /* Increase line opacity for better visibility on mobile */
+  .rn-connection {
+    stroke: rgba(255, 255, 255, 0.25);
+  }
+
+  .rn-canvas-wrap {
+    width: 120vw;
+    height: 60vw;
+    min-width: unset;
+    margin: 1rem 0 1rem -10vw; /* Center the 120vw width */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .rn-canvas-svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .rn-node-text {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(10px);
+    transition: opacity var(--rn-transition), transform var(--rn-transition);
+  }
+
+  .rn-node-html.active .rn-node-text {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .rn-node-desc {
+    display: none;
+  }
+
+  .rn-node-circle {
+    width: 56px;
+    height: 56px;
+  }
+
+  .rn-node-icon {
+    width: 26px;
+    height: 26px;
+  }
+
+  /* Make sure nodes aren't cut off by foreignObject boundaries when rotated */
+  .rn-node-text {
+    width: 200px;
+    padding: 10px 16px;
+  }
+
+  /* Mobile Static Card Container */
+  .rn-mobile-card-container {
+    position: relative;
+    width: 100%;
+    flex-grow: 1; /* take up the rest of the height */
+    display: flex;
+    justify-content: center;
+    align-items: center; /* center the stacked cards */
+    padding: 1rem;
+    z-index: 10;
+  }
+
+  .rn-mobile-card {
+    position: absolute; /* Stack cards on top of each other */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-width: 320px;
+    background: rgba(255, 255, 255, 0.02);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 2rem 1.75rem;
+    border-radius: 20px;
+    box-shadow:
+      0 4px 32px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    text-align: center;
+    
+    /* Animation state */
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(20px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+
+  .rn-mobile-card.visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+
+  .rn-mobile-card-empty {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 320px;
+    height: 180px;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 1.1rem;
+    padding: 1rem;
+    
+    /* Matching Animation state */
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(20px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    
+    /* It also needs glassmorphism to look like a placeholder card */
+    background: rgba(255, 255, 255, 0.02);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 20px;
+    box-shadow:
+      0 4px 32px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  }
+
+  .rn-mobile-card-empty.visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+
+  .rn-mobile-card-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .rn-mobile-card-icon {
+    width: 32px;
+    height: 32px;
+    color: #fff;
+  }
+
+  .rn-mobile-card-title {
+    color: white;
+    font-size: 1.5rem;
+    font-weight: 500;
+    margin: 0;
+  }
+
+  .rn-mobile-card-desc {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin: 0;
+  }
+}
+
+/* ── Reduced Motion ── */
+@media (prefers-reduced-motion: reduce) {
+  .rn-connection.drawing {
+    animation: none !important;
+    stroke-dashoffset: 0 !important;
+  }
+
+  .rn-section.in-view .rn-hub-node,
+  .rn-section.in-view .rn-node-html {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
