@@ -88,7 +88,13 @@ const ROW_Y_TOP = 20;   // y-top for upper cards
 const ROW_Y_BOT = 224;  // y-top for lower cards
 const CANVAS_H  = 340;  // total canvas height (px)
 
-function RecommendedJourney({ selectedModuleIds }: { selectedModuleIds: Set<string> }) {
+function RecommendedJourney({
+  selectedModuleIds,
+  totalCredits,
+}: {
+  selectedModuleIds: Set<string>;
+  totalCredits: number;
+}) {
   const journey = useMemo(
     () => generateRecommendedJourney(Array.from(selectedModuleIds)),
     [selectedModuleIds]
@@ -247,6 +253,23 @@ function RecommendedJourney({ selectedModuleIds }: { selectedModuleIds: Set<stri
           <span className="text-xs text-white/60 px-3.5 py-2 rounded-xl bg-white/10 border border-white/15 font-mono">
             {journey.length} {journey.length === 1 ? 'Step' : 'Steps'} Total
           </span>
+          <a
+            href="/#contact"
+            onClick={() => {
+              sessionStorage.setItem(
+                'productica_estimated_flow',
+                JSON.stringify({
+                  modules: Array.from(selectedModuleIds),
+                  totalCredits,
+                  timestamp: Date.now(),
+                })
+              );
+            }}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white text-black text-xs font-bold uppercase tracking-wider hover:bg-white/90 active:scale-95 transition-all shadow-[0_0_20px_rgba(255,255,255,0.25)] hover:shadow-[0_0_30px_rgba(255,255,255,0.45)] shrink-0"
+          >
+            Buy Estimated Flow ({totalCredits} {totalCredits === 1 ? 'Credit' : 'Credits'})
+            <ArrowRight className="w-3.5 h-3.5" />
+          </a>
         </div>
       </div>
 
@@ -521,12 +544,41 @@ function RecommendedJourney({ selectedModuleIds }: { selectedModuleIds: Set<stri
         </div>
       </div>
 
-      {/* ── Footer / Helper Note ── */}
-      <div className="px-6 md:px-10 py-4 border-t border-white/10 bg-white/[0.02] text-center">
-        <p className="text-xs text-white/40 leading-relaxed">
-          This journey is a recommendation based on startup best practices.{' '}
-          <span className="text-white/70">You're free to start with any module at any time.</span>
-        </p>
+      {/* ── Footer / Direct Buy Action Banner ── */}
+      <div className="px-6 md:px-10 py-5 border-t border-white/10 bg-gradient-to-r from-white/[0.04] via-white/[0.08] to-white/[0.04] flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-3 text-left">
+          <div className="w-10 h-10 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center shrink-0">
+            <Rocket className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-white tracking-tight">
+              Ready to execute this {journey.length}-step Recommended Flow?
+            </p>
+            <p className="text-xs text-white/50 mt-0.5">
+              Estimated total: <span className="text-white font-mono font-bold">{totalCredits} {totalCredits === 1 ? 'Credit' : 'Credits'}</span> (including AI prompt credits). You're free to start with any module at any time.
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3 w-full sm:w-auto">
+          <a
+            href="/#contact"
+            onClick={() => {
+              sessionStorage.setItem(
+                'productica_estimated_flow',
+                JSON.stringify({
+                  modules: Array.from(selectedModuleIds),
+                  totalCredits,
+                  timestamp: Date.now(),
+                })
+              );
+            }}
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-3 rounded-xl bg-gradient-to-r from-white to-neutral-200 text-black text-sm font-bold uppercase tracking-wider hover:opacity-95 active:scale-95 transition-all shadow-[0_0_25px_rgba(255,255,255,0.25)] hover:shadow-[0_0_35px_rgba(255,255,255,0.45)] shrink-0"
+          >
+            Buy Estimated Flow Directly ({totalCredits} {totalCredits === 1 ? 'Credit' : 'Credits'})
+            <ArrowRight className="w-4 h-4" />
+          </a>
+        </div>
       </div>
     </motion.div>
   );
@@ -736,9 +788,19 @@ function DashboardPlatform() {
 
               <a
                 href="/#contact"
-                className="flex w-full items-center justify-center gap-2 px-5 py-3 rounded-xl bg-white text-black text-sm font-semibold hover:bg-white/90 active:scale-[0.98] transition-all duration-200 focus-visible:ring-2 focus-visible:ring-white/60 outline-none"
+                onClick={() => {
+                  sessionStorage.setItem(
+                    'productica_estimated_flow',
+                    JSON.stringify({
+                      modules: Array.from(selectedModules),
+                      totalCredits,
+                      timestamp: Date.now(),
+                    })
+                  );
+                }}
+                className="flex w-full items-center justify-center gap-2 px-5 py-3 rounded-xl bg-white text-black text-sm font-semibold hover:bg-white/90 active:scale-[0.98] transition-all duration-200 shadow-[0_0_20px_rgba(255,255,255,0.2)] focus-visible:ring-2 focus-visible:ring-white/60 outline-none"
               >
-                Buy Credits <ArrowRight className="w-4 h-4" />
+                Buy Estimated Flow ({totalCredits} {totalCredits === 1 ? 'Credit' : 'Credits'}) <ArrowRight className="w-4 h-4" />
               </a>
               <a
                 href="https://dashboard.productica.in/"
@@ -755,7 +817,10 @@ function DashboardPlatform() {
         {/* ── Recommended Journey — Full Horizontal Frame Below Calculator ── */}
         <AnimatePresence>
           {selectedModules.size > 0 && (
-            <RecommendedJourney selectedModuleIds={selectedModules} />
+            <RecommendedJourney
+              selectedModuleIds={selectedModules}
+              totalCredits={totalCredits}
+            />
           )}
         </AnimatePresence>
       </section>

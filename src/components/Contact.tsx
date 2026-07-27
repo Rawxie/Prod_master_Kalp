@@ -47,6 +47,21 @@ export default function Contact() {
   };
 
   useEffect(() => {
+    try {
+      const savedFlow = sessionStorage.getItem('productica_estimated_flow');
+      if (savedFlow) {
+        const data = JSON.parse(savedFlow);
+        if (data.totalCredits && data.modules?.length) {
+          const flowMsg = `Interested in buying Estimated Flow (${data.totalCredits} Credits — Modules: ${data.modules.join(', ')})`;
+          setForm(prev => ({ ...prev, message: prev.message ? prev.message : flowMsg }));
+        }
+      }
+    } catch (err) {
+      // ignore parse errors
+    }
+  }, []);
+
+  useEffect(() => {
     const ctx = gsap.context(() => {
       let mm = gsap.matchMedia();
       
