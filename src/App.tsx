@@ -10,6 +10,7 @@ import Events from './pages/Events';
 import Blogs from './pages/Blogs';
 import AudiencePage from './pages/AudiencePage';
 import ComingSoon from './pages/ComingSoon';
+import PricingPage from './pages/PricingPage';
 import { audienceData, type AudienceSegment } from './data/audienceData';
 
 import CookieConsent from './components/CookieConsent';
@@ -127,6 +128,8 @@ function App() {
 
         const isComingSoon = href.includes('coming-soon');
 
+        const isPricing = href === '/pricing' || href.startsWith('/pricing');
+
         const audienceMatch = href.match(/\/(founders|incubators|investors|researchers|universities)$/);
 
         if (isTermsOrPrivacy) {
@@ -153,6 +156,11 @@ function App() {
           e.preventDefault();
           window.history.pushState(null, '', '/coming-soon');
           setCurrentPath('/coming-soon');
+          window.scrollTo({ top: 0, behavior: 'instant' });
+        } else if (isPricing) {
+          e.preventDefault();
+          window.history.pushState(null, '', '/pricing');
+          setCurrentPath('/pricing');
           window.scrollTo({ top: 0, behavior: 'instant' });
         } else if (audienceMatch) {
           e.preventDefault();
@@ -227,6 +235,8 @@ function App() {
         <Blogs />
       ) : currentPath === '/coming-soon' ? (
         <ComingSoon />
+      ) : currentPath === '/pricing' ? (
+        <PricingPage />
       ) : currentPath.match(/^\/(founders|incubators|investors|researchers|universities)$/) ? (
         <AudiencePage segment={currentPath.substring(1) as AudienceSegment} data={audienceData[currentPath.substring(1) as AudienceSegment]} />
       ) : (

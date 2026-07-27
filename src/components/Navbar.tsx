@@ -73,7 +73,7 @@ export default function Navbar({ showBackButton, backHref = "/#ecosystem", onBac
     { name: 'About', href: '/about' },
     { name: 'Events', href: '/events' },
     { name: 'Blogs', href: '/blogs' },
-    { name: 'Pricing', href: '/#pricing-section' },
+    { name: 'Pricing', href: '/pricing' },
     { name: 'Contact', href: '/#contact' },
   ];
 
