@@ -22,43 +22,253 @@ export const CREDIT_PACKAGES = [
 ];
 
 export const DASHBOARD_MODULES = [
-  { id: 'idea-validation',       name: 'Idea Validation',        icon: Lightbulb  },
-  { id: 'market-research',       name: 'Market Research',         icon: BarChart2  },
-  { id: 'competitor-analysis',   name: 'Competitor Analysis',     icon: TrendingUp },
-  { id: 'icp',                   name: 'Ideal Customer Persona',  icon: Target     },
-  { id: 'business-model-canvas', name: 'Business Model Canvas',   icon: Activity   },
-  { id: 'go-to-market',          name: 'Go-to-Market Strategy',   icon: Rocket     },
-  { id: 'finance-estimation',    name: 'Finance Estimation',      icon: DollarSign },
-  { id: 'pitch-investor-hub',    name: 'Pitch & Investor Hub',    icon: Users      },
-  { id: 'startup-health',        name: 'Startup Health',          icon: Zap        },
+  { id: 'idea-validation',       name: 'Idea Validation Advanced',   icon: Lightbulb,  credits: 2 },
+  { id: 'market-research',       name: 'Market Research',            icon: BarChart2,  credits: 5 },
+  { id: 'competitor-analysis',   name: 'Competition Analysis',       icon: TrendingUp, credits: 7 },
+  { id: 'icp',                   name: 'ICP',                        icon: Target,     credits: 4 },
+  { id: 'business-model-canvas', name: 'BMC',                        icon: Activity,   credits: 3 },
+  { id: 'go-to-market',          name: 'GTM',                        icon: Rocket,     credits: 6 },
+  { id: 'finance-estimation',    name: 'Finance Estimation',         icon: DollarSign, credits: 4 },
+  { id: 'pitch-investor-hub',    name: 'Pitch Hub & Investor',       icon: Users,      credits: 6 },
+  { id: 'startup-health',        name: 'Startup Health Diagnostics', icon: Zap,        credits: 3 },
 ];
 
 const MODULE_NAME_MAP = Object.fromEntries(DASHBOARD_MODULES.map(m => [m.id, m.name]));
 const MODULE_ICON_MAP = Object.fromEntries(DASHBOARD_MODULES.map(m => [m.id, m.icon]));
+const MODULE_CREDIT_MAP = Object.fromEntries(DASHBOARD_MODULES.map(m => [m.id, m.credits]));
+
+function sumModuleCredits(moduleIds: string[]): number {
+  return moduleIds.reduce((sum, id) => sum + (MODULE_CREDIT_MAP[id] ?? 0), 0);
+}
 
 const AGENT_LIST = [
-  { id: 'co-founder', name: 'Co-Founder', icon: BrainCircuit },
-  { id: 'marketing',  name: 'Marketing',  icon: TrendingUp   },
-  { id: 'ultraplan',  name: 'UltraPlan',  icon: Rocket       },
-];
+  {
+    id: 'co-founder',
+    name: 'Co-Founder',
+    icon: BrainCircuit,
+    tagline: 'Your strategic thinking partner',
+    paid: false as const,
+    price: null as number | null,
+    useCases: ['Brainstorming', 'Product refinement', 'Product feedback', 'Pitch readiness'],
+    capabilities: [
+      'Challenge assumptions and pressure-test ideas',
+      'Shape product direction with structured critique',
+      'Prep founder narratives for investors and teams',
+      'Turn vague goals into actionable next steps',
+    ],
+  },
+  {
+    id: 'marketing',
+    name: 'Marketing',
+    icon: TrendingUp,
+    tagline: 'Your growth and messaging engine',
+    paid: false as const,
+    price: null as number | null,
+    useCases: ['Marketing plan', 'Campaign strategy', 'Positioning'],
+    capabilities: [
+      'Build go-to-market and campaign plans',
+      'Craft messaging for your ICP and channels',
+      'Map funnels, content themes, and launch beats',
+      'Translate product value into clear marketing angles',
+    ],
+  },
+  {
+    id: 'ultraplan',
+    name: 'UltraPlanner',
+    icon: Rocket,
+    tagline: 'Compliance, documentation & startup planning',
+    paid: true as const,
+    price: 6.99,
+    useCases: ['Company compliance readiness', 'Documentation', 'Startup planning'],
+    capabilities: [
+      'Handle compliance readiness and company ops checks',
+      'Draft and structure startup documentation',
+      'Build execution plans, SOPs, and planning checklists',
+      'Keep founders aligned on process, ownership, and next steps',
+    ],
+  },
+] as const;
 
-const AGENT_IMAGES: Record<string, string> = {
+type AgentId = (typeof AGENT_LIST)[number]['id'];
+
+const AGENT_IMAGES: Record<AgentId, string> = {
   'co-founder': '/Cofounder.gif',
   'marketing':  '/marketing.gif',
   'ultraplan':  '/Ultraplan.gif',
 };
 
+const DASHBOARD_BILLING_URL = 'https://app.productica.in/billing';
+const AGENTS_BUY_CREDITS_URL = 'https://agents.productica.in/#buy-credits';
+
+const AGENT_USE_CASES = [
+  {
+    id: 'brainstorming',
+    name: 'Brainstorming',
+    description: 'Explore ideas, angles, and opportunities with structured thinking.',
+    minCredits: 20,
+    maxCredits: 25,
+    agentId: 'co-founder' as AgentId,
+  },
+  {
+    id: 'marketing-plan',
+    name: 'Marketing Plan',
+    description: 'Design a campaign plan, messaging, and channel strategy.',
+    minCredits: 15,
+    maxCredits: 20,
+    agentId: 'marketing' as AgentId,
+  },
+  {
+    id: 'product-refinement',
+    name: 'Product Refinement',
+    description: 'Tighten scope, features, and product decisions with critique.',
+    minCredits: 25,
+    maxCredits: 30,
+    agentId: 'co-founder' as AgentId,
+  },
+  {
+    id: 'product-feedback',
+    name: 'Product Feedback',
+    description: 'Get sharp feedback on UX, value prop, and product clarity.',
+    minCredits: 15,
+    maxCredits: 20,
+    agentId: 'co-founder' as AgentId,
+  },
+  {
+    id: 'pitch-readiness',
+    name: 'Pitch Readiness',
+    description: 'Prepare narrative, deck flow, and investor-ready answers.',
+    minCredits: 30,
+    maxCredits: 45,
+    agentId: 'co-founder' as AgentId,
+  },
+  {
+    id: 'compliance-readiness',
+    name: 'Company Compliance Readiness',
+    description: 'Assess operational and compliance readiness for scale.',
+    minCredits: 25,
+    maxCredits: 30,
+    agentId: 'ultraplan' as AgentId,
+  },
+  {
+    id: 'documentation',
+    name: 'Documentation',
+    description: 'Create SOPs, internal docs, and founder-ready documentation.',
+    minCredits: 20,
+    maxCredits: 30,
+    agentId: 'ultraplan' as AgentId,
+  },
+  {
+    id: 'startup-planning',
+    name: 'Startup Planning',
+    description: 'Build structured plans, milestones, and execution checklists.',
+    minCredits: 25,
+    maxCredits: 35,
+    agentId: 'ultraplan' as AgentId,
+  },
+] as const;
+
+type AgentUseCaseId = (typeof AGENT_USE_CASES)[number]['id'];
+
+const AGENT_NAME_MAP = Object.fromEntries(AGENT_LIST.map(a => [a.id, a.name])) as Record<AgentId, string>;
+const AGENT_META_MAP = Object.fromEntries(AGENT_LIST.map(a => [a.id, a])) as Record<
+  AgentId,
+  (typeof AGENT_LIST)[number]
+>;
+
+/** Heuristic credit estimate for a free-form custom goal. */
+function estimateCustomGoalCredits(goal: string): {
+  minCredits: number;
+  maxCredits: number;
+  agentId: AgentId;
+  matchedUseCase: string | null;
+} | null {
+  const text = goal.trim().toLowerCase();
+  if (!text) return null;
+
+  // Co-Founder / Marketing first so phrases like "marketing plan" don't hit UltraPlanner
+  const keywordMap: { keywords: string[]; useCaseId: AgentUseCaseId }[] = [
+    { keywords: ['brainstorm', 'ideat', 'explore idea', 'think through'], useCaseId: 'brainstorming' },
+    { keywords: ['marketing', 'campaign', 'gtm', 'growth', 'content', 'ads', 'positioning', 'brand'], useCaseId: 'marketing-plan' },
+    { keywords: ['refin', 'feature', 'scope', 'product direction'], useCaseId: 'product-refinement' },
+    { keywords: ['feedback', 'review my product', 'ux', 'critique'], useCaseId: 'product-feedback' },
+    { keywords: ['pitch', 'investor', 'deck', 'fundraising', 'raise'], useCaseId: 'pitch-readiness' },
+  ];
+
+  for (const entry of keywordMap) {
+    if (entry.keywords.some(k => text.includes(k))) {
+      const useCase = AGENT_USE_CASES.find(u => u.id === entry.useCaseId)!;
+      return {
+        minCredits: useCase.minCredits,
+        maxCredits: useCase.maxCredits,
+        agentId: useCase.agentId,
+        matchedUseCase: useCase.name,
+      };
+    }
+  }
+
+  // UltraPlanner owns compliance, documentation, and startup planning
+  if (
+    text.includes('document') ||
+    text.includes('sop') ||
+    text.includes('handbook') ||
+    text.includes('wiki')
+  ) {
+    const useCase = AGENT_USE_CASES.find(u => u.id === 'documentation')!;
+    return {
+      minCredits: useCase.minCredits,
+      maxCredits: useCase.maxCredits,
+      agentId: 'ultraplan',
+      matchedUseCase: useCase.name,
+    };
+  }
+  if (
+    text.includes('compliance') ||
+    text.includes('legal') ||
+    text.includes('regulation') ||
+    text.includes('policy')
+  ) {
+    const useCase = AGENT_USE_CASES.find(u => u.id === 'compliance-readiness')!;
+    return {
+      minCredits: useCase.minCredits,
+      maxCredits: useCase.maxCredits,
+      agentId: 'ultraplan',
+      matchedUseCase: useCase.name,
+    };
+  }
+  if (
+    text.includes('startup plan') ||
+    text.includes('business plan') ||
+    text.includes('execution plan') ||
+    text.includes('checklist') ||
+    text.includes('milestone') ||
+    text.includes('planning') ||
+    (text.includes('ops') && text.includes('process'))
+  ) {
+    const useCase = AGENT_USE_CASES.find(u => u.id === 'startup-planning')!;
+    return {
+      minCredits: useCase.minCredits,
+      maxCredits: useCase.maxCredits,
+      agentId: 'ultraplan',
+      matchedUseCase: useCase.name,
+    };
+  }
+
+  // Fallback: juggle between Co-Founder and Marketing by signal strength
+  const marketingHints = ['audience', 'channel', 'launch', 'acquisition', 'retention', 'seo', 'social'];
+  const agentId: AgentId = marketingHints.some(k => text.includes(k)) ? 'marketing' : 'co-founder';
+  const words = text.split(/\s+/).filter(Boolean).length;
+  if (words <= 8) {
+    return { minCredits: 15, maxCredits: 20, agentId, matchedUseCase: null };
+  }
+  if (words <= 20) {
+    return { minCredits: 20, maxCredits: 30, agentId, matchedUseCase: null };
+  }
+  return { minCredits: 30, maxCredits: 45, agentId, matchedUseCase: null };
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // SHARED UI PRIMITIVES
 // ─────────────────────────────────────────────────────────────────────────────
-
-function CreditBadge() {
-  return (
-    <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-white/8 border border-white/15 text-white/50 tracking-wide">
-      1 Credit
-    </span>
-  );
-}
 
 function AnimatedNumber({ value }: { value: number }) {
   return (
@@ -90,15 +300,27 @@ const CANVAS_H  = 340;  // total canvas height (px)
 
 function RecommendedJourney({
   selectedModuleIds,
-  totalCredits,
+  extraPromptCredits,
+  onSelectFlow,
 }: {
   selectedModuleIds: Set<string>;
-  totalCredits: number;
+  extraPromptCredits: number;
+  onSelectFlow: (moduleIds: string[]) => void;
 }) {
   const journey = useMemo(
     () => generateRecommendedJourney(Array.from(selectedModuleIds)),
     [selectedModuleIds]
   );
+
+  const flowModuleCredits = sumModuleCredits(journey);
+  const flowRequiredPromptCredits = journey.length;
+  const flowTotalCredits = flowModuleCredits + flowRequiredPromptCredits + extraPromptCredits;
+  const allFlowSelected = journey.length > 0 && journey.every(id => selectedModuleIds.has(id));
+
+  const handleSelectFlow = useCallback(() => {
+    onSelectFlow(journey);
+  }, [journey, onSelectFlow]);
+
 
   const [svgPath, setSvgPath] = useState('');
   const [canScrollLeft, setCanScrollLeft]   = useState(false);
@@ -164,22 +386,38 @@ function RecommendedJourney({
     return () => { clearTimeout(t); window.removeEventListener('resize', buildPath); };
   }, [buildPath, updateScrollButtons]);
 
-  // Support native vertical mouse wheel to scroll horizontally
+  // Drag-to-scroll state for smooth mouse dragging without page scroll jitter
+  const isDragging = useRef(false);
+  const startX = useRef(0);
+  const scrollLeftStart = useRef(0);
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    isDragging.current = true;
+    startX.current = e.pageX - (scrollRef.current?.offsetLeft || 0);
+    scrollLeftStart.current = scrollRef.current?.scrollLeft || 0;
+    if (scrollRef.current) scrollRef.current.style.cursor = 'grabbing';
+  };
+
+  const handleMouseLeaveOrUp = () => {
+    isDragging.current = false;
+    if (scrollRef.current) scrollRef.current.style.cursor = 'grab';
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging.current || !scrollRef.current) return;
+    const x = e.pageX - (scrollRef.current.offsetLeft || 0);
+    const walk = (x - startX.current) * 1.5;
+    scrollRef.current.scrollLeft = scrollLeftStart.current - walk;
+    updateScrollButtons();
+  };
+
+  // Passive scroll listener for updateScrollButtons (no wheel hijacking)
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
-    const handleWheel = (e: WheelEvent) => {
-      if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-        e.preventDefault();
-        el.scrollLeft += e.deltaY * 1.5;
-        updateScrollButtons();
-      }
-    };
-    el.addEventListener('wheel', handleWheel, { passive: false });
     el.addEventListener('scroll', updateScrollButtons, { passive: true });
     updateScrollButtons();
     return () => {
-      el.removeEventListener('wheel', handleWheel);
       el.removeEventListener('scroll', updateScrollButtons);
     };
   }, [updateScrollButtons, journey.length]);
@@ -195,22 +433,16 @@ function RecommendedJourney({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -16 }}
       transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-      className="mt-12 w-full rounded-3xl border border-white/15 bg-gradient-to-b from-white/[0.05] to-white/[0.02] backdrop-blur-2xl overflow-hidden shadow-2xl"
+      className="w-full rounded-3xl border border-white/15 bg-gradient-to-b from-white/[0.05] to-white/[0.02] backdrop-blur-2xl overflow-hidden shadow-2xl scroll-mt-28"
+      id="recommended-flow"
     >
       {/* ── Header with Interactive Scroll Controls ── */}
       <div className="px-6 md:px-10 pt-8 pb-6 border-b border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-2">
             <span className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] px-3 py-1 rounded-full bg-white/10 border border-white/20 text-white/70">
-              <Sparkles className="w-3.5 h-3.5 text-white" />
               Recommended Flow
-              <span className="text-white/40 font-normal ml-1">(Optional)</span>
             </span>
-            {journey.length > 3 && (
-              <span className="text-[11px] text-white/50 px-2.5 py-0.5 rounded-full bg-white/5 border border-white/10 hidden sm:inline-block">
-                ← Scroll or drag to explore all {journey.length} steps →
-              </span>
-            )}
           </div>
           <h3 className="text-xl font-semibold text-white tracking-tight">
             Your Optimal Startup Roadmap
@@ -253,23 +485,16 @@ function RecommendedJourney({
           <span className="text-xs text-white/60 px-3.5 py-2 rounded-xl bg-white/10 border border-white/15 font-mono">
             {journey.length} {journey.length === 1 ? 'Step' : 'Steps'} Total
           </span>
-          <a
-            href="/#contact"
-            onClick={() => {
-              sessionStorage.setItem(
-                'productica_estimated_flow',
-                JSON.stringify({
-                  modules: Array.from(selectedModuleIds),
-                  totalCredits,
-                  timestamp: Date.now(),
-                })
-              );
-            }}
+          <button
+            type="button"
+            onClick={handleSelectFlow}
             className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white text-black text-xs font-bold uppercase tracking-wider hover:bg-white/90 active:scale-95 transition-all shadow-[0_0_20px_rgba(255,255,255,0.25)] hover:shadow-[0_0_30px_rgba(255,255,255,0.45)] shrink-0"
           >
-            Buy Estimated Flow ({totalCredits} {totalCredits === 1 ? 'Credit' : 'Credits'})
-            <ArrowRight className="w-3.5 h-3.5" />
-          </a>
+            {allFlowSelected
+              ? `Flow Selected (${flowTotalCredits} Cr)`
+              : `Buy Estimated Flow (${flowTotalCredits} ${flowTotalCredits === 1 ? 'Credit' : 'Credits'})`}
+            {allFlowSelected ? <Check className="w-3.5 h-3.5" /> : <ArrowRight className="w-3.5 h-3.5" />}
+          </button>
         </div>
       </div>
 
@@ -318,7 +543,11 @@ function RecommendedJourney({
         {/* Scroll Container */}
         <div
           ref={scrollRef}
-          className="overflow-x-auto overflow-y-hidden px-6 md:px-10 py-6"
+          onMouseDown={handleMouseDown}
+          onMouseUp={handleMouseLeaveOrUp}
+          onMouseLeave={handleMouseLeaveOrUp}
+          onMouseMove={handleMouseMove}
+          className="overflow-x-auto overflow-y-hidden px-6 md:px-10 py-6 cursor-grab active:cursor-grabbing select-none"
           style={{ WebkitOverflowScrolling: 'touch', scrollbarWidth: 'auto' }}
         >
           <div
@@ -503,7 +732,7 @@ function RecommendedJourney({
                         >
                           {MODULE_NAME_MAP[moduleId]}
                         </h4>
-                        <div className="flex items-center gap-1 mt-1">
+                        <div className="flex items-center justify-between gap-1 mt-1">
                           {isSelected && isLast ? (
                             <span className="inline-flex items-center gap-1 text-[10px] text-emerald-400 font-semibold tracking-wide">
                               ★ Destination
@@ -517,6 +746,9 @@ function RecommendedJourney({
                               Recommended
                             </span>
                           )}
+                          <span className={`text-[10px] font-mono tabular-nums ${isSelected ? 'text-white/60' : 'text-white/30'}`}>
+                            {MODULE_CREDIT_MAP[moduleId] ?? 0} Cr
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -544,40 +776,28 @@ function RecommendedJourney({
         </div>
       </div>
 
-      {/* ── Footer / Direct Buy Action Banner ── */}
+      {/* ── Footer / Select Flow Action Banner ── */}
       <div className="px-6 md:px-10 py-5 border-t border-white/10 bg-gradient-to-r from-white/[0.04] via-white/[0.08] to-white/[0.04] flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="flex items-center gap-3 text-left">
-          <div className="w-10 h-10 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center shrink-0">
-            <Rocket className="w-5 h-5 text-white" />
-          </div>
-          <div>
-            <p className="text-sm font-semibold text-white tracking-tight">
-              Ready to execute this {journey.length}-step Recommended Flow?
-            </p>
-            <p className="text-xs text-white/50 mt-0.5">
-              Estimated total: <span className="text-white font-mono font-bold">{totalCredits} {totalCredits === 1 ? 'Credit' : 'Credits'}</span> (including AI prompt credits). You're free to start with any module at any time.
-            </p>
-          </div>
+        <div className="text-left">
+          <p className="text-sm font-semibold text-white tracking-tight">
+            Ready to execute this {journey.length}-step Recommended Flow?
+          </p>
+          <p className="text-xs text-white/50 mt-0.5">
+            Breakdown: <span className="text-white font-mono font-medium">{journey.length} Modules ({flowModuleCredits} Cr)</span> + <span className="text-white font-mono font-medium">{journey.length} Required Prompts ({flowRequiredPromptCredits} Cr)</span>{extraPromptCredits > 0 ? ` + ${extraPromptCredits} Extra Prompt Cr` : ''} = <span className="text-white font-mono font-bold text-white/90">{flowTotalCredits} Total Credits</span>.
+          </p>
         </div>
 
         <div className="flex items-center gap-3 w-full sm:w-auto">
-          <a
-            href="/#contact"
-            onClick={() => {
-              sessionStorage.setItem(
-                'productica_estimated_flow',
-                JSON.stringify({
-                  modules: Array.from(selectedModuleIds),
-                  totalCredits,
-                  timestamp: Date.now(),
-                })
-              );
-            }}
+          <button
+            type="button"
+            onClick={handleSelectFlow}
             className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-3 rounded-xl bg-gradient-to-r from-white to-neutral-200 text-black text-sm font-bold uppercase tracking-wider hover:opacity-95 active:scale-95 transition-all shadow-[0_0_25px_rgba(255,255,255,0.25)] hover:shadow-[0_0_35px_rgba(255,255,255,0.45)] shrink-0"
           >
-            Buy Estimated Flow Directly ({totalCredits} {totalCredits === 1 ? 'Credit' : 'Credits'})
-            <ArrowRight className="w-4 h-4" />
-          </a>
+            {allFlowSelected
+              ? `Flow Selected (${flowTotalCredits} ${flowTotalCredits === 1 ? 'Credit' : 'Credits'})`
+              : `Buy Estimated Flow (${flowTotalCredits} ${flowTotalCredits === 1 ? 'Credit' : 'Credits'})`}
+            {allFlowSelected ? <Check className="w-4 h-4" /> : <ArrowRight className="w-4 h-4" />}
+          </button>
         </div>
       </div>
     </motion.div>
@@ -593,7 +813,16 @@ function DashboardPlatform() {
   const [promptCredits, setPromptCredits]     = useState(1);
   const [activeJourney, setActiveJourney]     = useState<string | null>(null);
 
-  const totalCredits = selectedModules.size + promptCredits;
+  const selectedModuleList = useMemo(
+    () => Array.from(selectedModules),
+    [selectedModules]
+  );
+
+  const selectedModulesCount = selectedModuleList.length;
+  const moduleCredits = sumModuleCredits(selectedModuleList);
+  const requiredPromptCredits = selectedModulesCount; // 1 prompt per selected module
+  const extraPromptCredits = promptCredits;
+  const totalCredits = moduleCredits + requiredPromptCredits + extraPromptCredits;
 
   const toggleModule = useCallback((id: string) => {
     setSelectedModules(prev => {
@@ -608,7 +837,21 @@ function DashboardPlatform() {
     setSelectedModules(new Set(journey.moduleIds));
     setActiveJourney(journey.id);
     setTimeout(() => {
-      document.getElementById('credit-calculator')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const el =
+        document.getElementById('recommended-flow') ||
+        document.getElementById('credit-calculator');
+      el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 80);
+  }, []);
+
+  const selectRecommendedFlow = useCallback((moduleIds: string[]) => {
+    setSelectedModules(new Set(moduleIds));
+    setActiveJourney(null);
+    setTimeout(() => {
+      document.getElementById('credit-calculator')?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
     }, 80);
   }, []);
 
@@ -642,11 +885,110 @@ function DashboardPlatform() {
           className="text-white/50 text-lg leading-relaxed"
         >
           Purchase credits and spend them only on the modules you want.<br />
-          Every module costs <span className="text-white/80 font-medium">1 credit</span>.
+          Each module has its own credit cost.
         </motion.p>
       </div>
 
-      {/* ── Credit Calculator ── */}
+      {/* ── 1. Templates ── */}
+      <section id="templates" aria-label="Templates" className="scroll-mt-28">
+        <div className="text-center mb-10">
+          <h2 className="text-3xl md:text-4xl font-light tracking-tight text-white mb-3">
+            <span className="font-semibold">Templates</span>
+          </h2>
+          <p className="text-white/50 text-base">
+            One-click module bundles designed around common founder goals.
+          </p>
+        </div>
+
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {JOURNEYS.map((journey, i) => {
+            const modules  = DASHBOARD_MODULES.filter(m => journey.moduleIds.includes(m.id));
+            const isActive = activeJourney === journey.id;
+            const templateCredits = sumModuleCredits(journey.moduleIds);
+
+            return (
+              <motion.div
+                key={journey.id}
+                initial={{ opacity: 0, y: 24 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: i * 0.07 }}
+                whileHover={{ y: -4, transition: { duration: 0.2 } }}
+                className={`flex flex-col p-6 rounded-2xl border transition-all duration-200 ${
+                  isActive
+                    ? 'border-white/40 bg-white/[0.08] shadow-[0_0_0_1px_rgba(255,255,255,0.10)]'
+                    : 'border-white/10 bg-white/[0.03]'
+                }`}
+              >
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-xs px-2 py-0.5 rounded-md bg-white/8 border border-white/10 text-white/40 font-mono">
+                    {journey.moduleIds.length} modules
+                  </span>
+                  {isActive && (
+                    <motion.span
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="text-xs px-2 py-0.5 rounded-md bg-white/15 border border-white/25 text-white/70 font-medium"
+                    >
+                      ✓ Active
+                    </motion.span>
+                  )}
+                </div>
+
+                <h3 className="text-base font-semibold text-white mb-1.5 leading-snug">
+                  {journey.title}
+                </h3>
+                <p className="text-xs text-white/40 leading-relaxed mb-5">{journey.description}</p>
+
+                {/* Flow list */}
+                <div className="flex flex-col gap-0 mb-5 flex-grow">
+                  {modules.map((mod, idx) => (
+                    <div key={mod.id} className="flex flex-col items-start">
+                      <span className="text-xs text-white/60 bg-white/6 border border-white/10 px-2.5 py-1 rounded-lg">
+                        {mod.name} · {mod.credits} Cr
+                      </span>
+                      {idx < modules.length - 1 && (
+                        <div className="w-px h-3 bg-white/15 ml-3 my-0.5" />
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                <div className="flex items-center justify-between text-xs mb-4 px-3 py-2.5 rounded-xl bg-white/5 border border-white/8">
+                  <span className="text-white/40">Total Credits</span>
+                  <span className="text-white font-bold text-sm">{templateCredits}</span>
+                </div>
+
+                <motion.button
+                  onClick={() => applyJourney(journey)}
+                  whileTap={{ scale: 0.97 }}
+                  aria-label={`Use template: ${journey.title}`}
+                  className={`w-full py-2.5 rounded-xl text-xs font-semibold tracking-wide transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-white/40 ${
+                    isActive
+                      ? 'bg-white text-black'
+                      : 'bg-white/10 text-white/70 hover:bg-white/15 hover:text-white border border-white/10'
+                  }`}
+                >
+                  {isActive ? '✓ Template Applied' : 'Use This Template'}
+                </motion.button>
+              </motion.div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* ── 2. Recommended Flow (only when modules selected) ── */}
+      <AnimatePresence>
+        {selectedModules.size > 0 && (
+          <RecommendedJourney
+            key="recommended-flow"
+            selectedModuleIds={selectedModules}
+            extraPromptCredits={extraPromptCredits}
+            onSelectFlow={selectRecommendedFlow}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* ── 3. Credit Calculator ── */}
       <section id="credit-calculator" aria-label="Credit calculator" className="scroll-mt-28">
         <div className="text-center mb-10">
           <h2 className="text-3xl md:text-4xl font-light tracking-tight text-white mb-3">
@@ -655,16 +997,11 @@ function DashboardPlatform() {
           <p className="text-white/50 text-base">
             Select the modules you need and we'll calculate your total credits.
           </p>
-          <p className="text-white/30 text-sm mt-2">
-            Every module costs{' '}
-            <span className="text-white/60 font-medium px-1.5 py-0.5 rounded-md bg-white/8 border border-white/10">1 credit</span>
-          </p>
         </div>
 
         <div className="grid lg:grid-cols-[1fr_320px] gap-6 items-start">
-          {/* Left — selectable module cards + recommendation */}
+          {/* Left — selectable module cards */}
           <div className="flex flex-col gap-4">
-            {/* Selectable grid */}
             <div
               role="group"
               aria-label="Select dashboard modules"
@@ -680,7 +1017,7 @@ function DashboardPlatform() {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.97 }}
                     aria-pressed={isSelected}
-                    aria-label={`${mod.name}, 1 credit`}
+                    aria-label={`${mod.name}, ${mod.credits} ${mod.credits === 1 ? 'credit' : 'credits'}`}
                     className={`relative flex flex-col gap-3 p-4 rounded-xl border text-left transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:ring-offset-2 focus-visible:ring-offset-black ${
                       isSelected
                         ? 'border-white/40 bg-white/10 shadow-[0_0_0_1px_rgba(255,255,255,0.12)]'
@@ -691,19 +1028,28 @@ function DashboardPlatform() {
                       <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${isSelected ? 'bg-white/20' : 'bg-white/8'}`}>
                         <Icon className={`w-3.5 h-3.5 transition-colors ${isSelected ? 'text-white' : 'text-white/50'}`} />
                       </div>
-                      <AnimatePresence>
-                        {isSelected && (
-                          <motion.div
-                            initial={{ scale: 0, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            exit={{ scale: 0, opacity: 0 }}
-                            transition={{ duration: 0.15 }}
-                            className="w-5 h-5 rounded-full bg-white flex items-center justify-center"
-                          >
-                            <Check className="w-2.5 h-2.5 text-black" />
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
+                      <div className="flex items-center gap-2">
+                        <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-md border tabular-nums ${
+                          isSelected
+                            ? 'bg-white/15 border-white/25 text-white/80'
+                            : 'bg-white/5 border-white/10 text-white/40'
+                        }`}>
+                          {mod.credits} Cr
+                        </span>
+                        <AnimatePresence>
+                          {isSelected && (
+                            <motion.div
+                              initial={{ scale: 0, opacity: 0 }}
+                              animate={{ scale: 1, opacity: 1 }}
+                              exit={{ scale: 0, opacity: 0 }}
+                              transition={{ duration: 0.15 }}
+                              className="w-5 h-5 rounded-full bg-white flex items-center justify-center"
+                            >
+                              <Check className="w-2.5 h-2.5 text-black" />
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
                     </div>
                     <p className={`text-xs font-medium leading-snug transition-colors ${isSelected ? 'text-white' : 'text-white/60'}`}>
                       {mod.name}
@@ -751,15 +1097,21 @@ function DashboardPlatform() {
 
               <div className="flex flex-col gap-3 mb-6">
                 <div className="flex justify-between items-center text-sm">
-                  <span className="text-white/50">Modules Selected</span>
+                  <span className="text-white/50">Modules ({selectedModulesCount})</span>
                   <span className="text-white font-medium" aria-live="polite">
-                    <AnimatedNumber value={selectedModules.size} />
+                    <AnimatedNumber value={moduleCredits} /> {moduleCredits === 1 ? 'Credit' : 'Credits'}
                   </span>
                 </div>
                 <div className="flex justify-between items-center text-sm">
-                  <span className="text-white/50">Prompt Credits</span>
+                  <span className="text-white/50">Required Prompts ({selectedModulesCount})</span>
                   <span className="text-white font-medium" aria-live="polite">
-                    <AnimatedNumber value={promptCredits} />
+                    <AnimatedNumber value={requiredPromptCredits} /> {requiredPromptCredits === 1 ? 'Credit' : 'Credits'}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-white/50">Extra Prompt Credits</span>
+                  <span className="text-white font-medium" aria-live="polite">
+                    <AnimatedNumber value={extraPromptCredits} /> {extraPromptCredits === 1 ? 'Credit' : 'Credits'}
                   </span>
                 </div>
                 <div className="h-px bg-white/10 my-1" />
@@ -779,20 +1131,26 @@ function DashboardPlatform() {
                 className="p-4 rounded-xl bg-white/[0.06] border border-white/10 text-center mb-4"
               >
                 <p className="text-xs text-white/40 leading-relaxed">
-                  Turn your startup idea into a complete business blueprint in only{' '}
+                  Turn your startup idea into a complete business blueprint with{' '}
                   <span className="text-white font-semibold">
-                    <AnimatedNumber value={totalCredits} />&nbsp;{totalCredits === 1 ? 'Credit' : 'Credits'}
-                  </span>.
+                    <AnimatedNumber value={selectedModulesCount} /> {selectedModulesCount === 1 ? 'module' : 'modules'}
+                  </span>{' '}
+                  ({moduleCredits} module + {requiredPromptCredits} prompt credits).
                 </p>
               </motion.div>
 
               <a
-                href="/#contact"
+                href={DASHBOARD_BILLING_URL}
+                target="_blank"
+                rel="noopener noreferrer"
                 onClick={() => {
                   sessionStorage.setItem(
                     'productica_estimated_flow',
                     JSON.stringify({
-                      modules: Array.from(selectedModules),
+                      modules: selectedModuleList,
+                      moduleCredits,
+                      requiredPromptCredits,
+                      extraPromptCredits,
                       totalCredits,
                       timestamp: Date.now(),
                     })
@@ -803,7 +1161,7 @@ function DashboardPlatform() {
                 Buy Estimated Flow ({totalCredits} {totalCredits === 1 ? 'Credit' : 'Credits'}) <ArrowRight className="w-4 h-4" />
               </a>
               <a
-                href="https://dashboard.productica.in/"
+                href="https://app.productica.in/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="mt-2 flex w-full items-center justify-center gap-2 px-5 py-3 rounded-xl border border-white/15 text-white/60 text-sm font-medium hover:text-white hover:border-white/30 active:scale-[0.98] transition-all duration-200 focus-visible:ring-2 focus-visible:ring-white/40 outline-none"
@@ -812,102 +1170,6 @@ function DashboardPlatform() {
               </a>
             </motion.div>
           </div>
-        </div>
-
-        {/* ── Recommended Journey — Full Horizontal Frame Below Calculator ── */}
-        <AnimatePresence>
-          {selectedModules.size > 0 && (
-            <RecommendedJourney
-              selectedModuleIds={selectedModules}
-              totalCredits={totalCredits}
-            />
-          )}
-        </AnimatePresence>
-      </section>
-
-      {/* ── Popular Founder Journeys ── */}
-      <section aria-label="Popular Founder Journeys">
-        <div className="text-center mb-10">
-          <h2 className="text-3xl md:text-4xl font-light tracking-tight text-white mb-3">
-            Popular <span className="font-semibold">Founder Journeys</span>
-          </h2>
-          <p className="text-white/50 text-base">
-            One-click module bundles designed around common founder goals.
-          </p>
-        </div>
-
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {JOURNEYS.map((journey, i) => {
-            const modules  = DASHBOARD_MODULES.filter(m => journey.moduleIds.includes(m.id));
-            const isActive = activeJourney === journey.id;
-
-            return (
-              <motion.div
-                key={journey.id}
-                initial={{ opacity: 0, y: 24 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: i * 0.07 }}
-                whileHover={{ y: -4, transition: { duration: 0.2 } }}
-                className={`flex flex-col p-6 rounded-2xl border transition-all duration-200 ${
-                  isActive
-                    ? 'border-white/40 bg-white/[0.08] shadow-[0_0_0_1px_rgba(255,255,255,0.10)]'
-                    : 'border-white/10 bg-white/[0.03]'
-                }`}
-              >
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="text-xs px-2 py-0.5 rounded-md bg-white/8 border border-white/10 text-white/40 font-mono">
-                    {journey.moduleIds.length} modules
-                  </span>
-                  {isActive && (
-                    <motion.span
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      className="text-xs px-2 py-0.5 rounded-md bg-white/15 border border-white/25 text-white/70 font-medium"
-                    >
-                      ✓ Active
-                    </motion.span>
-                  )}
-                </div>
-
-                <h3 className="text-base font-semibold text-white mb-1.5 leading-snug">
-                  {journey.title}
-                </h3>
-                <p className="text-xs text-white/40 leading-relaxed mb-5">{journey.description}</p>
-
-                {/* Flow list */}
-                <div className="flex flex-col gap-0 mb-5 flex-grow">
-                  {modules.map((mod, idx) => (
-                    <div key={mod.id} className="flex flex-col items-start">
-                      <span className="text-xs text-white/60 bg-white/6 border border-white/10 px-2.5 py-1 rounded-lg">
-                        {mod.name}
-                      </span>
-                      {idx < modules.length - 1 && (
-                        <div className="w-px h-3 bg-white/15 ml-3 my-0.5" />
-                      )}
-                    </div>
-                  ))}
-                </div>
-
-                <div className="flex items-center justify-between text-xs mb-4 px-3 py-2.5 rounded-xl bg-white/5 border border-white/8">
-                  <span className="text-white/40">Total Credits</span>
-                  <span className="text-white font-bold text-sm">{journey.moduleIds.length}</span>
-                </div>
-
-                <motion.button
-                  onClick={() => applyJourney(journey)}
-                  whileTap={{ scale: 0.97 }}
-                  aria-label={`Use journey: ${journey.title}`}
-                  className={`w-full py-2.5 rounded-xl text-xs font-semibold tracking-wide transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-white/40 ${
-                    isActive
-                      ? 'bg-white text-black'
-                      : 'bg-white/10 text-white/70 hover:bg-white/15 hover:text-white border border-white/10'
-                  }`}
-                >
-                  {isActive ? '✓ Journey Applied' : 'Use This Journey'}
-                </motion.button>
-              </motion.div>
-            );
-          })}
         </div>
       </section>
 
@@ -943,14 +1205,16 @@ function DashboardCTA({ totalCredits }: { totalCredits: number }) {
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
           <a
-            href="/#contact"
+            href={DASHBOARD_BILLING_URL}
+            target="_blank"
+            rel="noopener noreferrer"
             className="group flex items-center gap-2 px-8 py-3.5 bg-white text-black text-sm font-semibold rounded-full hover:bg-white/90 active:scale-[0.97] transition-all duration-200 shadow-lg shadow-white/10"
           >
             Buy Credits
             <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
           </a>
           <a
-            href="https://dashboard.productica.in/"
+            href="https://app.productica.in/"
             target="_blank"
             rel="noopener noreferrer"
             className="px-8 py-3.5 text-sm font-medium text-white/50 hover:text-white transition-colors duration-200 tracking-wide"
@@ -968,11 +1232,33 @@ function DashboardCTA({ totalCredits }: { totalCredits: number }) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 function AgentsPlatform() {
-  const [selectedAgents, setSelectedAgents] = useState<Set<string>>(new Set());
-  const totalCredits = selectedAgents.size;
+  const [selectedUseCases, setSelectedUseCases] = useState<Set<string>>(new Set());
+  const [customGoal, setCustomGoal] = useState('');
 
-  const toggleAgent = useCallback((id: string) => {
-    setSelectedAgents(prev => {
+  const customEstimate = useMemo(
+    () => estimateCustomGoalCredits(customGoal),
+    [customGoal]
+  );
+
+  const selectedUseCaseList = useMemo(
+    () => AGENT_USE_CASES.filter(u => selectedUseCases.has(u.id)),
+    [selectedUseCases]
+  );
+
+  const presetMin = selectedUseCaseList.reduce((sum, u) => sum + u.minCredits, 0);
+  const presetMax = selectedUseCaseList.reduce((sum, u) => sum + u.maxCredits, 0);
+  const customMin = customEstimate?.minCredits ?? 0;
+  const customMax = customEstimate?.maxCredits ?? 0;
+  const totalMin = presetMin + customMin;
+  const totalMax = presetMax + customMax;
+  const hasEstimate = selectedUseCaseList.length > 0 || !!customEstimate;
+  const needsUltraPlanner =
+    selectedUseCaseList.some(u => u.agentId === 'ultraplan') ||
+    customEstimate?.agentId === 'ultraplan';
+  const ultraPlannerPrice = AGENT_META_MAP.ultraplan.price ?? 6.99;
+
+  const toggleUseCase = useCallback((id: string) => {
+    setSelectedUseCases(prev => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id); else next.add(id);
       return next;
@@ -1005,16 +1291,25 @@ function AgentsPlatform() {
           transition={{ duration: 0.6, delay: 0.1 }}
           className="text-white/50 text-lg leading-relaxed"
         >
-          Every AI Agent costs <span className="text-white/80 font-medium">1 credit</span> per interaction.
+          Pick the outcomes you need — credits are estimated by use case, not by agent seat.
         </motion.p>
       </div>
 
-      {/* ── Agent Display Cards ── */}
+      {/* ── Available Agents — use cases & capabilities ── */}
       <section aria-label="Available AI agents">
-        <p className="text-xs uppercase tracking-[0.2em] text-white/30 font-medium mb-8 text-center">
-          Available Agents
-        </p>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 max-w-3xl mx-auto">
+        <div className="text-center mb-10">
+          <p className="text-xs uppercase tracking-[0.2em] text-white/30 font-medium mb-3">
+            Available Agents
+          </p>
+          <h2 className="text-3xl md:text-4xl font-light tracking-tight text-white mb-3">
+            Meet your <span className="font-semibold">team</span>
+          </h2>
+          <p className="text-white/50 text-base">
+            Each agent specializes in different founder outcomes.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
           {AGENT_LIST.map((agent, i) => {
             const Icon = agent.icon;
             return (
@@ -1023,24 +1318,63 @@ function AgentsPlatform() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: i * 0.1 }}
-                whileHover={{ y: -5, transition: { duration: 0.2 } }}
-                className="flex flex-col gap-4 p-6 rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-sm group"
+                whileHover={{ y: -4, transition: { duration: 0.2 } }}
+                className="flex flex-col gap-5 p-6 rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-sm"
               >
-                <div className="w-12 h-12 rounded-2xl bg-white/8 border border-white/10 flex items-center justify-center group-hover:bg-white/12 transition-colors overflow-hidden">
-                  <img
-                    src={AGENT_IMAGES[agent.id]}
-                    alt={agent.name}
-                    className="w-full h-full object-cover rounded-2xl"
-                    onError={e => {
-                      (e.currentTarget as HTMLImageElement).style.display = 'none';
-                      (e.currentTarget.nextSibling as HTMLElement)?.classList.remove('hidden');
-                    }}
-                  />
-                  <Icon className="w-5 h-5 text-white/60 hidden" />
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 rounded-2xl bg-white/8 border border-white/10 flex items-center justify-center overflow-hidden shrink-0">
+                    <img
+                      src={AGENT_IMAGES[agent.id]}
+                      alt={agent.name}
+                      className="w-full h-full object-cover rounded-2xl"
+                      onError={e => {
+                        (e.currentTarget as HTMLImageElement).style.display = 'none';
+                        (e.currentTarget.nextSibling as HTMLElement)?.classList.remove('hidden');
+                      }}
+                    />
+                    <Icon className="w-5 h-5 text-white/60 hidden" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <p className="text-base font-semibold text-white">{agent.name}</p>
+                      {agent.paid && agent.price != null && (
+                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-white text-black tracking-wide">
+                          Paid · ${agent.price.toFixed(2)}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-white/40 mt-0.5">{agent.tagline}</p>
+                  </div>
                 </div>
+
                 <div>
-                  <p className="text-base font-semibold text-white/90 mb-2">{agent.name}</p>
-                  <CreditBadge />
+                  <p className="text-[10px] uppercase tracking-[0.16em] text-white/30 font-medium mb-2">
+                    Use Cases
+                  </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {agent.useCases.map(useCase => (
+                      <span
+                        key={useCase}
+                        className="text-[11px] px-2 py-1 rounded-md bg-white/6 border border-white/10 text-white/60"
+                      >
+                        {useCase}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <p className="text-[10px] uppercase tracking-[0.16em] text-white/30 font-medium mb-2">
+                    Capabilities
+                  </p>
+                  <ul className="flex flex-col gap-2">
+                    {agent.capabilities.map(capability => (
+                      <li key={capability} className="flex items-start gap-2 text-xs text-white/55 leading-relaxed">
+                        <span className="mt-1.5 w-1 h-1 rounded-full bg-white/40 shrink-0" />
+                        {capability}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               </motion.div>
             );
@@ -1048,109 +1382,232 @@ function AgentsPlatform() {
         </div>
       </section>
 
-      {/* ── Agent Calculator ── */}
-      <section aria-label="Agent credit calculator">
+      {/* ── Build Your Team — use-case calculator ── */}
+      <section id="agent-calculator" aria-label="Agent credit calculator" className="scroll-mt-28">
         <div className="text-center mb-10">
           <h2 className="text-3xl md:text-4xl font-light tracking-tight text-white mb-3">
             Build Your <span className="font-semibold">Team</span>
           </h2>
-          <p className="text-white/50 text-base">Select the agents you want to work with.</p>
+          <p className="text-white/50 text-base">
+            Select the outcomes you want — we'll estimate credits and match the right agent.
+          </p>
         </div>
 
-        <div className="grid lg:grid-cols-[1fr_300px] gap-6 items-start max-w-4xl mx-auto w-full">
-          <div role="group" aria-label="Select AI agents" className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {AGENT_LIST.map(agent => {
-              const Icon = agent.icon;
-              const isSelected = selectedAgents.has(agent.id);
-              return (
-                <motion.button
-                  key={agent.id}
-                  onClick={() => toggleAgent(agent.id)}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.97 }}
-                  aria-pressed={isSelected}
-                  aria-label={`${agent.name} agent, 1 credit`}
-                  className={`relative flex flex-col gap-4 p-5 rounded-2xl border text-left transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:ring-offset-2 focus-visible:ring-offset-black ${
-                    isSelected
-                      ? 'border-white/40 bg-white/10 shadow-[0_0_0_1px_rgba(255,255,255,0.12)]'
-                      : 'border-white/10 bg-white/[0.03] hover:bg-white/6 hover:border-white/20'
-                  }`}
-                >
-                  <div className="flex items-start justify-between">
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors overflow-hidden ${isSelected ? 'bg-white/20' : 'bg-white/8'}`}>
-                      <img
-                        src={AGENT_IMAGES[agent.id]}
-                        alt={agent.name}
-                        className="w-full h-full object-cover rounded-xl"
-                        onError={e => {
-                          (e.currentTarget as HTMLImageElement).style.display = 'none';
-                          (e.currentTarget.nextSibling as HTMLElement)?.classList.remove('hidden');
-                        }}
-                      />
-                      <Icon className={`w-4 h-4 hidden ${isSelected ? 'text-white' : 'text-white/50'}`} />
+        <div className="grid lg:grid-cols-[1fr_320px] gap-6 items-start">
+          <div className="flex flex-col gap-4">
+            <div
+              role="group"
+              aria-label="Select agent use cases"
+              className="grid grid-cols-1 sm:grid-cols-2 gap-3"
+            >
+              {AGENT_USE_CASES.map(useCase => {
+                const isSelected = selectedUseCases.has(useCase.id);
+                return (
+                  <motion.button
+                    key={useCase.id}
+                    type="button"
+                    onClick={() => toggleUseCase(useCase.id)}
+                    whileHover={{ scale: 1.01 }}
+                    whileTap={{ scale: 0.98 }}
+                    aria-pressed={isSelected}
+                    className={`relative flex flex-col gap-3 p-4 rounded-xl border text-left transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:ring-offset-2 focus-visible:ring-offset-black ${
+                      isSelected
+                        ? 'border-white/40 bg-white/10 shadow-[0_0_0_1px_rgba(255,255,255,0.12)]'
+                        : 'border-white/10 bg-white/[0.03] hover:bg-white/6 hover:border-white/20'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className={`text-sm font-semibold leading-snug ${isSelected ? 'text-white' : 'text-white/75'}`}>
+                          {useCase.name}
+                        </p>
+                        <p className="text-[11px] text-white/40 mt-1 leading-relaxed">
+                          {useCase.description}
+                        </p>
+                      </div>
+                      <AnimatePresence>
+                        {isSelected && (
+                          <motion.div
+                            initial={{ scale: 0, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0, opacity: 0 }}
+                            transition={{ duration: 0.15 }}
+                            className="w-5 h-5 rounded-full bg-white flex items-center justify-center shrink-0"
+                          >
+                            <Check className="w-2.5 h-2.5 text-black" />
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
                     </div>
-                    <AnimatePresence>
-                      {isSelected && (
-                        <motion.div
-                          initial={{ scale: 0, opacity: 0 }}
-                          animate={{ scale: 1, opacity: 1 }}
-                          exit={{ scale: 0, opacity: 0 }}
-                          transition={{ duration: 0.15 }}
-                          className="w-5 h-5 rounded-full bg-white flex items-center justify-center"
-                        >
-                          <Check className="w-2.5 h-2.5 text-black" />
-                        </motion.div>
+
+                    <div className="flex items-center justify-between gap-2 pt-1">
+                      <span className={`text-[10px] px-2 py-0.5 rounded-md border ${
+                        isSelected
+                          ? 'bg-white/15 border-white/25 text-white/80'
+                          : 'bg-white/5 border-white/10 text-white/40'
+                      }`}>
+                        {AGENT_NAME_MAP[useCase.agentId]}
+                        {AGENT_META_MAP[useCase.agentId].paid && AGENT_META_MAP[useCase.agentId].price != null
+                          ? ` · $${AGENT_META_MAP[useCase.agentId].price!.toFixed(2)}`
+                          : ''}
+                      </span>
+                      <span className={`text-xs font-mono tabular-nums ${isSelected ? 'text-white/80' : 'text-white/45'}`}>
+                        {useCase.minCredits}–{useCase.maxCredits} Cr
+                      </span>
+                    </div>
+                  </motion.button>
+                );
+              })}
+            </div>
+
+            {/* Custom goal */}
+            <div className="p-4 rounded-xl border border-white/10 bg-white/[0.03]">
+              <label htmlFor="custom-agent-goal" className="block">
+                <p className="text-sm font-medium text-white/80 mb-0.5">What do you want to achieve?</p>
+                <p className="text-xs text-white/40 mb-3 leading-relaxed">
+                  Describe a custom goal — we'll estimate credits from similar use cases.
+                </p>
+              </label>
+              <textarea
+                id="custom-agent-goal"
+                value={customGoal}
+                onChange={e => setCustomGoal(e.target.value)}
+                rows={3}
+                placeholder="e.g. Help me prepare a seed pitch and refine my pricing story…"
+                className="w-full resize-none rounded-xl border border-white/10 bg-black/40 px-3.5 py-3 text-sm text-white placeholder:text-white/25 outline-none focus:border-white/30 focus:ring-1 focus:ring-white/20 transition-colors"
+              />
+              <AnimatePresence>
+                {customEstimate && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -4 }}
+                    className="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs"
+                  >
+                    <span className="text-white/45">
+                      Estimated for{' '}
+                      <span className="text-white/75 font-medium">
+                        {AGENT_NAME_MAP[customEstimate.agentId]}
+                      </span>
+                      {AGENT_META_MAP[customEstimate.agentId].paid &&
+                        AGENT_META_MAP[customEstimate.agentId].price != null && (
+                          <span className="text-white/55">
+                            {' '}· ${AGENT_META_MAP[customEstimate.agentId].price!.toFixed(2)}
+                          </span>
+                        )}
+                      {customEstimate.matchedUseCase && (
+                        <span className="text-white/35">
+                          {' '}· similar to {customEstimate.matchedUseCase}
+                        </span>
                       )}
-                    </AnimatePresence>
-                  </div>
-                  <div>
-                    <p className={`text-sm font-semibold mb-2 transition-colors ${isSelected ? 'text-white' : 'text-white/70'}`}>
-                      {agent.name}
-                    </p>
-                    <CreditBadge />
-                  </div>
-                </motion.button>
-              );
-            })}
+                    </span>
+                    <span className="font-mono text-white/80 tabular-nums">
+                      {customEstimate.minCredits}–{customEstimate.maxCredits} Cr
+                    </span>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </div>
 
-          {/* Total card */}
+          {/* Summary */}
           <div className="sticky top-28">
             <motion.div layout className="p-6 rounded-2xl border border-white/15 bg-white/[0.05] backdrop-blur-xl">
               <p className="text-xs uppercase tracking-[0.18em] text-white/30 mb-6 font-medium">Summary</p>
-              <div className="flex flex-col gap-3 mb-6">
-                {AGENT_LIST.map(agent => (
-                  <div key={agent.id} className="flex justify-between items-center text-sm">
-                    <span className={`transition-colors ${selectedAgents.has(agent.id) ? 'text-white/80' : 'text-white/30 line-through'}`}>
-                      {agent.name}
+
+              <div className="flex flex-col gap-3 mb-6 min-h-[120px]">
+                {!hasEstimate && (
+                  <p className="text-sm text-white/35 leading-relaxed">
+                    Select use cases or describe a custom goal to estimate your credits.
+                  </p>
+                )}
+
+                {selectedUseCaseList.map(useCase => (
+                  <div key={useCase.id} className="flex justify-between items-start gap-3 text-sm">
+                    <div>
+                      <p className="text-white/80">{useCase.name}</p>
+                      <p className="text-[11px] text-white/35 mt-0.5">{AGENT_NAME_MAP[useCase.agentId]}</p>
+                    </div>
+                    <span className="text-white/55 text-xs font-mono tabular-nums shrink-0">
+                      {useCase.minCredits}–{useCase.maxCredits}
                     </span>
-                    <AnimatePresence>
-                      {selectedAgents.has(agent.id) && (
-                        <motion.span
-                          initial={{ opacity: 0, x: 8 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          exit={{ opacity: 0, x: 8 }}
-                          className="text-white/50 text-xs"
-                        >
-                          1 credit
-                        </motion.span>
-                      )}
-                    </AnimatePresence>
                   </div>
                 ))}
-                <div className="h-px bg-white/10 my-1" />
-                <div className="flex justify-between items-center">
-                  <span className="text-white/70 font-medium">Total Credits</span>
-                  <span className="text-2xl font-semibold text-white" aria-live="polite" aria-atomic="true">
-                    <AnimatedNumber value={totalCredits} />
-                  </span>
-                </div>
+
+                {customEstimate && (
+                  <div className="flex justify-between items-start gap-3 text-sm">
+                    <div>
+                      <p className="text-white/80">Custom goal</p>
+                      <p className="text-[11px] text-white/35 mt-0.5">
+                        {AGENT_NAME_MAP[customEstimate.agentId]}
+                      </p>
+                    </div>
+                    <span className="text-white/55 text-xs font-mono tabular-nums shrink-0">
+                      {customEstimate.minCredits}–{customEstimate.maxCredits}
+                    </span>
+                  </div>
+                )}
+
+                {hasEstimate && (
+                  <>
+                    {needsUltraPlanner && (
+                      <div className="flex justify-between items-center text-sm">
+                        <span className="text-white/50">UltraPlanner Agent</span>
+                        <span className="text-white/80 font-medium tabular-nums">${ultraPlannerPrice.toFixed(2)}</span>
+                      </div>
+                    )}
+                    <div className="h-px bg-white/10 my-1" />
+                    <div className="flex justify-between items-center">
+                      <span className="text-white/70 font-medium">Estimated Credits</span>
+                      <span className="text-2xl font-semibold text-white tabular-nums" aria-live="polite">
+                        {totalMin === totalMax ? (
+                          <AnimatedNumber value={totalMin} />
+                        ) : (
+                          <>
+                            <AnimatedNumber value={totalMin} />
+                            <span className="text-white/40 mx-1">–</span>
+                            <AnimatedNumber value={totalMax} />
+                          </>
+                        )}
+                      </span>
+                    </div>
+                  </>
+                )}
               </div>
+
               <a
-                href="/#contact"
-                className="flex w-full items-center justify-center gap-2 px-5 py-3 rounded-xl bg-white text-black text-sm font-semibold hover:bg-white/90 active:scale-[0.98] transition-all duration-200"
+                href={AGENTS_BUY_CREDITS_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => {
+                  sessionStorage.setItem(
+                    'productica_agent_estimate',
+                    JSON.stringify({
+                      useCases: selectedUseCaseList.map(u => u.id),
+                      customGoal: customGoal.trim() || null,
+                      customEstimate,
+                      needsUltraPlanner,
+                      ultraPlannerPrice: needsUltraPlanner ? ultraPlannerPrice : null,
+                      totalMin,
+                      totalMax,
+                      timestamp: Date.now(),
+                    })
+                  );
+                }}
+                className="flex w-full items-center justify-center gap-2 px-5 py-3 rounded-xl bg-white text-black text-sm font-semibold hover:bg-white/90 active:scale-[0.98] transition-all duration-200 shadow-[0_0_20px_rgba(255,255,255,0.2)] focus-visible:ring-2 focus-visible:ring-white/60 outline-none"
               >
-                Buy Credits <ArrowRight className="w-4 h-4" />
+                {hasEstimate
+                  ? `Buy Credits (${totalMin === totalMax ? totalMin : `${totalMin}–${totalMax}`})`
+                  : 'Buy Credits'}
+                <ArrowRight className="w-4 h-4" />
+              </a>
+              <a
+                href="https://agents.productica.in/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-2 flex w-full items-center justify-center gap-2 px-5 py-3 rounded-xl border border-white/15 text-white/60 text-sm font-medium hover:text-white hover:border-white/30 active:scale-[0.98] transition-all duration-200 focus-visible:ring-2 focus-visible:ring-white/40 outline-none"
+              >
+                Explore Agents
               </a>
             </motion.div>
           </div>
@@ -1174,10 +1631,12 @@ function AgentsPlatform() {
             <span className="font-semibold text-white">AI startup team.</span>
           </p>
           <p className="text-white/40 text-base mb-8 max-w-lg mx-auto">
-            Each agent interaction costs 1 credit. Scale as much as you need.
+            Estimate by outcome, then buy only the credits your use cases need.
           </p>
           <a
-            href="/#contact"
+            href={AGENTS_BUY_CREDITS_URL}
+            target="_blank"
+            rel="noopener noreferrer"
             className="group inline-flex items-center gap-2 px-8 py-3.5 bg-white text-black text-sm font-semibold rounded-full hover:bg-white/90 active:scale-[0.97] transition-all"
           >
             Buy Credits

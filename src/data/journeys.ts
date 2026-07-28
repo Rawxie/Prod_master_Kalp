@@ -2,8 +2,8 @@
 // FOUNDER JOURNEY PRESETS
 // ─────────────────────────────────────────────────────────────────────────────
 //
-// Each journey is a curated bundle of modules designed around a common founder
-// goal. Clicking a journey auto-fills the credit calculator.
+// Each journey is a curated template bundle of modules designed around a common
+// founder goal. Clicking a template auto-fills the credit calculator.
 //
 // Module IDs must match DASHBOARD_MODULES ids in PricingPage.tsx.
 
