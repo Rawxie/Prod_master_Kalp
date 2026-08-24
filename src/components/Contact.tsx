@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { ADDRESSES } from '../data/addresses';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -52,7 +53,10 @@ export default function Contact() {
       if (savedFlow) {
         const data = JSON.parse(savedFlow);
         if (data.totalCredits && data.modules?.length) {
-          const flowMsg = `Interested in buying Estimated Flow (${data.totalCredits} Credits — Modules: ${data.modules.join(', ')})`;
+          const count = data.journeyLength || data.modules.length;
+          const modCr = data.moduleCredits || count;
+          const prmCr = data.requiredPromptCredits || count;
+          const flowMsg = `Interested in buying Estimated Flow (${data.totalCredits} Total Credits — ${count} Modules: ${modCr} Module Cr + ${prmCr} Required Prompt Cr + ${data.extraPromptCredits || 0} Extra Prompts)`;
           setForm(prev => ({ ...prev, message: prev.message ? prev.message : flowMsg }));
         }
       }
@@ -231,7 +235,12 @@ export default function Contact() {
               {[
                 { label: 'Email', value: <a href="mailto:info@productica.in" className="hover:text-white transition-colors">info@productica.in</a> },
                 { label: 'Phone', value: <a href="tel:+917069133331" className="hover:text-white transition-colors">+91 70691 33331</a> },
-                { label: 'Office', value: <>Block A-806, Navrachna Innovation Foundation<br/>Navrachna University<br/>Vadodara, Gujarat, India</> },
+                { label: 'Office', value: <>{ADDRESSES.office.lines.map((line, i) => (
+                  <span key={line}>{line}{i < ADDRESSES.office.lines.length - 1 && <br />}</span>
+                ))}</> },
+                { label: 'Branch', value: <>{ADDRESSES.branch.lines.map((line, i) => (
+                  <span key={line}>{line}{i < ADDRESSES.branch.lines.length - 1 && <br />}</span>
+                ))}</> },
                 { label: 'Response', value: 'Within 24 hours' },
               ].map(({ label, value }) => (
                 <div key={label} className="contact-tag opacity-0 flex items-start gap-4">
