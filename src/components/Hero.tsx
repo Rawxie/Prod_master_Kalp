@@ -247,7 +247,7 @@ export default function Hero({ onVideoLoad }: { onVideoLoad?: () => void }) {
         >
           {/* Primary Button */}
           <button
-            onClick={() => scrollToSection('validate')}
+            onClick={() => scrollToSection('free-validation')}
             className="group flex flex-1 items-center justify-center gap-2.5 px-8 py-3.5 bg-white text-black text-[13px] font-medium rounded-full tracking-wide hover:bg-white/90 active:scale-[0.97] transition-all duration-300 shadow-lg shadow-white/10 whitespace-nowrap cursor-pointer"
           >
             Validate Idea

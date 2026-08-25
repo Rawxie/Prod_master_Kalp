@@ -105,7 +105,7 @@ export default function IdeaFlow() {
 
   return (
     <section 
-      id="validate"
+      id="free-validation"
       ref={sectionRef}
       className={`relative z-[30] w-full bg-stone-50 flex flex-col items-center px-6 transition-all duration-500 ${
         step === 3 ? 'py-16' : 'min-h-screen justify-center py-20'
