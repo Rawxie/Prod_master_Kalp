@@ -1,9 +1,19 @@
 /** Shared FX disclaimer for credit pack INR brackets. */
 export const CREDIT_FX_NOTE =
-  'INR amounts shown are indicative. Final price is adjusted to the USD–INR rate of the day at purchase.';
+  'INR amounts are indicative. Final price is adjusted to the USD–INR rate of the day at purchase.';
 
 export function formatUsd(amount: number) {
   return `$${amount.toFixed(2)}`;
+}
+
+/** INR range primary, USD secondary — e.g. ₹600–700 ($6.99) */
+export function formatInrPrimary(inrRange: string, usd: number) {
+  return `${inrRange} (${formatUsd(usd)})`;
+}
+
+/** USD primary, INR secondary — e.g. $6.99 (₹600–700) */
+export function formatUsdPrimary(usd: number, inrRange: string) {
+  return `${formatUsd(usd)} (${inrRange})`;
 }
 
 export const DASHBOARD_BILLING_URL = 'https://app.productica.in/billing';
