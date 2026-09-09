@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 
 const sections = [
   { id: 'reality', label: '01. Reality' },
-  { id: 'validate', label: '02. Validate' },
+  { id: 'free-validation', label: '02. Validate' },
   { id: 'agents', label: '03. Productica Teams' },
   { id: 'why-choose', label: '04. Why choose' },
   { id: 'achievements', label: '05. Achievements' },
