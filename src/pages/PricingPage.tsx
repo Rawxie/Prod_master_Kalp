@@ -23,6 +23,8 @@ import {
   AGENT_CREDIT_FX_NOTE,
   AGENTS_BUY_CREDITS_URL,
   ULTRAPLANNER_PRICE,
+  formatInrPrimary,
+  formatUltraPlannerFee,
   estimateCustomGoalCredits,
   type AgentId,
 } from '../data/agentCredits';
@@ -1230,7 +1232,7 @@ function AgentsPlatform() {
             Buy <span className="font-semibold">credits</span>
           </h2>
           <p className="text-white/50 text-base max-w-xl mx-auto">
-            Priced in USD, with indicative INR in brackets. Checkout on agents.productica.in.
+            Priced in INR (indicative), with USD in brackets. Checkout on agents.productica.in.
           </p>
         </div>
 
@@ -1258,13 +1260,12 @@ function AgentsPlatform() {
               </div>
               <div className="flex items-end justify-between gap-3">
                 <div>
-                  <p className="text-xs text-white/30 line-through mb-1">
-                    {formatUsd(pack.usdWas)}{' '}
-                    <span className="font-normal">({pack.inrWasRange})</span>
+                  <p className="text-xs text-white/30 line-through mb-1 tabular-nums">
+                    {formatInrPrimary(pack.inrWasRange, pack.usdWas)}
                   </p>
                   <p className="text-xl font-semibold text-white tabular-nums">
-                    {formatUsd(pack.usdPrice)}{' '}
-                    <span className="text-sm font-medium text-white/45">({pack.inrRange})</span>
+                    {pack.inrRange}{' '}
+                    <span className="text-sm font-medium text-white/45">({formatUsd(pack.usdPrice)})</span>
                   </p>
                 </div>
                 <span className="text-xs text-white/40 inline-flex items-center gap-1">
@@ -1535,9 +1536,9 @@ function AgentsPlatform() {
                 {hasEstimate && (
                   <>
                     {needsUltraPlanner && (
-                      <div className="flex justify-between items-center text-sm">
+                      <div className="flex justify-between items-center text-sm gap-3">
                         <span className="text-white/50">UltraPlanner Agent</span>
-                        <span className="text-white/80 font-medium tabular-nums">${ultraPlannerPrice.toFixed(2)}</span>
+                        <span className="text-white/80 font-medium tabular-nums text-right">{formatUltraPlannerFee()}</span>
                       </div>
                     )}
                     <div className="h-px bg-white/10 my-1" />

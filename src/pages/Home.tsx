@@ -54,10 +54,8 @@ export default function Home() {
         <div id="about">
           <ScrollStory />
         </div>
-        <div id="validate" className="scroll-mt-20">
-          <ReactiveTypography />
-          <IdeaFlow />
-        </div>
+        <ReactiveTypography />
+        <IdeaFlow />
 
         {/* 3. Agents */}
         <div id="agents">

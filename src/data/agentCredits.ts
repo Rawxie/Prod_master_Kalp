@@ -1,4 +1,4 @@
-import { CREDIT_FX_NOTE, formatUsd } from './dashboardCreditPacks';
+import { CREDIT_FX_NOTE, formatUsd, formatInrPrimary, formatUsdPrimary } from './dashboardCreditPacks';
 
 export type AgentId = 'co-founder' | 'marketing' | 'ultraplan';
 
@@ -9,10 +9,17 @@ export const AGENT_DISPLAY_NAMES: Record<AgentId, string> = {
 };
 
 export const ULTRAPLANNER_PRICE = 6.99;
+/** Indicative INR for UltraPlanner fee (≈ ₹90–100 / USD). */
+export const ULTRAPLANNER_INR_RANGE = '₹600–700';
 
 /** Same FX disclaimer as dashboard packs. */
 export const AGENT_CREDIT_FX_NOTE = CREDIT_FX_NOTE;
-export { CREDIT_FX_NOTE, formatUsd };
+export { CREDIT_FX_NOTE, formatUsd, formatInrPrimary, formatUsdPrimary };
+
+/** UltraPlanner stays USD-primary with INR reference. */
+export function formatUltraPlannerFee() {
+  return formatUsdPrimary(ULTRAPLANNER_PRICE, ULTRAPLANNER_INR_RANGE);
+}
 
 /** Indicative INR ranges (≈ ₹90–100 / USD). Final INR charged at purchase FX rate. */
 export const AGENT_CREDIT_PACKS = [

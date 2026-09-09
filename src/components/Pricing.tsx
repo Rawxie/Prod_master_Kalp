@@ -20,6 +20,8 @@ import {
   AGENT_CREDIT_FX_NOTE,
   AGENTS_BUY_CREDITS_URL,
   ULTRAPLANNER_PRICE,
+  formatInrPrimary,
+  formatUltraPlannerFee,
   estimateCustomGoalCredits,
   type AgentId,
 } from '../data/agentCredits';
@@ -64,7 +66,7 @@ type PlatformTab = 'dashboard' | 'agents';
 
 function agentLabel(agentId: AgentId) {
   const name = AGENT_DISPLAY_NAMES[agentId];
-  return agentId === 'ultraplan' ? `${name} · $${ULTRAPLANNER_PRICE.toFixed(2)}` : name;
+  return agentId === 'ultraplan' ? `${name} · ${formatUltraPlannerFee()}` : name;
 }
 function DashboardCredits() {
   const [goalId, setGoalId] = useState<string | null>(null);
@@ -435,7 +437,7 @@ function AgentsCredits() {
           Productica Teams <span className="font-semibold">credit bundles</span>
         </h3>
         <p className="text-white/45 text-sm">
-          Priced in USD, with indicative INR in brackets.
+          Priced in INR (indicative), with USD in brackets.
         </p>
       </div>
 
@@ -458,13 +460,12 @@ function AgentsCredits() {
               </p>
             </div>
             <div>
-              <p className="text-xs text-white/30 line-through mb-0.5">
-                {formatUsd(pack.usdWas)}{' '}
-                <span className="font-normal">({pack.inrWasRange})</span>
+              <p className="text-xs text-white/30 line-through mb-0.5 tabular-nums">
+                {formatInrPrimary(pack.inrWasRange, pack.usdWas)}
               </p>
               <p className="text-lg font-semibold text-white tabular-nums">
-                {formatUsd(pack.usdPrice)}{' '}
-                <span className="text-sm font-medium text-white/45">({pack.inrRange})</span>
+                {pack.inrRange}{' '}
+                <span className="text-sm font-medium text-white/45">({formatUsd(pack.usdPrice)})</span>
               </p>
             </div>
           </a>
@@ -558,7 +559,7 @@ function AgentsCredits() {
                     </span>
                     {customEstimate.agentId === 'ultraplan' && (
                       <span className="text-white/55">
-                        {' '}· ${ULTRAPLANNER_PRICE.toFixed(2)}
+                        {' '}· {formatUltraPlannerFee()}
                       </span>
                     )}
                     {customEstimate.matchedUseCase && (
@@ -611,9 +612,9 @@ function AgentsCredits() {
                 </div>
               )}
               {needsUltra && (
-                <div className="flex justify-between text-sm">
+                <div className="flex justify-between text-sm gap-3">
                   <span className="text-white/50">UltraPlanner agent</span>
-                  <span className="text-white/80">${ULTRAPLANNER_PRICE.toFixed(2)}</span>
+                  <span className="text-white/80 tabular-nums text-right">{formatUltraPlannerFee()}</span>
                 </div>
               )}
               <div className="h-px bg-white/10" />

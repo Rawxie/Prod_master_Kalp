@@ -157,8 +157,9 @@ export default function IdeaFlow() {
 
   return (
     <section
+      id="validate"
       ref={sectionRef}
-      className={`relative z-[30] w-full bg-stone-50 flex flex-col items-center px-6 transition-all duration-500 ${
+      className={`relative z-[30] w-full scroll-mt-20 bg-stone-50 flex flex-col items-center px-6 transition-all duration-500 ${
         step === 3 ? 'py-16' : 'min-h-screen justify-center py-20'
       }`}
     >
