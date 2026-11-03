@@ -23,12 +23,59 @@ const num = (s: string, d = 0) => {
   return m ? parseFloat(m[0]) : d;
 };
 
+const SECTION_TITLES: [string, RegExp][] = [
+  ['0', /headline|snapshot|overview/i],
+  ['1', /syncoro\s*iq|iq test/i],
+  ['2', /should you build/i],
+  ['3', /sharpened/i],
+  ['4', /productica lens|(?:^|\b)the lens\b/i],
+  ['5', /who buys|ideal customer|segments/i],
+  ['6', /market size|^market\b/i],
+  ['7', /competition|who you.?re up against/i],
+  ['8', /lean canvas/i],
+  ['9', /pre-?mortem|riskiest|risks?\s*&/i],
+  ['10', /readiness|3r/i],
+  ['11', /scorecard|final score|operator verdict/i],
+];
+
+function unwrapMarkdown(md: string) {
+  let text = String(md || '').replace(/^\uFEFF/, '').replace(/\r/g, '').trim();
+  const fenced = text.match(/^```(?:markdown|md|text)?\s*\n([\s\S]*?)\n```$/i);
+  if (fenced) text = fenced[1].trim();
+  if (text.startsWith('{') || text.startsWith('[')) {
+    try {
+      const json = JSON.parse(text);
+      if (typeof json === 'string') return json.replace(/\r/g, '');
+      const nested = json?.markdown || json?.result || json?.report || json?.text;
+      if (typeof nested === 'string' && nested.trim()) return nested.replace(/\r/g, '');
+    } catch { /* still markdown */ }
+  }
+  return text;
+}
+
 function splitSections(md: string) {
   const out: Record<string, string> = {};
-  const re = /^##\s+(\d+)\.\s*(.*)$/gm;
   const marks: { n: string; start: number; end: number }[] = [];
-  let m: RegExpExecArray | null;
-  while ((m = re.exec(md))) marks.push({ n: m[1], start: m.index + m[0].length, end: m.index });
+  const lines = md.split('\n');
+  let offset = 0;
+  for (const raw of lines) {
+    const line = raw.trim();
+    let n = '';
+    const numbered = line.match(/^(?:#{1,4}\s+|\*\*)(\d+)\s*[.):\-]\s+(.+?)(?:\*\*)?\s*$/);
+    if (numbered) n = String(Number(numbered[1]));
+    else {
+      const bare = line.match(/^(#{1,4})\s+(?:\*\*)?(.+?)(?:\*\*)?\s*$/);
+      if (bare) {
+        const title = strip(bare[2]).replace(/^\d+\s*[.):\-]\s*/, '');
+        const hit = SECTION_TITLES.find(([, re]) => re.test(title));
+        if (hit) n = hit[0];
+      }
+    }
+    if (n && !marks.some(m => m.n === n)) {
+      marks.push({ n, start: offset + raw.length + 1, end: offset });
+    }
+    offset += raw.length + 1;
+  }
   marks.forEach((k, i) => {
     out[k.n] = md.slice(k.start, i + 1 < marks.length ? marks[i + 1].end : md.length);
   });
@@ -71,8 +118,21 @@ const between = (text: string, a: string | RegExp, b?: string | RegExp) => {
 };
 
 const kv = (text: string, label: string) => {
-  const m = text.match(new RegExp(`\\*\\*${label}:?\\*\\*:?\\s*(.+)`, 'i'));
-  return m ? strip(m[1]) : '';
+  const bold = text.match(new RegExp(`\\*\\*${label}:?\\*\\*:?\\s*(.+)`, 'i'));
+  if (bold && strip(bold[1])) return strip(bold[1]);
+  const plain = text.match(new RegExp(`(?:^|\\n)\\s*(?:[-*]\\s+)?${label}:\\s*(.+)`, 'i'));
+  if (plain && strip(plain[1])) return strip(plain[1]);
+  const next = text.match(new RegExp(`(?:\\*\\*)?${label}:?(?:\\*\\*)?:?\\s*\\n\\s*(.+)`, 'i'));
+  return next ? strip(next[1]) : '';
+};
+
+const firstNum = (...vals: Array<string | number | null | undefined>) => {
+  for (const v of vals) {
+    if (v == null || v === '') continue;
+    const n = typeof v === 'number' ? v : num(v, NaN);
+    if (!isNaN(n)) return n;
+  }
+  return NaN;
 };
 
 const bullets = (text: string) => {
@@ -136,16 +196,16 @@ function parseBlocks(section: string): Block[] {
   for (const raw of section.split('\n')) {
     const line = raw.trim();
     let m: RegExpMatchArray | null;
-    if ((m = line.match(/^###\s+(.+)$/))) {
+    if ((m = line.match(/^#{3,4}\s+(.+)$/))) {
       close();
       cur = { heading: strip(m[1]), level: 3, parts: [] };
-    } else if ((m = line.match(/^\*\*([^*]+?):?\*\*:?\s*$/))) {
-      close();
-      cur = { heading: strip(m[1]).replace(/:$/, ''), level: 4, parts: [] };
-    } else if ((m = line.match(/^\*\*(Breakpoint|Condition to prove):\*\*\s*(.*)$/i))) {
+    } else if ((m = line.match(/^\*\*(Breakpoint|Condition to prove|Venture Signature|Venture fit|Next test|Claims|Evidence register):\*\*\s*(.*)$/i))) {
       close();
       cur = { heading: m[1], level: 4, parts: [] };
       if (m[2]) buf.push(m[2]);
+    } else if ((m = line.match(/^\*\*([^*]+?):?\*\*:?\s*$/))) {
+      close();
+      cur = { heading: strip(m[1]).replace(/:$/, ''), level: 4, parts: [] };
     } else buf.push(raw);
   }
   close();
@@ -155,7 +215,7 @@ function parseBlocks(section: string): Block[] {
 export function parseIdeaReport(md: string): ParsedIdeaReport {
   const warnings: string[] = [];
   const D: Record<string, any> = {};
-  const text = String(md || '').replace(/\r/g, '');
+  const text = unwrapMarkdown(md);
   const S = splitSections(text);
 
   const safe = (label: string, fn: () => void) => {
@@ -170,37 +230,55 @@ export function parseIdeaReport(md: string): ParsedIdeaReport {
 
   // 0. HEADLINE
   safe('headline', () => {
-    const s = S['0'] || text.slice(0, 1500);
-    const v = kv(s, 'Verdict');
+    const s = S['0'] || text.slice(0, 2500);
+    const v = kv(s, 'Verdict') || kv(text, 'Verdict');
     D.verdict = v ? v.replace(/\s+/g, ' ') : '';
-    D.sub = kv(s, 'Summary');
-    const today = num(kv(s, 'Syncoro IQ today'), NaN);
-    const up = num(kv(s, 'Syncoro IQ upside[^:]*'), NaN);
+    D.sub = kv(s, 'Summary') || kv(text, 'Summary');
+    const today = firstNum(
+      kv(s, 'Syncoro IQ today'),
+      kv(s, 'IQ today'),
+      kv(text, 'Syncoro IQ today'),
+      (s.match(/Syncoro IQ today[^0-9\n]{0,24}([\d.]+)/i) || [])[1],
+      (text.match(/Syncoro IQ today[^0-9\n]{0,24}([\d.]+)/i) || [])[1],
+      (text.match(/\bIQ\s*(?:score)?\s*today[^0-9\n]{0,24}([\d.]+)/i) || [])[1],
+      (text.match(/Syncoro IQ[:\s*]*([\d.]+)\s*\/\s*10/i) || [])[1],
+    );
+    const up = firstNum(
+      kv(s, 'Syncoro IQ upside[^:]*'),
+      kv(text, 'Syncoro IQ upside[^:]*'),
+      (text.match(/Syncoro IQ upside[^0-9\n]{0,40}([\d.]+)/i) || [])[1],
+    );
     D.iq = { today: isNaN(today) ? null : today, upside: isNaN(up) ? null : up };
-    D.proof = num((kv(s, 'Proof level').match(/E(\d)/) || [])[1], 0);
-    D.proofLabel = kv(s, 'Proof level');
+    const proof = kv(s, 'Proof level') || kv(text, 'Proof level');
+    D.proof = num((proof.match(/E(\d)/i) || [])[1], 0);
+    D.proofLabel = proof;
   });
 
   // 1. SYNCORO IQ TEST
   safe('iq', () => {
-    const s = S['1'] || '';
-    const weights: Record<string, number> = {};
-    for (const m of s.matchAll(/([\d.]+)\s*[×x]\s*[\d.]+\s+(Innovation|Value|Market|Profitability|X-Factor)/g))
-      weights[m[2]] = parseFloat(m[1]);
-    const upLine = s.match(/Upside scores:\*\*\s*(.+)/i)?.[1] || '';
-    const ups: Record<string, number> = {};
-    for (const m of upLine.matchAll(/(Innovation|Value|Market|Profitability|X-Factor)\s+([\d.]+)/g)) ups[m[1]] = parseFloat(m[2]);
-    const defaults: Record<string, number> = { Innovation: 0.15, Value: 0.25, Market: 0.2, Profitability: 0.2, 'X-Factor': 0.2 };
-    const q: any[] = [];
-    for (const m of s.matchAll(/###\s+(Innovation|Value|Market|Profitability|X-Factor)\s+Quotient\s*[—-]\s*([\d.]+)\s*\/\s*10([\s\S]*?)(?=###|\*\*Upside|$)/g)) {
-      const name = m[1];
-      const t = parseTables(m[3])[0];
-      const up = ups[name] ?? parseFloat(m[2]);
-      const factors = (t?.rows || []).map(r => [r[0], num(r[1]), up, r[2] || ''] as any[]);
-      q.push([name, weights[name] ?? defaults[name], parseFloat(m[2]), up, factors]);
-    }
-    if (q.length) D.q = q;
-    else warnings.push('iq: no quotient blocks found');
+    const parseQ = (s: string) => {
+      const weights: Record<string, number> = {};
+      for (const m of s.matchAll(/([\d.]+)\s*[×x*·]\s*[\d.]+\s+(Innovation|Value|Market|Profitability|X-Factor)/g))
+        weights[m[2]] = parseFloat(m[1]);
+      const upLine = s.match(/Upside scores?:?\*\*\s*(.+)/i)?.[1] || kv(s, 'Upside scores') || '';
+      const ups: Record<string, number> = {};
+      for (const m of upLine.matchAll(/(Innovation|Value|Market|Profitability|X-Factor)\s+([\d.]+)/g)) ups[m[1]] = parseFloat(m[2]);
+      const defaults: Record<string, number> = { Innovation: 0.15, Value: 0.25, Market: 0.2, Profitability: 0.2, 'X-Factor': 0.2 };
+      const q: any[] = [];
+      const qRe = /(?:#{2,4}\s+|\*\*)(Innovation|Value|Market|Profitability|X-Factor)\s+Quotient\s*[—–\-:]+\s*([\d.]+)\s*\/\s*10(?:\*\*)?([\s\S]*?)(?=(?:#{2,4}\s+|\*\*)(?:Innovation|Value|Market|Profitability|X-Factor)\s+Quotient|\*\*Upside|$)/gi;
+      for (const m of s.matchAll(qRe)) {
+        const name = m[1];
+        const t = parseTables(m[3])[0];
+        const todayScore = parseFloat(m[2]);
+        const up = ups[name] ?? todayScore;
+        const factors = (t?.rows || []).map(r => [r[0], num(r[1]), up, r[2] || r[3] || ''] as any[]);
+        q.push([name, weights[name] ?? defaults[name], todayScore, up, factors]);
+      }
+      return q;
+    };
+    const q = parseQ(S['1'] || '') ;
+    D.q = q.length ? q : parseQ(text);
+    if (!D.q.length) warnings.push('iq: no quotient blocks found');
   });
 
   // 2. SHOULD YOU BUILD THIS
@@ -225,7 +303,9 @@ export function parseIdeaReport(md: string): ParsedIdeaReport {
   // section is parsed into its ordered blocks and nothing is dropped. Known blocks get a designed layout
   // in the renderer; unknown ones render generically.
   safe('lens', () => {
-    D.lens = { blocks: parseBlocks(S['4'] || '') };
+    const raw = (S['4'] || '').trim();
+    const blocks = parseBlocks(raw);
+    D.lens = { blocks, raw };
   });
 
   // 5. WHO BUYS FIRST
@@ -314,7 +394,9 @@ export function parseIdeaReport(md: string): ParsedIdeaReport {
     D.unlockTarget = (sb.match(/Target to unlock:\s*(.+)$/i) || [])[1] || '';
   });
 
-  const missing = ['q', 'why', 'clar', 'lens', 'segTable', 'mkt', 'comp', 'leanCanvas', 'assume', 'score'].filter(k => !D[k] || (Array.isArray(D[k]) && !D[k].length));
+  const missing = ['q', 'why', 'clar', 'segTable', 'mkt', 'comp', 'leanCanvas', 'assume', 'score'].filter(k => !D[k] || (Array.isArray(D[k]) && !D[k].length));
+  if (!D.lens?.blocks?.length && !D.lens?.raw) missing.push('lens');
+  if (D.iq?.today == null && !D.q?.length) missing.push('iq');
   if (missing.length) warnings.push(`missing: ${missing.join(', ')}`);
   return { data: D, warnings };
 }

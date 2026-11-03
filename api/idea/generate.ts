@@ -171,8 +171,16 @@ async function runReport(
 // Small denormalised summary so the history list never has to load the full markdown.
 function readMeta(md: string) {
   const title = (md.match(/^#\s+(.+)$/m) || [])[1]?.replace(/\*\*/g, '').trim().slice(0, 140) || null;
-  const verdict = (md.match(/\*\*Verdict:\*\*\s*([^\n]+)/i) || [])[1]?.replace(/\*\*/g, '').trim().slice(0, 40) || null;
-  const iqRaw = (md.match(/\*\*Syncoro IQ today:\*\*\s*([\d.]+)/i) || [])[1];
+  const verdict = (
+    (md.match(/\*\*Verdict:\*\*\s*([^\n]+)/i) || [])[1] ||
+    (md.match(/^Verdict:\s*([^\n]+)/im) || [])[1] ||
+    ''
+  ).replace(/\*\*/g, '').trim().slice(0, 40) || null;
+  const iqRaw = (
+    (md.match(/\*\*Syncoro IQ today:\*\*\s*([\d.]+)/i) || [])[1] ||
+    (md.match(/Syncoro IQ today[^0-9\n]{0,24}([\d.]+)/i) || [])[1] ||
+    (md.match(/Syncoro IQ[:\s*]*([\d.]+)\s*\/\s*10/i) || [])[1]
+  );
   const iq = iqRaw && !isNaN(Number(iqRaw)) ? Math.min(10, Math.max(0, Number(iqRaw))) : null;
   return { title, verdict, iq };
 }

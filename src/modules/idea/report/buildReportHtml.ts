@@ -68,8 +68,9 @@ export function buildReportBody(R) {
     if ((r[3] == null || isNaN(r[3])) && Array.isArray(r[4]) && r[4].length) r[3] = r1(av(r[4].map(x => +x[2])));
   });
   const f = i => r1(q.reduce((s, r) => s + r[1] * r[i], 0));
-  const a = D.iq && D.iq.today != null ? +D.iq.today : f(2);
-  const b = D.iq && D.iq.upside != null ? +D.iq.upside : f(3);
+  const finite = n => n != null && n !== '' && !isNaN(+n);
+  const a = finite(D.iq && D.iq.today) ? +D.iq.today : (q.length ? f(2) : 0);
+  const b = finite(D.iq && D.iq.upside) ? +D.iq.upside : (q.length ? f(3) : a);
   const mn = q.length ? Math.min(...q.map(r => r[2])) : 0;
   const pf = +D.proof || 0;
   const Vcalc = a < 3.5 ? 'Park' : (a < 5 || mn < 4) ? 'Pivot' : (a >= 6.5 && pf >= 3) ? 'Build' : 'Test first';
@@ -81,9 +82,11 @@ export function buildReportBody(R) {
   const SC = (D.score && D.score.length) ? D.score : [];
   const dateStr = D.date || new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
+  const meterLeft = /^park/i.test(V) ? '17.5%' : /^pivot/i.test(V) ? '42.5%' : /^test/i.test(V) ? '57.5%' : /^build/i.test(V) ? '82.5%' : `${Math.min(92, Math.max(8, a * 10))}%`;
   const hero = `<header class="hero"><div class="wrap"><div><span class="pill ${vc}">Verdict: ${V}</span><h1>${D.name}</h1><p class="th">${D.sub || ''}</p></div>
 <div class="card hero-gauge"><div class="hg-head"><span class="eyebrow">Syncoro IQ · Venture Diagnostic</span><span class="chip ${vchip}">${V}</span></div>${gauge(a, b)}
-<div class="iq-legend"><span><i></i>Today ${a.toFixed(1)}</span><span><i class="d"></i>Upside ${b.toFixed(1)}</span><span><i class="b"></i>6.5 Build gate</span></div></div>
+<div class="iq-legend"><span><i></i>Today ${a.toFixed(1)}</span><span><i class="d"></i>Upside ${b.toFixed(1)}</span><span><i class="b"></i>6.5 Build gate</span></div>
+<div class="verdict-meter" aria-label="Verdict ${V}, Syncoro IQ ${a.toFixed(1)} of 10"><div class="verdict-pointer" style="left:${meterLeft}"><b>${V} · ${a.toFixed(1)}</b><i class="pointer-dot"></i></div><div class="verdict-scale"><span>Park</span><span>Pivot</span><span>Test</span><span>Build</span></div></div></div>
 </div></header>`;
 
   const S = [];
@@ -109,16 +112,17 @@ export function buildReportBody(R) {
   // 4. THE PRODUCTICA LENS
   // Rendered block by block, in the agent's own order. Known blocks get a designed layout; every other
   // block (extra buyer lanes, activation map, ...) is rendered generically so nothing is ever dropped.
-  if (D.lens && D.lens.blocks && D.lens.blocks.length) S.push(() => {
+  if (D.lens && ((D.lens.blocks && D.lens.blocks.length) || D.lens.raw)) S.push(() => {
     const inline = t => String(t || '')
       .replace(/\*\*(.+?)\*\*/g, '<b>$1</b>')
       .replace(/(^|[\s(])\*([^*]+)\*(?=[\s).,;:]|$)/g, '$1<i>$2</i>');
     const sigCell = v => { const s = sigOf(v); return `<span class="tick ${s[1]}">${s[4]}</span>`; };
     const table = t => tbl(t.head, t.rows.map(r => r.map((c, i) => /signal/i.test(t.head[i] || '') ? sigCell(c) : i == 0 ? `<b>${c}</b>` : c)), 'tbl-compare');
     const bulletList = p => `<div class="card"><ul style="padding-left:18px;display:grid;gap:6px;font-size:14px;color:var(--ink)">${p.items.map(([k, v]) => `<li>${k ? `<b>${k}:</b> ` : ''}${v}</li>`).join('')}</ul></div>`;
-    const generic = b => b.parts.map(p => p.type == 'table' ? table(p) : p.type == 'bullets' ? bulletList(p) : `<p style="font-size:14.5px;color:var(--ink);line-height:1.55">${inline(p.text)}</p>`).join('');
-    const first = (b, type) => b.parts.find(p => p.type == type);
+    const generic = b => (b.parts || []).map(p => p.type == 'table' ? table(p) : p.type == 'bullets' ? bulletList(p) : `<p style="font-size:14.5px;color:var(--ink);line-height:1.55">${inline(p.text)}</p>`).join('');
+    const first = (b, type) => (b.parts || []).find(p => p.type == type);
     const get = (items, k) => ((items || []).find(x => String(x[0]).toLowerCase().startsWith(k)) || [])[1];
+    const isKey = (key, name) => key === name || key.endsWith(name) || key.includes(name);
 
     const fitPanel = (t, iD, iS, iF, iE) => {
       const rows = t.rows.map(r => {
@@ -132,12 +136,10 @@ export function buildReportBody(R) {
 ${rows}</div>`;
     };
 
-    const html = D.lens.blocks.map(b => {
+    const html = (D.lens.blocks || []).map(b => {
       const key = String(b.heading || '').toLowerCase().trim();
-      if (!key && b.level == 2) return ''; // preamble: covered by the section lead
-      if (b.level == 3) return `<h3 class="lens-sub" style="font-size:24px;margin-top:22px;padding-top:16px;border-top:1px solid var(--ln)">${b.heading}</h3>`;
 
-      if (key == 'venture signature') {
+      if (isKey(key, 'venture signature')) {
         const bl = first(b, 'bullets'), items = bl ? bl.items : [];
         const mech = get(items, 'primary value'), outcome = get(items, 'customer outcome');
         if (mech) {
@@ -146,42 +148,49 @@ ${rows}</div>`;
         }
       }
 
-      if (key == 'condition to prove') {
-        return `<div class="lens-cond"><b>Condition to prove:</b> ${b.parts.filter(p => p.type == 'text').map(p => inline(p.text)).join(' ')}</div>`;
+      if (isKey(key, 'condition to prove')) {
+        return `<div class="lens-cond"><b>Condition to prove:</b> ${b.parts.filter(p => p.type == 'text').map(p => inline(p.text)).join(' ') || generic(b)}</div>`;
       }
 
-      if (key == 'venture fit') {
+      if (isKey(key, 'venture fit')) {
         const t = first(b, 'table');
         const ix = re => t ? t.head.findIndex(h => re.test(h)) : -1;
         const iD = ix(/dimension/i), iS = ix(/signal/i), iF = ix(/finding/i), iE = ix(/evidence/i);
         if (t && iD > -1 && iS > -1 && iF > -1) return fitPanel(t, iD, iS, iF, iE);
       }
 
-      if (key == 'claims' || key == 'evidence register') {
+      if (isKey(key, 'claims') || isKey(key, 'evidence register')) {
         const t = first(b, 'table');
         if (t) return `<details class="card"><summary>${b.heading} (${t.rows.length})</summary>${table(t)}</details>`;
       }
 
-      if (key == 'breakpoint') {
+      if (isKey(key, 'breakpoint')) {
         const title = (b.parts.find(p => p.type == 'text') || {}).text || '';
         const bl = first(b, 'bullets');
         const notes = (bl ? bl.items : []).map(x => `<p class="pos-note" style="margin-top:6px"><strong>${x[0]}:</strong> ${x[1]}</p>`).join('');
-        return `<div class="pos-callout"><div class="pos-badge">BREAKPOINT</div><div class="pos-statement">${inline(title)}</div>${notes}</div>`;
+        return `<div class="pos-callout"><div class="pos-badge">BREAKPOINT</div><div class="pos-statement">${inline(title) || generic(b)}</div>${notes}</div>`;
       }
 
-      if (key == 'next test') {
+      if (isKey(key, 'next test')) {
         const nt = (first(b, 'bullets') || { items: [] }).items;
         const row = (label, k) => get(nt, k) ? `<div class="wide"><span>${label}</span>${get(nt, k)}</div>` : '';
         const pass = get(nt, 'pass') ? `<div class="pass"><span>Pass if</span>${get(nt, 'pass')}</div>` : '';
         const revise = get(nt, 'revise') ? `<div class="rev"><span>Revise if</span>${get(nt, 'revise')}</div>` : '';
-        return `<div class="card"><span class="eyebrow">Next test</span><h3 style="margin-top:4px">${get(nt, 'assumption') || 'The next experiment'}</h3><div class="nt-grid">${row('Test with', 'test with')}${row('Do', 'do')}${row('Evidence to observe', 'evidence')}${pass}${revise}${row('Decision', 'decision')}</div></div>`;
+        const grid = `${row('Test with', 'test with')}${row('Do', 'do')}${row('Evidence to observe', 'evidence')}${pass}${revise}${row('Decision', 'decision')}`;
+        return `<div class="card"><span class="eyebrow">Next test</span><h3 style="margin-top:4px">${get(nt, 'assumption') || b.heading || 'The next experiment'}</h3><div class="nt-grid">${grid || generic(b)}</div></div>`;
       }
 
-      // anything else (buyer path per lane, activation map, ...): shown as written, in order
-      return `<h3 class="lens-sub">${b.heading}</h3>${generic(b)}`;
+      // anything else (buyer path, activation map, preamble with no heading): shown as written
+      const body = generic(b);
+      if (!key) return body;
+      return `<h3 class="lens-sub">${b.heading}</h3>${body}`;
     }).join('');
 
-    return sec('lens', 'The Productica Lens', 'How this idea creates value, and where it meets the buyer. The Lens gives no score and no verdict: it maps fit, evidence, the breakpoint and the next test.', `<div class="lens-shell">${html}</div>`);
+    const fallback = !String(html || '').trim() && D.lens.raw
+      ? `<div class="card"><p style="font-size:14.5px;color:var(--ink);line-height:1.55;white-space:pre-wrap">${inline(D.lens.raw)}</p></div>`
+      : '';
+
+    return sec('lens', 'The Productica Lens', 'How this idea creates value, and where it meets the buyer. The Lens gives no score and no verdict: it maps fit, evidence, the breakpoint and the next test.', `<div class="lens-shell">${html || fallback}</div>`);
   });
 
   // 5. WHO BUYS FIRST

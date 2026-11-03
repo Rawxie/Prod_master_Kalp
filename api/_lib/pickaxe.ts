@@ -6,6 +6,17 @@ export class PickaxeError extends Error {}
 
 const safeJson = (s: string) => { try { return JSON.parse(s); } catch { return null; } };
 
+function pickText(value: unknown): string {
+  if (typeof value === 'string' && value.trim()) return value;
+  if (!value || typeof value !== 'object') return '';
+  const o = value as Record<string, unknown>;
+  for (const key of ['result', 'output', 'completion', 'markdown', 'report', 'text', 'message', 'content']) {
+    const hit = pickText(o[key]);
+    if (hit) return hit;
+  }
+  return '';
+}
+
 /** The deployment id is the bearer token. Never call this from the browser. */
 export async function completePickaxe(
   token: string | undefined,
@@ -26,11 +37,12 @@ export async function completePickaxe(
     });
     const text = await r.text();
     const json = safeJson(text);
-    if (!r.ok || !json || json.success === false || typeof json.result !== 'string' || !json.result.trim()) {
+    const result = pickText(json) || (typeof text === 'string' && !text.trim().startsWith('{') ? text : '');
+    if (!r.ok || json?.success === false || !result.trim()) {
       console.error('[pickaxe] error', r.status, text.slice(0, 500));
       throw new PickaxeError('The report engine could not complete this run. Please try again.');
     }
-    return json.result;
+    return result;
   } catch (e: any) {
     if (e?.name === 'AbortError') throw new PickaxeError('The report took too long. Please try again.');
     throw e;

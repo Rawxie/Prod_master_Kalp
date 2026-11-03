@@ -81,7 +81,7 @@ export default function NewsCards() {
         {[2, 1, 0].map(offset => (
           <div
             key={offset}
-            className="absolute inset-x-0 top-0 rounded-2xl border border-white/10 bg-black"
+            className="absolute inset-x-0 top-0 rounded-2xl border border-white/10 bg-white/[0.03]"
             style={{
               transform: `translateY(${offset * 10}px) scale(${1 - offset * 0.03})`,
               opacity: offset === 0 ? 1 : 0.35,
@@ -99,7 +99,7 @@ export default function NewsCards() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -16 }}
             transition={{ duration: 0.35 }}
-            className="absolute inset-0 z-10 rounded-2xl border border-white/15 bg-[#0a0a0a] p-5 flex flex-col hover:border-white/30 transition-colors overflow-hidden"
+            className="absolute inset-0 z-10 rounded-2xl border border-white/15 bg-white/[0.03] p-5 flex flex-col hover:border-white/30 transition-colors overflow-hidden"
           >
             <div className="flex items-center justify-between gap-3 text-[10px] font-mono uppercase tracking-widest text-white/40">
               <span>{card.source}</span>
@@ -113,7 +113,7 @@ export default function NewsCards() {
                   className="hidden sm:block w-20 h-20 rounded-xl object-cover border border-white/10 shrink-0 bg-white/5"
                 />
               )}
-              <h3 className="text-lg md:text-xl font-semibold tracking-tight leading-snug">{card.title}</h3>
+              <h3 className="text-lg md:text-xl font-semibold tracking-tight leading-snug text-white">{card.title}</h3>
             </div>
             {card.summary && <p className="mt-3 text-sm text-white/45 leading-relaxed line-clamp-3">{card.summary}</p>}
             <span className="mt-auto pt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-white">

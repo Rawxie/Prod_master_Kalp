@@ -121,7 +121,7 @@ td b{color:var(--ink)}
 .verdict-scale span:nth-child(1){background:var(--bad)}.verdict-scale span:nth-child(2){background:color-mix(in srgb,var(--bad) 70%,var(--up))}.verdict-scale span:nth-child(3){background:var(--up);color:#1b1b1b}.verdict-scale span:nth-child(4){background:var(--good)}
 .verdict-pointer{position:absolute;top:0;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;z-index:3;transition:left 1s cubic-bezier(.2,.8,.2,1)}
 .verdict-pointer b{order:-1;background:var(--ink);color:var(--bg);padding:4px 8px;border-radius:6px;font:700 10px var(--hd);white-space:nowrap}
-.pointer-dot{width:2px;height:44px;background:var(--ink);position:relative}
+.pointer-dot{display:block;width:2px;height:44px;background:var(--ink);position:relative}
 .pointer-dot:after{content:"";position:absolute;left:50%;bottom:-4px;width:10px;height:10px;border:2px solid var(--ink);background:var(--cd);border-radius:50%;transform:translateX(-50%)}
 
 /* VENTURE FIT */
