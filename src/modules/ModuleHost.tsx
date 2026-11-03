@@ -25,7 +25,7 @@ export default function ModuleHost({ module }: { module: AppModule }) {
 
   return (
     <AuthProvider>
-      {module.requiresAuth ? <AuthGate title={module.title}>{page}</AuthGate> : page}
+      {module.requiresAuth ? <AuthGate title={module.title} landing={module.landing}>{page}</AuthGate> : page}
     </AuthProvider>
   );
 }

@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { LogOut, Moon, Sun } from 'lucide-react';
+import { grantsHref, ideaHref, markWorkspaceOpen } from './venture/landingGate';
 import { useVentureTheme } from './venture/theme';
 
 interface Props {
@@ -24,8 +25,8 @@ export default function ToolChrome({ active, account, onSignOut, children }: Pro
         </a>
 
         <nav className="flex items-center gap-1 text-sm">
-          <a href="/idea" className={tab(active === 'idea')}>Validate</a>
-          <a href="/grants" className={tab(active === 'grants')}>Grants</a>
+          <a href={ideaHref()} onClick={markWorkspaceOpen} aria-current={active === 'idea' ? 'page' : undefined} className={tab(active === 'idea')}>Validate</a>
+          <a href={grantsHref()} onClick={markWorkspaceOpen} aria-current={active === 'grants' ? 'page' : undefined} className={tab(active === 'grants')}>Grants</a>
         </nav>
 
         <div className="ml-auto flex items-center gap-2 md:gap-3 min-w-0">

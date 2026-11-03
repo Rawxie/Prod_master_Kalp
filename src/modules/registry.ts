@@ -1,4 +1,5 @@
 import type { ComponentType } from 'react';
+import type { VentureTool } from './venture/landingGate';
 
 // Every app-style page (anything beyond the marketing site) is a module registered here.
 // To add one: create src/modules/<name>/<Name>Module.tsx (default export a component),
@@ -10,6 +11,8 @@ export interface AppModule {
   title: string;
   /** Signed-out visitors see the email sign-in instead of the page. */
   requiresAuth: boolean;
+  /** Public landing shown before sign-in. */
+  landing?: VentureTool;
   /** Lazy so the marketing site never downloads module code (or Supabase). */
   load: () => Promise<{ default: ComponentType }>;
 }
@@ -19,12 +22,14 @@ export const modules: AppModule[] = [
     path: '/idea',
     title: 'VentureLab',
     requiresAuth: true,
+    landing: 'idea',
     load: () => import('./idea/IdeaModule'),
   },
   {
     path: '/grants',
     title: 'VentureLab',
     requiresAuth: true,
+    landing: 'grants',
     load: () => import('./grants/GrantsModule'),
   },
 ];

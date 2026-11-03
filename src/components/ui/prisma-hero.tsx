@@ -102,7 +102,7 @@ export interface PrismaHeroProps {
   /** Small label above the description. Full-screen landing only. */
   eyebrow?: string;
   /** Quiet second action, kept in the banner so the page does not need another title row. */
-  secondary?: { label: string; href: string };
+  secondary?: { label: string; href: string; onClick?: () => void };
   navItems?: PrismaHeroNavItem[];
   videoSrc?: string;
   /** Sits in the page header instead of covering the screen. */
@@ -234,7 +234,7 @@ const PrismaHero = ({
                   </span>
                 </motion.a>
                 {secondary && (
-                  <a href={secondary.href} className="text-sm font-medium" style={{ color: 'rgba(225, 224, 204, 0.8)' }}>
+                  <a href={secondary.href} onClick={secondary.onClick} className="text-sm font-medium" style={{ color: 'rgba(225, 224, 204, 0.8)' }}>
                     {secondary.label}
                   </a>
                 )}

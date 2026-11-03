@@ -1,7 +1,8 @@
-import { useEffect } from 'react';
 import { PrismaHero } from '@/components/ui/prisma-hero';
+import ToolStory from './venture/ToolStory';
 
 interface Props {
+  kind: 'idea' | 'grants';
   title: string;
   eyebrow: string;
   description: string;
@@ -10,25 +11,11 @@ interface Props {
   onEnter: () => void;
 }
 
-/** Full-screen hero in front of a tool. The page does not scroll until the visitor continues. */
-export default function ToolLanding({ title, eyebrow, description, detail, ctaLabel, onEnter }: Props) {
-  useEffect(() => {
-    const root = document.documentElement;
-    const prevHtml = root.style.overflow;
-    const prevBody = document.body.style.overflow;
-    root.style.overflow = 'hidden';
-    document.body.style.overflow = 'hidden';
-    const lenis = (window as unknown as { lenis?: { stop: () => void; start: () => void } }).lenis;
-    lenis?.stop();
-    return () => {
-      root.style.overflow = prevHtml;
-      document.body.style.overflow = prevBody;
-      lenis?.start();
-    };
-  }, []);
-
+/** Full-screen hero, then the tool story. The hero itself is unchanged. */
+export default function ToolLanding({ kind, title, eyebrow, description, detail, ctaLabel, onEnter }: Props) {
   return (
-    <div className="vl-landing-screen vl-hero fixed inset-0 z-40 overflow-hidden" style={{ background: '#000' }}>
+    <div>
+      <div className="vl-landing-screen vl-hero relative h-dvh overflow-hidden" style={{ background: '#000' }}>
       <PrismaHero
         fill
         title={title}
@@ -50,6 +37,8 @@ export default function ToolLanding({ title, eyebrow, description, detail, ctaLa
           </button>
         </div>
       </header>
+      </div>
+      <ToolStory kind={kind} onCta={onEnter} />
     </div>
   );
 }

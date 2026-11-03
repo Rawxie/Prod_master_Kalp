@@ -3,6 +3,7 @@ import { ArrowRight, Eye, EyeOff, Moon, Sun } from 'lucide-react';
 import { getSupabase } from '../lib/supabase';
 import { useVentureTheme } from '../modules/venture/theme';
 import { useAuth } from './useAuth';
+import { grantsHref, ideaHref } from '../modules/venture/landingGate';
 import { normalizePhone, normalizeUsername, validatePassword, validatePhone, validateUsername } from './redirect';
 
 type Mode = 'signin' | 'signup' | 'forgot';
@@ -240,8 +241,8 @@ export default function LoginScreen({ title }: { title: string }) {
         </a>
         <div className="flex items-center gap-3">
           <nav className="hidden sm:flex items-center gap-3 text-sm text-white/50">
-            <a href="/idea" className="hover:text-white">Validate</a>
-            <a href="/grants" className="hover:text-white">Grants</a>
+            <a href={ideaHref()} className="hover:text-white">Validate</a>
+            <a href={grantsHref()} className="hover:text-white">Grants</a>
           </nav>
           <button type="button" onClick={toggle} aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'} className="w-9 h-9 rounded-full border border-white/15 flex items-center justify-center text-white/70 hover:text-white">
             {theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />}

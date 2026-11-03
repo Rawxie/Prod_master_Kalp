@@ -3,7 +3,8 @@ import { ArrowRight, FileText, Trash2 } from 'lucide-react';
 import { PrismaHero } from '@/components/ui/prisma-hero';
 import { useAuth } from '../../auth/useAuth';
 import ToolChrome from '../ToolChrome';
-import ToolLanding from '../ToolLanding';
+import ProducticaFooter from '../venture/ProducticaFooter';
+import { markWorkspaceOpen } from '../venture/landingGate';
 import { readWorkspace, writeWorkspace } from '../workspace';
 import { grantsApi } from '../grants/grantsApi';
 import IdeaForm, { type FormBusy } from './IdeaForm';
@@ -34,10 +35,9 @@ export default function IdeaModule() {
   const [prefill, setPrefill] = useState<Partial<IdeaAnswers> | undefined>();
   const [formKey, setFormKey] = useState(0);
   const [grantByIdea, setGrantByIdea] = useState<Record<string, string>>({});
-  const [entered, setEntered] = useState(() => {
-    const params = new URLSearchParams(window.location.search);
-    return params.get('from') === 'grants' || Boolean(params.get('r'));
-  });
+  useEffect(() => {
+    markWorkspaceOpen();
+  }, []);
 
   useEffect(() => {
     document.title = 'Validate · VentureLab';
@@ -176,19 +176,6 @@ export default function IdeaModule() {
     ? 'A report is already generating. It will appear in your history when it is ready.'
     : undefined;
 
-  if (!entered) {
-    return (
-      <ToolLanding
-        title="Validate"
-        eyebrow="Idea validation"
-        description="Big ideas deserve better than guesswork."
-        detail="Validate your startup idea with AI-powered market insights, competitor analysis, and product-market fit intelligence. Know your opportunity before you build."
-        ctaLabel="Start a validation"
-        onEnter={() => setEntered(true)}
-      />
-    );
-  }
-
   return (
     <div className="min-h-screen bg-black text-white selection:bg-white selection:text-black">
       <ToolChrome active="idea" account={displayName} onSignOut={() => void signOut()}>
@@ -204,7 +191,7 @@ export default function IdeaModule() {
             description="Name the startup. Get a scored report. Then match grants on the same venture."
             ctaLabel={remaining === 0 ? 'Your reports' : 'New validation'}
             ctaHref={remaining === 0 ? '#history' : '#validate'}
-            secondary={{ label: 'Open Grants', href: '/grants' }}
+            secondary={{ label: 'Open Grants', href: '/grants#match', onClick: markWorkspaceOpen }}
           />
           <aside id="history" className="flex h-full min-h-[280px] max-h-[520px] flex-col overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] scroll-mt-8">
             <div className="px-5 pt-5">
@@ -261,6 +248,7 @@ export default function IdeaModule() {
           )}
         </section>
       </main>
+      <ProducticaFooter />
     </div>
   );
 }
@@ -342,7 +330,7 @@ function HistoryRow({ r, grantsHref, grantsDone, onOpen, onDelete }: { r: IdeaRe
         </button>
         <div className="flex flex-col items-end gap-2">
           {grantsHref && (
-            <a href={grantsHref} onClick={e => e.stopPropagation()} className="text-[10px] font-mono uppercase tracking-widest text-white/50 hover:text-white transition-colors">
+            <a href={grantsHref} onClick={e => { e.stopPropagation(); markWorkspaceOpen(); }} className="text-[10px] font-mono uppercase tracking-widest text-white/50 hover:text-white transition-colors">
               Grants
             </a>
           )}

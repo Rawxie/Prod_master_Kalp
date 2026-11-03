@@ -159,9 +159,17 @@ function App() {
       const appModule = findModule(path);
       if (appModule) {
         e.preventDefault();
+        const fromTool = currentPath === '/idea' || currentPath.startsWith('/idea/') || currentPath === '/grants' || currentPath.startsWith('/grants/');
+        const intoSaved = url.searchParams.has('r') || url.searchParams.has('idea') || url.searchParams.get('from') === 'grants';
+        if (fromTool || intoSaved) {
+          try {
+            sessionStorage.setItem('productica.venturelab.entered.idea', '1');
+            sessionStorage.setItem('productica.venturelab.entered.grants', '1');
+          } catch { /* private mode */ }
+        }
         go(next);
         if (!hash) window.scrollTo({ top: 0, behavior: 'instant' });
-        else setTimeout(() => scrollToHash(hash), 50);
+        else [50, 180, 400].forEach(delay => setTimeout(() => scrollToHash(hash), delay));
         return;
       }
 

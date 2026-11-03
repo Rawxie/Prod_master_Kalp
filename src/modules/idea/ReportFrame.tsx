@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { ArrowLeft, ArrowRight, Printer } from 'lucide-react';
+import { markWorkspaceOpen } from '../venture/landingGate';
 import { parseIdeaReport } from './report/parseReport';
 import { buildReportDocument } from './report/buildReportHtml';
 
@@ -38,7 +39,7 @@ export default function ReportFrame({ markdown, grantsHref, onBack }: Props) {
           <ArrowLeft size={14} /> Validate
         </button>
         <div className="flex items-center gap-2">
-          <a href={grantsHref} className="flex items-center gap-2 text-xs font-semibold rounded-full bg-white text-black px-4 py-1.5 hover:bg-white/90 transition-colors">
+          <a href={grantsHref} onClick={markWorkspaceOpen} className="flex items-center gap-2 text-xs font-semibold rounded-full bg-white text-black px-4 py-1.5 hover:bg-white/90 transition-colors">
             Grants <ArrowRight size={14} />
           </a>
           <button

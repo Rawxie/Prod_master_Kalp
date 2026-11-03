@@ -4,7 +4,8 @@ import { ArrowRight, ArrowUpRight, FileText, Trash2 } from 'lucide-react';
 import { PrismaHero } from '@/components/ui/prisma-hero';
 import { useAuth } from '../../auth/useAuth';
 import ToolChrome from '../ToolChrome';
-import ToolLanding from '../ToolLanding';
+import ProducticaFooter from '../venture/ProducticaFooter';
+import { markWorkspaceOpen } from '../venture/landingGate';
 import { writeWorkspace } from '../workspace';
 import { ideaApi } from '../idea/ideaApi';
 import type { IdeaReportSummary } from '../idea/types';
@@ -46,7 +47,9 @@ export default function GrantsModule() {
   const [showForm, setShowForm] = useState(true);
   /** True when the visitor chose to answer the venture questions on this page. */
   const [ownIdea, setOwnIdea] = useState(false);
-  const [entered, setEntered] = useState(() => Boolean(ideaFromUrl()));
+  useEffect(() => {
+    markWorkspaceOpen();
+  }, []);
 
   useEffect(() => {
     document.title = 'Grants · VentureLab';
@@ -249,19 +252,6 @@ export default function GrantsModule() {
     ? `/idea?r=${source.id}`
     : `/idea?from=grants`;
 
-  if (!entered) {
-    return (
-      <ToolLanding
-        title="Grants"
-        eyebrow="Grant matching"
-        description="Find the funding your startup deserves."
-        detail="Discover startup grants and government schemes tailored to your business, industry, and stage. Spend less time searching and more time building."
-        ctaLabel="Match grants"
-        onEnter={() => setEntered(true)}
-      />
-    );
-  }
-
   return (
     <div className="min-h-screen bg-black text-white selection:bg-white selection:text-black">
       {busy && waitStartedAt && (
@@ -287,7 +277,7 @@ export default function GrantsModule() {
             description="Match schemes to one of your ideas. A saved validation skips those questions. Starting here asks them once."
             ctaLabel="Match grants"
             ctaHref="#match"
-            secondary={{ label: 'Open Validate', href: '/idea' }}
+            secondary={{ label: 'Open Validate', href: '/idea#validate', onClick: markWorkspaceOpen }}
           />
           <aside className="flex h-full min-h-[280px] max-h-[520px] flex-col overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03]">
             <div className="px-5 pt-5">
@@ -384,7 +374,7 @@ export default function GrantsModule() {
                     </button>
                   </div>
                   {source && (
-                    <a href={`/idea?r=${source.id}`} className="inline-flex items-center gap-1.5 text-sm text-white/60 hover:text-white transition-colors">
+                    <a href={`/idea?r=${source.id}`} onClick={markWorkspaceOpen} className="inline-flex items-center gap-1.5 text-sm text-white/60 hover:text-white transition-colors">
                       <FileText size={14} /> Open this validation
                     </a>
                   )}
@@ -392,7 +382,7 @@ export default function GrantsModule() {
               ) : (
                 <p className="text-sm text-white/40">
                   No validations yet, so Grants asks the same venture questions.{' '}
-                  <a href="/idea" className="text-white underline underline-offset-2 hover:text-white/70">Validate first</a>
+                  <a href="/idea#validate" onClick={markWorkspaceOpen} className="text-white underline underline-offset-2 hover:text-white/70">Validate first</a>
                   {' '}if you would rather answer them there.
                 </p>
               )}
@@ -508,6 +498,7 @@ export default function GrantsModule() {
           </section>
         </div>
       </main>
+      <ProducticaFooter />
     </div>
   );
 }
@@ -519,7 +510,7 @@ function ContextCard({ source, input, validateHref, asking, hasIdeas }: { source
         <p className="text-[10px] font-mono uppercase tracking-[0.3em] text-white/30">Shared with idea validation</p>
         <p className="mt-2 text-lg font-semibold tracking-tight">{source.startup_name?.trim() || source.title || source.idea}</p>
         <p className="mt-1 text-sm text-white/45">{source.stage}{source.verdict ? ` · ${source.verdict}` : ''}{source.iq != null ? ` · IQ ${Number(source.iq).toFixed(1)}` : ''}</p>
-        <a href={`/idea?r=${source.id}`} className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-white hover:text-white/70 transition-colors">
+        <a href={`/idea?r=${source.id}`} onClick={markWorkspaceOpen} className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-white hover:text-white/70 transition-colors">
           Open the validation <ArrowRight size={14} />
         </a>
       </div>
@@ -543,14 +534,17 @@ function ContextCard({ source, input, validateHref, asking, hasIdeas }: { source
       </p>
       <a
         href={validateHref}
-        onClick={() => writeWorkspace({
-          venture: input.startupName.trim() || input.idea.trim(),
-          startupName: input.startupName.trim(),
-          idea: input.idea.trim(),
-          audience: input.audience.trim(),
-          different: input.different.trim(),
-          stage: input.stage || undefined,
-        })}
+        onClick={() => {
+          markWorkspaceOpen();
+          writeWorkspace({
+            venture: input.startupName.trim() || input.idea.trim(),
+            startupName: input.startupName.trim(),
+            idea: input.idea.trim(),
+            audience: input.audience.trim(),
+            different: input.different.trim(),
+            stage: input.stage || undefined,
+          });
+        }}
         className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-white hover:text-white/70 transition-colors"
       >
         Validate this idea <ArrowRight size={14} />
@@ -591,7 +585,7 @@ function ResultList({
   return (
     <div className="grid gap-4">
       {source && (
-        <a href={`/idea?r=${source.id}`} className="rounded-2xl border border-white/10 px-5 py-4 flex flex-wrap items-center justify-between gap-3 hover:border-white/25 transition-colors">
+        <a href={`/idea?r=${source.id}`} onClick={markWorkspaceOpen} className="rounded-2xl border border-white/10 px-5 py-4 flex flex-wrap items-center justify-between gap-3 hover:border-white/25 transition-colors">
           <span>
             <span className="block text-[10px] font-mono uppercase tracking-[0.25em] text-white/30">From idea validation</span>
             <span className="mt-1 block text-sm font-semibold">{source.startup_name?.trim() || source.title || source.idea}</span>

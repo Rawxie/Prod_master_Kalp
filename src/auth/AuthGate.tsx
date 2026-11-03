@@ -1,13 +1,33 @@
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { useAuth } from './useAuth';
 import LoginScreen from './LoginScreen';
+import ToolLanding from '../modules/ToolLanding';
+import { landingCopy } from '../modules/venture/landingCopy';
+import { markWorkspaceOpen, shouldSkipLanding, type VentureTool } from '../modules/venture/landingGate';
 import { VentureTheme } from '../modules/venture/theme';
 
-// Renders children only for signed-in users. Wrap any page that needs an account.
-export default function AuthGate({ title, children }: { title: string; children: ReactNode }) {
+// Public landing first, then sign-in, then the tool.
+export default function AuthGate({ title, landing, children }: { title: string; landing?: VentureTool; children: ReactNode }) {
   const { configured, loading, session, passwordRecovery } = useAuth();
+  const [askedToEnter, setAskedToEnter] = useState(() => !landing || shouldSkipLanding(landing));
+  const showLanding = Boolean(landing) && !askedToEnter && !session && !passwordRecovery;
 
-  const screen = !configured ? (
+  const enter = () => {
+    markWorkspaceOpen();
+    setAskedToEnter(true);
+  };
+
+  const screen = showLanding && landing ? (
+    <ToolLanding
+      kind={landing}
+      title={landingCopy[landing].title}
+      eyebrow={landingCopy[landing].eyebrow}
+      description={landingCopy[landing].description}
+      detail={landingCopy[landing].detail}
+      ctaLabel={landingCopy[landing].ctaLabel}
+      onEnter={enter}
+    />
+  ) : !configured ? (
       <div className="min-h-screen bg-black text-white flex items-center justify-center px-6">
         <div className="max-w-md">
           <p className="text-[10px] font-mono uppercase tracking-[0.3em] text-white/30 mb-4">Not configured</p>
