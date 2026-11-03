@@ -27,9 +27,8 @@ const HELP = {
 const gauge = (s, u) => {
   const P = (v, r) => { const g = Math.PI * (1 + v / 10); return [(320 + r * Math.cos(g)).toFixed(1), (270 + r * Math.sin(g)).toFixed(1)]; };
   const [x1, y1] = P(6.5, 184), [x2, y2] = P(6.5, 216), arc = 'M 120 270 A 200 200 0 0 1 520 270';
-  return `<div class="iq-cockpit"><svg viewBox="60 14 520 286" aria-label="Syncoro IQ ${s.toFixed(1)} of 10, upside ${u.toFixed(1)}">
+  return `<div class="iq-cockpit"><svg viewBox="60 14 520 286" aria-label="Syncoro IQ ${s.toFixed(1)} of 10">
 <path d="${arc}" class="iq-track"/><path d="${arc}" class="iq-fill" pathLength="100" style="stroke-dasharray:${s * 10} 100"/>
-<path d="${arc}" class="iq-upside" pathLength="100" style="stroke-dasharray:${Math.max(0, u - s) * 10} 100;stroke-dashoffset:-${s * 10}"/>
 ${[0, 2, 4, 6, 8, 10].map(v => { const [x, y] = P(v, 242); return `<text x="${x}" y="${y}" class="iq-tick" text-anchor="middle" dominant-baseline="middle">${v}</text>`; }).join('')}
 <g class="iq-build-mark"><line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/></g></svg>
 <div class="iq-score-overlay"><strong>${s.toFixed(1)}</strong><span>SYNCORO IQ / 10</span></div></div>`;
@@ -58,7 +57,7 @@ const cap = w => String(w || '').charAt(0).toUpperCase() + String(w || '').slice
 // styling comes from the signal family, the label is always the agent's own word
 const sigOf = s => { const k = String(s || '').toLowerCase().trim(); const base = SIG[SIG_ALIAS[k] || k] || SIG.unknown; return [base[0], base[1], base[2], base[3], cap(k) || base[4]]; };
 
-export function buildReportBody(R) {
+export function buildReportBody(R, opts = {}) {
   const D = esc(R || {});
   const q = D.q || [];
   const r1 = x => Math.round((x + 1e-9) * 10) / 10;
@@ -82,20 +81,18 @@ export function buildReportBody(R) {
   const SC = (D.score && D.score.length) ? D.score : [];
   const dateStr = D.date || new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
-  const meterLeft = /^park/i.test(V) ? '17.5%' : /^pivot/i.test(V) ? '42.5%' : /^test/i.test(V) ? '57.5%' : /^build/i.test(V) ? '82.5%' : `${Math.min(92, Math.max(8, a * 10))}%`;
   const hero = `<header class="hero"><div class="wrap"><div><span class="pill ${vc}">Verdict: ${V}</span><h1>${D.name}</h1><p class="th">${D.sub || ''}</p></div>
-<div class="card hero-gauge"><div class="hg-head"><span class="eyebrow">Syncoro IQ · Venture Diagnostic</span><span class="chip ${vchip}">${V}</span></div>${gauge(a, b)}
-<div class="iq-legend"><span><i></i>Today ${a.toFixed(1)}</span><span><i class="d"></i>Upside ${b.toFixed(1)}</span><span><i class="b"></i>6.5 Build gate</span></div>
-<div class="verdict-meter" aria-label="Verdict ${V}, Syncoro IQ ${a.toFixed(1)} of 10"><div class="verdict-pointer" style="left:${meterLeft}"><b>${V} · ${a.toFixed(1)}</b><i class="pointer-dot"></i></div><div class="verdict-scale"><span>Park</span><span>Pivot</span><span>Test</span><span>Build</span></div></div></div>
+<div class="card hero-gauge"><div class="hg-head"><span class="eyebrow">Syncoro IQ · Venture Diagnostic</span><span class="chip ${vchip}">${V}</span></div>${gauge(a, b)}</div>
 </div></header>`;
+
 
   const S = [];
 
   // 1. SYNCORO IQ TEST
   if (q.length) S.push(() => {
-    const rows = r => `<div class="iq-quotient"><div class="iq-qhead"><h3>${r[0]} Quotient</h3><div class="iq-qscore">${(+r[2]).toFixed(1)}<small> / 10</small>${r[3] != null && !isNaN(r[3]) ? `<small style="margin-left:12px;color:var(--tc2)">upside ${(+r[3]).toFixed(1)}</small>` : ''}</div></div>${(r[4] || []).map(x => `<div class="iq-row"><span>${x[0]}</span><span class="iq-dots">${Array.from({ length: 10 }, (_, k) => `<i class="${k < +x[1] ? 'on' : ''}"></i>`).join('')}</span><span class="iq-evidence">${x[3] || ''}</span></div>`).join('')}</div>`;
+    const rows = r => `<div class="iq-quotient"><div class="iq-qhead"><h3>${r[0]} Quotient</h3><div class="iq-qscore">${(+r[2]).toFixed(1)}<small> / 10</small></div></div>${(r[4] || []).map(x => `<div class="iq-row"><span>${x[0]}</span><span class="iq-dots">${Array.from({ length: 10 }, (_, k) => `<i class="${k < +x[1] ? 'on' : ''}"></i>`).join('')}</span><span class="iq-evidence">${x[3] || ''}</span></div>`).join('')}</div>`;
     return sec('iq', 'Syncoro IQ Test', 'Five quotients, weighted into one score. The meter at the top of the report shows the result.',
-      `<div class="iq-shell"><div class="iq-hero"><div class="iq-topline"><div><span class="eyebrow">Syncoro IQ · Venture Diagnostic</span><p class="sm" style="margin-top:6px;max-width:56ch">The score separates what is attractive on paper from what has enough empirical evidence to deserve founder capital.${D.proofLabel ? ` Current proof level: <b>${D.proofLabel}</b>.` : ''}</p></div><div class="verdict-orb"><span>VERDICT</span><strong>${V}</strong><small>${dateStr}</small></div></div></div><div class="iq-formula">${q.map(r => `${Number(r[1]).toFixed(2)}×${(+r[2]).toFixed(1)} ${r[0]}`).join('  +  ')}  =  <b>${a.toFixed(1)}</b></div>${q.map(rows).join('')}</div>`);
+      `<div class="iq-shell"><div class="iq-hero"><div class="iq-topline"><div><span class="eyebrow">Syncoro IQ · Venture Diagnostic</span><p class="sm" style="margin-top:6px;max-width:56ch">The score separates what is attractive on paper from what has enough empirical evidence to deserve founder capital.${D.proofLabel ? ` Current proof level: <b>${D.proofLabel}</b>.` : ''}</p></div><div class="verdict-orb"><span>VERDICT</span><strong>${V}</strong><small>${dateStr}</small></div></div></div>${q.map(rows).join('')}</div>`);
   });
 
   // 2. SHOULD YOU BUILD THIS?
@@ -109,88 +106,21 @@ export function buildReportBody(R) {
     tbl(['', 'As submitted', 'Worth testing'], D.clar.map(r => [`<b>${r[0]}</b>`, r[1], r[2]]), 'tbl-compare') +
     (D.pos ? `<div class="pos-callout"><div class="pos-badge">CORE STRATEGIC POSITIONING</div><div class="pos-statement">“${D.pos}”</div>${D.wedge ? `<p class="pos-note"><strong>Wedge principle:</strong> ${D.wedge}</p>` : ''}</div>` : '')));
 
-  // 4. THE PRODUCTICA LENS
-  // Rendered block by block, in the agent's own order. Known blocks get a designed layout; every other
-  // block (extra buyer lanes, activation map, ...) is rendered generically so nothing is ever dropped.
-  if (D.lens && ((D.lens.blocks && D.lens.blocks.length) || D.lens.raw)) S.push(() => {
-    const inline = t => String(t || '')
-      .replace(/\*\*(.+?)\*\*/g, '<b>$1</b>')
-      .replace(/(^|[\s(])\*([^*]+)\*(?=[\s).,;:]|$)/g, '$1<i>$2</i>');
-    const sigCell = v => { const s = sigOf(v); return `<span class="tick ${s[1]}">${s[4]}</span>`; };
-    const table = t => tbl(t.head, t.rows.map(r => r.map((c, i) => /signal/i.test(t.head[i] || '') ? sigCell(c) : i == 0 ? `<b>${c}</b>` : c)), 'tbl-compare');
-    const bulletList = p => `<div class="card"><ul style="padding-left:18px;display:grid;gap:6px;font-size:14px;color:var(--ink)">${p.items.map(([k, v]) => `<li>${k ? `<b>${k}:</b> ` : ''}${v}</li>`).join('')}</ul></div>`;
-    const generic = b => (b.parts || []).map(p => p.type == 'table' ? table(p) : p.type == 'bullets' ? bulletList(p) : `<p style="font-size:14.5px;color:var(--ink);line-height:1.55">${inline(p.text)}</p>`).join('');
-    const first = (b, type) => (b.parts || []).find(p => p.type == type);
-    const get = (items, k) => ((items || []).find(x => String(x[0]).toLowerCase().startsWith(k)) || [])[1];
-    const isKey = (key, name) => key === name || key.endsWith(name) || key.includes(name);
-
-    const fitPanel = (t, iD, iS, iF, iE) => {
-      const rows = t.rows.map(r => {
-        const s = sigOf(r[iS]);
-        const ev = iE > -1 && r[iE] ? `<div class="fit-grid-meta" style="grid-template-columns:1fr"><div><span>Evidence badge</span>${r[iE]}</div></div>` : '';
-        return `<div class="fit-card-row" style="--fc:var(--${s[0]})"><div class="fit-num">${s[3]}</div><div><div class="fit-topline"><b>${r[iD]}</b><span class="${s[2]}">${s[4]}</span></div><p class="fit-desc">${r[iF]}</p>${ev}</div></div>`;
-      }).join('');
-      return `<h3 class="lens-sub">Venture fit</h3><div class="fit-panel">
-<div class="fit-head"><div><span class="eyebrow">Diagnostic Audit</span><h3>How well does ${D.name} fit its buyers?</h3><p class="sm">Commercial tests, read from evidence rather than scored.</p></div></div>
-<div class="fit-legend"><span><i style="background:var(--good)"></i>Aligned</span><span><i style="background:var(--up)"></i>Mixed / neutral</span><span><i style="background:var(--bad)"></i>Friction</span><span><i style="background:var(--mu)"></i>Unknown (not yet evidenced)</span></div>
-${rows}</div>`;
-    };
-
-    const html = (D.lens.blocks || []).map(b => {
-      const key = String(b.heading || '').toLowerCase().trim();
-
-      if (isKey(key, 'venture signature')) {
-        const bl = first(b, 'bullets'), items = bl ? bl.items : [];
-        const mech = get(items, 'primary value'), outcome = get(items, 'customer outcome');
-        if (mech) {
-          const rest = items.filter(x => !/^(primary value|customer outcome)/i.test(x[0]));
-          return `<div class="hero-arch-card lens-arch"><div class="h-arch-kicker"><span class="eyebrow">Venture Signature</span></div><h3>${mech}</h3><p class="h-arch-desc">${outcome || ''}</p><div class="h-arch-grid">${rest.map(x => `<div${String(x[1]).length > 90 ? ' class="span2"' : ''}><small>${x[0]}</small><b>${x[1]}</b></div>`).join('')}</div></div>`;
-        }
-      }
-
-      if (isKey(key, 'condition to prove')) {
-        return `<div class="lens-cond"><b>Condition to prove:</b> ${b.parts.filter(p => p.type == 'text').map(p => inline(p.text)).join(' ') || generic(b)}</div>`;
-      }
-
-      if (isKey(key, 'venture fit')) {
-        const t = first(b, 'table');
-        const ix = re => t ? t.head.findIndex(h => re.test(h)) : -1;
-        const iD = ix(/dimension/i), iS = ix(/signal/i), iF = ix(/finding/i), iE = ix(/evidence/i);
-        if (t && iD > -1 && iS > -1 && iF > -1) return fitPanel(t, iD, iS, iF, iE);
-      }
-
-      if (isKey(key, 'claims') || isKey(key, 'evidence register')) {
-        const t = first(b, 'table');
-        if (t) return `<details class="card"><summary>${b.heading} (${t.rows.length})</summary>${table(t)}</details>`;
-      }
-
-      if (isKey(key, 'breakpoint')) {
-        const title = (b.parts.find(p => p.type == 'text') || {}).text || '';
-        const bl = first(b, 'bullets');
-        const notes = (bl ? bl.items : []).map(x => `<p class="pos-note" style="margin-top:6px"><strong>${x[0]}:</strong> ${x[1]}</p>`).join('');
-        return `<div class="pos-callout"><div class="pos-badge">BREAKPOINT</div><div class="pos-statement">${inline(title) || generic(b)}</div>${notes}</div>`;
-      }
-
-      if (isKey(key, 'next test')) {
-        const nt = (first(b, 'bullets') || { items: [] }).items;
-        const row = (label, k) => get(nt, k) ? `<div class="wide"><span>${label}</span>${get(nt, k)}</div>` : '';
-        const pass = get(nt, 'pass') ? `<div class="pass"><span>Pass if</span>${get(nt, 'pass')}</div>` : '';
-        const revise = get(nt, 'revise') ? `<div class="rev"><span>Revise if</span>${get(nt, 'revise')}</div>` : '';
-        const grid = `${row('Test with', 'test with')}${row('Do', 'do')}${row('Evidence to observe', 'evidence')}${pass}${revise}${row('Decision', 'decision')}`;
-        return `<div class="card"><span class="eyebrow">Next test</span><h3 style="margin-top:4px">${get(nt, 'assumption') || b.heading || 'The next experiment'}</h3><div class="nt-grid">${grid || generic(b)}</div></div>`;
-      }
-
-      // anything else (buyer path, activation map, preamble with no heading): shown as written
-      const body = generic(b);
-      if (!key) return body;
-      return `<h3 class="lens-sub">${b.heading}</h3>${body}`;
-    }).join('');
-
-    const fallback = !String(html || '').trim() && D.lens.raw
-      ? `<div class="card"><p style="font-size:14.5px;color:var(--ink);line-height:1.55;white-space:pre-wrap">${inline(D.lens.raw)}</p></div>`
-      : '';
-
-    return sec('lens', 'The Productica Lens', 'How this idea creates value, and where it meets the buyer. The Lens gives no score and no verdict: it maps fit, evidence, the breakpoint and the next test.', `<div class="lens-shell">${html || fallback}</div>`);
+  // 4. THE PRODUCTICA LENS: venture archetype + venture fit
+  const A = D.arch || {};
+  const fitRows = D.fit || [];
+  if (A.n || fitRows.length || (D.lens && D.lens.raw)) S.push(() => {
+    const st = v => v >= 7 ? ['tag-good', 'Strong', 'Evidence supports this dimension.'] : v >= 5 ? ['tag-watch', 'Watch', 'Worth validating with focused buyer evidence.'] : ['tag-focus', 'Focus area', 'This is currently constraining the thesis.'];
+    const short = n => { const l = String(n).toLowerCase(); return l.startsWith('tailwind') ? 'Tailwind' : l.startsWith('price') ? 'Budget' : l.startsWith('reach') ? 'Reach' : l.startsWith('stick') ? 'Stickiness' : l.startsWith('trust') ? 'Trust' : n; };
+    const archetypes = [['M', 'Mandate Rider', 'Sells into a requirement the buyer must meet'], ['B', 'Mission Led Brand', 'Chosen for what it stands for'], ['X', 'Marketplace Maker', 'Connects buyers and sellers'], ['H', 'Habit Product', 'Used daily or weekly'], ['D', 'Deep Tech Builder', 'Built on a technical advance'], ['E', 'Efficiency Engine', 'Saves a business time or money'], ['S', 'Service to Platform', 'Starts as a service, becomes a product'], ['C', 'Community Builder', 'Value comes from its members'], ['V', 'Experience Creator', 'Sells memorable moments']];
+    const norm = x => String(x || '').toLowerCase().replace(/^the\s+/, '').trim();
+    const primary = norm(A.n), secondary = norm((D.arch2 || {}).n);
+    const mark = r => { const n = r[1].toLowerCase(); return n === primary ? 'PRIMARY' : (secondary && n === secondary) ? 'SECONDARY' : ''; };
+    const arch = A.n ? `<div class="lens-top"><div class="hero-arch-card"><div class="h-arch-kicker"><span class="eyebrow" style="color:var(--up)">Your primary archetype</span></div><h3>${A.n}</h3><p class="h-arch-desc">${A.d || ''}</p><div class="h-arch-grid">${A.win ? `<div><small>What drives success</small><b>${A.win}</b></div>` : ''}${A.watch ? `<div><small>What to watch</small><b>${A.watch}</b></div>` : ''}${A.kpi ? `<div><small>Key metric</small><b>${A.kpi}</b></div>` : ''}${(D.arch2 || {}).n ? `<div><small>Secondary archetype</small><b>${D.arch2.n}</b></div>` : ''}</div></div>
+<div class="arch-list">${archetypes.map(r => { const m = mark(r); return `<div class="arch-item ${m ? 'active' : ''}"><span class="letter">${r[0]}</span><div><h4>${r[1]}</h4><p>${r[2]}</p></div><span class="mark">${m || '○'}</span></div>`; }).join('')}</div></div>` : '';
+    const fitHtml = fitRows.length ? `<div class="fit-panel"><div class="fit-head"><div><span class="eyebrow">Venture Fit</span><h3>How well does the idea fit its buyers?</h3><p class="sm">Five tests scored 0 to 10. The point is not the average, it is knowing what to test next.</p></div></div>${fitRows.map(r => { const v = Math.max(0, Math.min(10, +r[1] || 0)); const [tag, label, note] = st(v); return `<div class="vf-row"><b>${short(r[0])}</b><div class="vf-bar"><i style="--fit:${v * 10}%"></i></div><span class="vf-score">${v}/10</span><span class="${tag}">${label}</span><span class="vf-note">${r[2] || note}${r[3] ? `<em>${r[3]}</em>` : ''}${r[4] ? `<em><b>Next:</b> ${r[4]}</em>` : ''}</span></div>`; }).join('')}</div>` : '';
+    const raw = !arch && !fitHtml && D.lens && D.lens.raw ? `<div class="card"><p class="raw-lens">${D.lens.raw}</p></div>` : '';
+    return sec('lens', 'The Productica Lens', 'Two views that sit beside the score and work for any idea, in any market. <b>Venture Archetype</b> shows which pattern your venture follows and what that pattern needs to succeed. <b>Venture Fit</b> shows how well the idea matches the way its buyers decide.', `<div class="lens-shell">${arch}${fitHtml}${raw}</div>`);
   });
 
   // 5. WHO BUYS FIRST
@@ -218,26 +148,34 @@ ${rows}</div>`;
 
   // 8. LEAN CANVAS
   if (D.leanCanvas && Object.keys(D.leanCanvas).length) S.push(() => {
-    const C = D.leanCanvas, cell = (k, l, c = '') => `<div class="lc-cell lc-${k} ${c}"><h4>${l}</h4><p>${C[k] || ''}</p></div>`;
+    const C = D.leanCanvas, v = x => (Array.isArray(x) ? list(x) : `<p>${x || ''}</p>`), cell = (k, l, c = '') => `<div class="lc-cell lc-${k} ${c}"><h4>${l}</h4>${v(C[k])}</div>`;
     return sec('lean-canvas', 'Lean Canvas, first version', 'The whole business model on one page, before any code is written.', `<div class="lc">${cell('problem', 'Problem')}${cell('solution', 'Solution')}${cell('metrics', 'Key metrics')}${cell('uvp', 'Unique value', 'lc-hi')}${cell('unfair', 'Unfair advantage')}${cell('channels', 'Channels')}${cell('segments', 'Customer')}${cell('cost', 'Costs')}${cell('revenue', 'Revenue')}</div>`);
   });
 
   // 9. RISKS & PRE-MORTEM
   if ((D.assume && D.assume.length) || (D.stories && D.stories.length)) S.push(() => {
     const sv = { critical: 'bad', high: 'up', medium: 'tc' };
-    return sec('risks', 'Riskiest assumptions & pre-mortem', D.riskLead || '', `<div class="as-list">${(D.assume || []).map((r, i) => `<div class="as-row" style="--sc:var(--${sv[String(r[2]).toLowerCase()] || 'mu'})"><span class="as-n">${i + 1}</span><div><b>${r[0]}</b><small>${r[1]}</small></div><span class="as-sev">${r[2]}</span><span class="as-ev">Evidence ${r[3]}</span></div>`).join('')}</div>
-<h3 class="pm-h">Pre-mortem</h3>
-<div class="pm-explain"><span class="pm-q">?</span><p><b>What is a pre-mortem?</b> A post-mortem asks why something failed after the fact. A pre-mortem asks the same question before you start: imagine it is 18 months from now and the venture has not worked out, then write down the most likely reasons. Psychologist Gary Klein designed it to surface risks that optimism hides, while there is still time to prevent them. Here are the three most likely stories for this idea, each with its prevention.</p></div>
+    return sec('risks', 'Riskiest assumptions & premortem', D.riskLead || '', `<div class="as-list">${(D.assume || []).map((r, i) => `<div class="as-row" style="--sc:var(--${sv[String(r[2]).toLowerCase()] || 'mu'})"><span class="as-n">${i + 1}</span><div><b>${r[0]}</b><small>${r[1]}</small></div><span class="as-sev">${r[2]}</span><span class="as-ev">Evidence ${r[3]}</span></div>`).join('')}</div>
+<h3 class="pm-h">Premortem</h3>
+<div class="pm-explain"><span class="pm-q">?</span><p><b>What is a premortem?</b> A postmortem asks why something failed after the fact. A premortem asks the same question before you start: imagine it is 18 months from now and the venture has not worked out, then write down the most likely reasons. Psychologist Gary Klein designed it to surface risks that optimism hides, while there is still time to prevent them. Here are the three most likely stories for this idea, each with its prevention.</p></div>
 <div class="pm-grid">${(D.stories || []).map((s, i) => `<div class="pm-card"><span class="pm-k">Story ${i + 1}</span><h4>${s[0]}</h4><p>${s[1]}</p><div class="pm-prev"><b>Prevent:</b> ${s[2]}</div></div>`).join('')}</div>`);
   });
 
-  // 10. SYNCORO 3R READINESS
-  if (D.readiness && D.readiness.gates && D.readiness.gates.length) S.push(() => {
-    const G = D.readiness.gates;
-    return sec('readiness', 'Syncoro 3R Readiness', 'Three qualification gates: Market-Ready, Growth-Ready, Investment-Ready. Each is scored 1–5 from the Syncoro IQ factors and capped by your proof level.',
-      gx(G.map(g => ring(g.level / 5 * 100, `${g.level}/5`, g.name)), 's') +
-      gx(G.map(g => card(`<h3>${g.name}</h3><p class="sm">${g.question}</p><p style="margin-top:8px"><span class="chip ${g.level >= 4 ? 'g' : g.level <= 2 ? 'u' : ''}">${g.band}</span></p><p class="rd-meta"><b>Raw score:</b> ${g.raw}</p><p class="rd-meta"><b>Limited by:</b> ${g.limited}</p><p class="rd-meta"><b>Next unlock:</b> ${g.unlock}</p>`)), 's') +
-      ((D.readiness.calc || []).length ? `<details class="card"><summary>How these were calculated</summary><ul class="calc-list">${D.readiness.calc.map(c => `<li>${c}</li>`).join('')}</ul></details>` : ''));
+  // 10. SYNCORO 3R READINESS: derived from the scores above, never judged separately
+  if (q.length) S.push(() => {
+    const fx = (qi, fi) => (q[qi] && q[qi][4] && q[qi][4][fi] ? +q[qi][4][fi][1] : null);
+    const fit = D.fit || [];
+    const fv = n => { const r = fit.find(r => String(r[0]).toLowerCase().startsWith(n)); return r ? +r[1] : null; };
+    const beach = (D.segTable || []).find(x => x.roleType == 'g') || (D.segTable || [])[0] || {};
+    const msV = Math.round(av([fx(2, 0), fx(4, 1), fv('tailwind')]) + 1e-9);
+    const R3 = [
+      ['Market Ready', [['Beachhead segment pain 4/5 or higher', (+beach.pain || 0) >= 4], ['Value Quotient 6.0 or higher', (q[1] ? +q[1][2] : 0) >= 6], ['Proof level E2 (customer interviews) or higher', pf >= 2], ['Trust Readiness 5 or higher', (fv('trust') || 0) >= 5]]],
+      ['Growth Ready', [['Reach Efficiency 6 or higher', (fv('reach') || 0) >= 6], ['Stickiness 6 or higher', (fv('stick') || 0) >= 6], ['Profitability Quotient 6.0 or higher', (q[3] ? +q[3][2] : 0) >= 6], ['Market Strength 7 or higher', msV >= 7]]],
+      ['Investment Ready', [['Syncoro IQ 6.5 or higher', a >= 6.5], ['Proof level E3 (paid pilots) or higher', pf >= 3], ['At least one moat rated 4/5 or higher', (D.moat || []).some(m => +m[1] >= 4)], ['24-month target of ₹8 crore ARR or more', (+D.arr24 || 0) >= 8e7]]],
+    ];
+    return sec('readiness', 'Syncoro 3R Readiness', 'Three qualification gates: Market Ready, Growth Ready, Investment Ready. Each criterion is checked against the scores above.',
+      gx(R3.map(g => { const n = g[1].filter(c => c[1]).length; return ring(n / 4 * 100, `${n}/4`, g[0]); }), 's') +
+      gx(R3.map(g => card(`<h3>${g[0]}</h3>` + g[1].map(c => `<div style="display:flex;gap:10px;align-items:flex-start;margin:8px 0;font-size:13.5px"><span class="tick ${c[1] ? 't-yes' : 't-no'}">${c[1] ? '✓' : '✗'}</span><span>${c[0]}</span></div>`).join(''))), 's'));
   });
 
   // 11. FINAL SCORECARD & SOUNDBOARD
@@ -253,28 +191,42 @@ ${rows}</div>`;
 <p style="font-size:14px;color:var(--tx);line-height:1.5">${eligible
         ? 'Your venture meets the qualification standard (Syncoro IQ ≥ 6.5 or Proof Level ≥ E3). You are eligible to book a 60-minute venture stress-test session with Syncoro partners and advisors.'
         : `The Syncoro Soundboard is reserved for ventures at <strong>Proof Level E3 (Paid pilots)</strong> or <strong>Syncoro IQ 6.5+</strong>. Your current standing: <strong>${a.toFixed(1)} / 6.5 IQ</strong> and <strong>Proof Level E${pf}</strong>. Prove demand with paying customers to unlock partner advisory.`}</p>
-${eligible ? '<a class="sb-btn" href="https://productica.in/coming-soon" target="_top">Apply for Syncoro Soundboard →</a>' : `<div class="sm" style="color:var(--mu);font-weight:600">Target to unlock: ${D.unlockTarget || 'reach Proof Level E3 with paying customers.'}</div>`}
+${eligible ? '<a class="sb-btn" href="https://gtm.syncoro.com" target="_blank" rel="noopener">Apply for Syncoro Soundboard →</a>' : `<div class="sm" style="color:var(--mu);font-weight:600">Target to unlock: ${D.unlockTarget || 'reach Proof Level E3 with paying customers.'}</div>`}
 </div>`);
   });
 
-  // 12. HOW PRODUCTICA CAN HELP (static)
+  // 12. HOW PRODUCTICA CAN HELP: journey strip + short cards
   S.push(() => {
-    const roadmap = [
-      ['01', 'Diagnose', 'Turn the raw idea into a decision-ready venture thesis', ['Syncoro IP · IQ diagnostic', 'Productica IP · Idea validation']],
-      ['02', 'Sharpen', 'Define the buyer, venture signature, positioning and the real moat', ['Syncoro IP · Venture intelligence', 'Productica IP · ICP + MOAT']],
-      ['03', 'Validate', 'Convert assumptions into evidence through interviews, pilots and market tests', ['Syncoro IP · Evidence framework', 'Productica IP · PMF + PASR']],
-      ['04', 'Decide', 'Make the next capital, product or go-to-market decision from live evidence', ['Syncoro IP · Decision intelligence', 'Productica IP · Decision OS + agents']],
-      ['05', 'Scale', 'Keep the venture intelligence layer alive as the company changes', ['Syncoro IP · Strategic intelligence', 'Productica IP · Venture intelligence platform']],
+    const items = [
+      ['Fit', 'Product Market Fit', 'Find your audience, market gaps and value proposition.', 'span3'],
+      ['Plan', 'Go to Market Strategy', 'Plan your positioning, audience and path to market.', 'span3'],
+      ['Pitch', 'Pitch Deck Maker', "Build a pitch that shows your startup's potential.", 'span2'],
+      ['Build', 'Startup Tools', 'Idea development, domain checks, research and more.', 'span2'],
+      ['Grow', 'Founder Community & Events', 'Meet founders, join events, find collaborators.', 'span2'],
     ];
-    return sec('help', 'How Productica can help', 'A shared operating roadmap: Syncoro brings the intelligence layer; Productica turns that intelligence into repeatable founder decisions, evidence and execution.', `
-<div class="help-shell"><div class="help-intro"><div class="help-callout"><span class="eyebrow" style="color:var(--up)">The Combined Thesis</span><h3>From idea → evidence → venture intelligence.</h3><p>Productica is not another static report. The system progressively reduces uncertainty, captures empirical evidence, and turns every validated signal into the founder's next move.</p></div>
-<div class="ip-grid"><div class="ip-card"><span class="ip-label">Syncoro IP</span><h4>Intelligence Layer</h4><p>Diagnostic frameworks, venture patterns, strategic interpretation and evidence-led judgment.</p></div><div class="ip-card"><span class="ip-label">Productica IP</span><h4>Execution Engine</h4><p>Idea validation, ICP qualification, MOAT testing, PASR, autonomous agents, and a living decision OS.</p></div></div></div>
-<div class="roadmap">${roadmap.map(r => `<div class="road-step"><div class="road-num">${r[0]}</div><div class="road-card"><h4>${r[1]}</h4><p>${r[2]}</p><div class="road-ip">${r[3].map(x => { const [owner, ...rest] = x.split(' · '); return `<span><b>${owner}</b>${rest.join(' · ')}</span>`; }).join('')}</div></div></div>`).join('')}</div>
-<div class="outcome"><b>End state:</b> The founder moves from “Should I build this?” to “What does the evidence say, what changed, and what should I do next?” — with Syncoro and Productica reinforcing the same decision loop.</div></div>`);
+    const steps = [['Validate', 'You are here', 1], ...items.map(x => [x[0], x[1], 0])];
+    return sec('help', 'How Productica can help', 'Validation is step one. Here is what comes next.',
+      `<div class="jr">${steps.map((s, i) => `<div class="jr-step ${s[2] ? 'done' : ''}"><span class="jr-dot">${i + 1}</span><b>${s[0]}</b><small>${s[1]}</small></div>`).join('')}</div>
+<div class="bento">${items.map((x, i) => `<div class="help-card ${x[3]}"><span class="help-step">Step ${i + 2} · ${x[0]}</span><h4>${x[1]}</h4><p>${x[2]}</p></div>`).join('')}</div>
+<div class="help-close">From idea to execution, Productica is here to help.</div>`);
+  });
+
+  // 13. GRANTS & FUNDING
+  if (opts.grantsHref) S.push(() => {
+    const how = [['Match', 'Grants you may qualify for'], ['Autofill', 'Applications prefilled from this report'], ['Review', 'You check and submit']];
+    return sec('grants', 'Grants & Funding', '', `<div class="gr"><div><span class="gr-tag">Productica Autofill</span><h3>Apply to grants in minutes.</h3><p class="gr-sub">We find grants you may qualify for and prefill the applications. You review and submit.</p><a class="gr-btn" href="${E(opts.grantsHref)}" target="_top">View grants →</a></div><ol class="gr-how">${how.map((h, i) => `<li><span class="gr-n">${i + 1}</span><div><b>${h[0]}</b><small>${h[1]}</small></div></li>`).join('')}</ol></div>`);
   });
 
   const body = S.map(fn => { try { return fn(); } catch (e) { console.error('[idea-report] section failed', e); return ''; } }).join('');
-  return { name: D.name, hero, body };
+  // inline citations: every [n] marker becomes a click-to-expand source badge
+  const host = u => { try { return new URL(u).hostname.replace(/^www\./, ''); } catch (e) { return u; } };
+  const cite = html => html.replace(/\[(\d{1,2})\](?!\()/g, (m, n) => {
+    const src = D.sources && D.sources[+n - 1];
+    if (!src) return m;
+    const url = /^https?:\/\//i.test(String(src[3] || '').replace(/&amp;/g, '&')) ? src[3] : '';
+    return `<span class="cite"><button class="cite-b" type="button" aria-expanded="false" aria-label="Show source ${n}">${n}</button><span class="cite-card"><b>${src[0] || ''}</b>: ${src[1] || ''}${src[2] ? ` (${src[2]})` : ''}. ${url ? `<a href="${url}" target="_blank" rel="noopener">${E(host(url.replace(/&amp;/g, '&')))} ↗</a>` : ''}</span></span>`;
+  });
+  return { name: D.name, hero: cite(hero), body: cite(body) };
 }
 
 // Runtime inside the iframe: scroll-in animations, count-up numbers, (?) toggles, progress bar, print support.
@@ -291,24 +243,27 @@ var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isInter
 q('header,section').forEach(function(x){io.observe(x)});
 addEventListener('scroll',function(){var h=document.documentElement,p=document.getElementById('pr');if(p)p.style.width=h.scrollTop/Math.max(1,h.scrollHeight-h.clientHeight)*100+'%'},{passive:true});
 document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('.qm');if(!b)return;var o=b.getAttribute('aria-expanded')!='true';b.setAttribute('aria-expanded',o);document.getElementById(b.getAttribute('aria-controls')).classList.toggle('open',o)});
-addEventListener('beforeprint',function(){q('header,section').forEach(function(x){x.classList.add('on')});q('.qx').forEach(function(x){x.classList.add('open')});q('details').forEach(function(x){x.open=true})});
+var cp=null,cb=null;
+function cc(){if(cp){cp.remove();cp=null}if(cb){cb.setAttribute('aria-expanded','false');cb=null}}
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('.cite-b');
+if(!b){if(!(e.target.closest&&e.target.closest('.cite-pop')))cc();return}
+var was=b===cb;cc();if(was)return;
+var d=document.createElement('div');d.className='cite-pop';d.innerHTML=b.nextElementSibling.innerHTML;document.body.appendChild(d);
+var r=b.getBoundingClientRect(),l=Math.min(r.left,innerWidth-d.offsetWidth-12),t=r.bottom+6;
+if(t+d.offsetHeight>innerHeight-12)t=r.top-d.offsetHeight-6;
+d.style.left=Math.max(12,l)+'px';d.style.top=Math.max(12,t)+'px';b.setAttribute('aria-expanded','true');cp=d;cb=b});
+addEventListener('scroll',cc,{passive:true});addEventListener('resize',cc);addEventListener('keydown',function(e){if(e.key=='Escape')cc()});
+addEventListener('beforeprint',function(){cc();q('header,section').forEach(function(x){x.classList.add('on')});q('.qx').forEach(function(x){x.classList.add('open')});q('details').forEach(function(x){x.open=true})});
 })();`;
 
 export function buildReportDocument(R, { theme, grantsHref } = {}) {
-  const { name, hero, body } = buildReportBody(R);
-  const grants = grantsHref ? `<section id="grants"><div class="wrap"><div class="soundboard-card eligible">
-<div class="sb-header"><span class="chip g">Next step</span><span style="font-size:12px;color:var(--mu);font-weight:600">Separate tool · also works on its own</span></div>
-<h3>See which grants fit this idea.</h3>
-<p style="font-size:14px;color:var(--tx);line-height:1.5">This report is sent into grant matching, so both tools stay on the same venture. You can also open /grants later on its own.</p>
-<a class="sb-btn" href="${E(grantsHref)}" target="_top">Check grants →</a>
-</div></div></section>` : '';
+  const { name, hero, body } = buildReportBody(R, { grantsHref });
   return `<!doctype html><html lang="en"${theme ? ` data-theme="${theme}"` : ''}><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${name} · Idea Validation Report | Productica</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Instrument+Sans:wght@400;500;600;700&display=swap">
 <style>${reportCss}</style></head><body>
 <div class="top"><div><div class="brand-lockup"><b>Productica</b><span>Powered by Syncoro Ventures</span></div><span style="color:var(--mu);font-weight:600">${name} · Idea Validation Report</span></div><div id="pr"></div></div>
 ${hero}${body}
-${grants}
 <footer><div class="wrap"><b>Productica</b> <span style="opacity:.8;font-size:13px">· Powered by Syncoro Ventures</span><p>Prepared with AI-assisted research from public information. A decision aid, not investment, legal or financial advice. Scores, ratings and readiness checks are Productica's estimates until tested. Syncoro IQ, Productica Lens, and Venture Archetypes are proprietary decision-support methodologies.</p></div></footer>
 <script>${RUNTIME}</script></body></html>`;
 }

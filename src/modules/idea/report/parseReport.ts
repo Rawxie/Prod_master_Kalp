@@ -36,6 +36,7 @@ const SECTION_TITLES: [string, RegExp][] = [
   ['9', /pre-?mortem|riskiest|risks?\s*&/i],
   ['10', /readiness|3r/i],
   ['11', /scorecard|final score|operator verdict/i],
+  ['12', /^sources?\b|references/i],
 ];
 
 function unwrapMarkdown(md: string) {
@@ -212,7 +213,27 @@ function parseBlocks(section: string): Block[] {
   return blocks;
 }
 
+// Pickaxe may answer with the report data itself (JSON). Accept it as-is when it has the report shape.
+export function readReportJson(md: string): Record<string, any> | null {
+  let t = String(md || '').replace(/^﻿/, '').trim();
+  const fenced = t.match(/^```(?:json)?\s*\n([\s\S]*?)\n```$/i);
+  if (fenced) t = fenced[1].trim();
+  if (!t.startsWith('{')) return null;
+  try {
+    let j = JSON.parse(t);
+    for (const k of ['report', 'data', 'result']) {
+      if (j && typeof j[k] === 'object' && j[k] && !Array.isArray(j[k]) && (j[k].q || j[k].name)) { j = j[k]; break; }
+    }
+    if (j && typeof j === 'object' && !Array.isArray(j) && Array.isArray(j.q) && j.q.length) return j;
+  } catch { /* markdown */ }
+  return null;
+}
+
+const SIGNAL_SCORE: Record<string, number> = { aligned: 8, strong: 8, neutral: 5, mixed: 5, friction: 3, weak: 3, unknown: 4 };
+
 export function parseIdeaReport(md: string): ParsedIdeaReport {
+  const json = readReportJson(md);
+  if (json) return { data: json, warnings: [] };
   const warnings: string[] = [];
   const D: Record<string, any> = {};
   const text = unwrapMarkdown(md);
@@ -306,6 +327,48 @@ export function parseIdeaReport(md: string): ParsedIdeaReport {
     const raw = (S['4'] || '').trim();
     const blocks = parseBlocks(raw);
     D.lens = { blocks, raw };
+    const bl = (b: Block) => b.parts.flatMap(p => (p.type === 'bullets' ? p.items : []));
+    const getv = (items: [string, string][], re: RegExp) => (items.find(x => re.test(x[0])) || [])[1] || '';
+    const archB = blocks.find(b => /archetype/i.test(b.heading));
+    const sigB = blocks.find(b => /venture signature/i.test(b.heading));
+    const archItems = archB ? bl(archB) : [];
+    const sigItems = sigB ? bl(sigB) : [];
+    if (archItems.length) {
+      const lead = archB!.parts.find(p => p.type === 'text');
+      D.arch = {
+        n: getv(archItems, /^(primary )?archetype|^name/i) || (lead && lead.type === 'text' ? lead.text : ''),
+        d: getv(archItems, /descri|what it is|summary/i),
+        win: getv(archItems, /drives success|win/i),
+        watch: getv(archItems, /watch|risk/i),
+        kpi: getv(archItems, /metric|kpi/i),
+      };
+      const second = getv(archItems, /secondary/i);
+      if (second) D.arch2 = { n: second };
+    } else if (sigItems.length) {
+      const n = getv(sigItems, /primary value/i);
+      if (n) {
+        D.arch = {
+          n,
+          d: getv(sigItems, /customer outcome/i),
+          win: getv(sigItems, /success|moat|proof/i),
+          watch: getv(sigItems, /watch|risk|breakpoint/i),
+          kpi: getv(sigItems, /metric|kpi/i),
+        };
+      }
+    }
+    const fitB = blocks.find(b => /venture fit/i.test(b.heading) && b.parts.some(p => p.type === 'table'));
+    const ft = fitB && fitB.parts.find(p => p.type === 'table');
+    if (ft && ft.type === 'table') {
+      const ix = (re: RegExp) => ft.head.findIndex(h => re.test(h));
+      const iD = ix(/dimension|test/i), iSc = ix(/score/i), iSi = ix(/signal/i), iF = ix(/finding|why|reason/i), iE = ix(/evidence/i), iA = ix(/action|next/i);
+      if (iD > -1 && (iSc > -1 || iSi > -1)) {
+        D.fit = ft.rows.map(r => {
+          const score = iSc > -1 ? num(r[iSc], NaN) : NaN;
+          const sig = iSi > -1 ? String(r[iSi] || '').toLowerCase().trim() : '';
+          return [r[iD], !isNaN(score) ? score : (SIGNAL_SCORE[sig] ?? 4), iF > -1 ? r[iF] : '', iE > -1 ? r[iE] : '', iA > -1 ? r[iA] : ''];
+        });
+      }
+    }
   });
 
   // 5. WHO BUYS FIRST
@@ -377,6 +440,32 @@ export function parseIdeaReport(md: string): ParsedIdeaReport {
       })),
       calc: [...between(s, '**Calculation:**').matchAll(/^\s*-\s+(.+)$/gm)].map(m => strip(m[1])),
     };
+  });
+
+  // 12. SOURCES (numbered list or table) feeding the [n] citation badges
+  safe('sources', () => {
+    const s = S['12'] || '';
+    if (!s.trim()) return;
+    const out: string[][] = [];
+    const t = parseTables(s)[0];
+    if (t) {
+      for (const r of t.rows) {
+        const url = r.find(c => /^https?:\/\//i.test(c)) || '';
+        out.push([r[0] || '', r[1] || '', r.find((c, i) => i > 1 && c !== url) || '', url]);
+      }
+    } else {
+      for (const raw of s.split('\n')) {
+        const m = raw.trim().match(/^(?:\[?\d+[.\]):]\s*|[-*]\s+)(.+)$/);
+        if (!m) continue;
+        const line = strip(m[1]);
+        const url = (line.match(/https?:\/\/[^\s)>\]]+/) || [''])[0];
+        const date = (line.match(/\(([^)]*\d{4}[^)]*)\)/) || [])[1] || '';
+        const rest = line.replace(url, '').replace(/\([^)]*\d{4}[^)]*\)/, '').replace(/[()\s—–-]+$/g, '').trim();
+        const parts = rest.split(/\s+[—–]\s+|:\s+/);
+        out.push([parts[0] || '', parts.slice(1).join(' — '), date, url]);
+      }
+    }
+    if (out.length) D.sources = out;
   });
 
   // 11. FINAL SCORECARD

@@ -170,6 +170,16 @@ async function runReport(
 
 // Small denormalised summary so the history list never has to load the full markdown.
 function readMeta(md: string) {
+  // Pickaxe may return the report data as JSON instead of markdown.
+  const j = safeJson(md.replace(/^```(?:json)?\s*\n?|\n?```\s*$/g, '').trim());
+  if (j && typeof j === 'object' && Array.isArray(j.q)) {
+    const iqNum = Number(j.iq?.today ?? j.iq);
+    return {
+      title: String(j.name || '').slice(0, 140) || null,
+      verdict: String(j.verdict || '').slice(0, 40) || null,
+      iq: isNaN(iqNum) || j.iq == null ? null : Math.min(10, Math.max(0, iqNum)),
+    };
+  }
   const title = (md.match(/^#\s+(.+)$/m) || [])[1]?.replace(/\*\*/g, '').trim().slice(0, 140) || null;
   const verdict = (
     (md.match(/\*\*Verdict:\*\*\s*([^\n]+)/i) || [])[1] ||
