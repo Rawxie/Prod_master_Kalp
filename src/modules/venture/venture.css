@@ -1,0 +1,389 @@
+.vl {
+  --vl-bg: #0c0c0d;
+  --vl-fg: #f5f5f4;
+  --vl-muted: rgba(245, 245, 244, 0.62);
+  --vl-faint: rgba(245, 245, 244, 0.38);
+  --vl-line: rgba(255, 255, 255, 0.12);
+  --vl-card: #161617;
+  --vl-btn: #f5f5f4;
+  --vl-btn-fg: #111111;
+  color-scheme: dark;
+  min-height: 100vh;
+  background: var(--vl-bg);
+  color: var(--vl-fg);
+}
+
+.vl[data-theme='light'] {
+  --vl-bg: #f3f2ee;
+  --vl-fg: #161616;
+  --vl-muted: rgba(22, 22, 22, 0.62);
+  --vl-faint: rgba(22, 22, 22, 0.42);
+  --vl-line: rgba(22, 22, 22, 0.12);
+  --vl-card: #ffffff;
+  --vl-btn: #161616;
+  --vl-btn-fg: #f7f7f5;
+  color-scheme: light;
+}
+
+.vl ::selection {
+  background: var(--vl-fg);
+  color: var(--vl-btn-fg);
+}
+
+.vl.bg-black,
+.vl .bg-black { background-color: var(--vl-bg) !important; }
+.vl .bg-black\/80 { background-color: color-mix(in srgb, var(--vl-bg) 88%, transparent) !important; }
+.vl .text-white { color: var(--vl-fg) !important; }
+.vl .text-black { color: var(--vl-btn-fg) !important; }
+.vl .bg-white { background-color: var(--vl-btn) !important; }
+.vl .text-white\/20,
+.vl .text-white\/25,
+.vl .text-white\/30,
+.vl .text-white\/35 { color: var(--vl-faint) !important; }
+.vl .text-white\/40,
+.vl .text-white\/45,
+.vl .text-white\/50,
+.vl .text-white\/55,
+.vl .text-white\/60,
+.vl .text-white\/65 { color: var(--vl-muted) !important; }
+.vl .text-white\/70,
+.vl .text-white\/80 { color: var(--vl-fg) !important; opacity: 0.82; }
+.vl .bg-white\/\[0\.03\],
+.vl .bg-white\/\[0\.05\],
+.vl .bg-white\/5,
+.vl .bg-white\/10 { background-color: var(--vl-card) !important; }
+.vl .border-white\/10,
+.vl .border-white\/15,
+.vl .border-white\/20,
+.vl .border-white\/25,
+.vl .border-white\/30 { border-color: var(--vl-line) !important; }
+.vl .border-white\/40 { border-color: var(--vl-fg) !important; }
+.vl .bg-white\/10.border-white\/40,
+.vl .border-white\/40.bg-white\/10 {
+  background: var(--vl-fg) !important;
+  color: var(--vl-btn-fg) !important;
+  border-color: var(--vl-fg) !important;
+}
+.vl .hover\:text-white:hover,
+.vl .hover\:text-white\/70:hover { color: var(--vl-fg) !important; opacity: 1; }
+.vl .hover\:bg-white\/90:hover { filter: brightness(0.92); }
+.vl .hover\:bg-white\/5:hover { background-color: var(--vl-card) !important; }
+.vl .hover\:border-white\/25:hover,
+.vl .hover\:border-white\/30:hover { border-color: var(--vl-fg) !important; }
+.vl .placeholder\:text-white\/20::placeholder { color: var(--vl-faint); }
+.vl .focus\:border-white\/80:focus { border-color: var(--vl-fg) !important; }
+.vl .border-dashed { border-color: var(--vl-line) !important; }
+
+/* Command bar: two tools, one obvious next step, account tucked away. */
+.vl-bar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  border-bottom: 1px solid var(--vl-line);
+  background: color-mix(in srgb, var(--vl-bg) 90%, transparent);
+  backdrop-filter: blur(18px);
+}
+.vl-bar-row {
+  max-width: 1120px;
+  margin: 0 auto;
+  min-height: 68px;
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.vl-brand {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.05;
+  text-decoration: none;
+  color: var(--vl-fg);
+}
+.vl-brand span {
+  font-size: 10px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--vl-faint);
+}
+.vl-brand strong {
+  margin-top: 3px;
+  font-size: 16px;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+.vl-switch {
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 16px;
+  border: 1px solid var(--vl-line);
+  background: color-mix(in srgb, var(--vl-fg) 5%, transparent);
+}
+.vl-switch a {
+  min-width: 124px;
+  min-height: 44px;
+  padding: 6px 14px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-decoration: none;
+  color: var(--vl-muted);
+}
+.vl-switch a small {
+  font-size: 11px;
+  line-height: 1.2;
+  color: inherit;
+  opacity: 0.75;
+}
+.vl-switch-label {
+  font-size: 14px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+.vl-switch a.on {
+  background: var(--vl-btn);
+  color: var(--vl-btn-fg);
+}
+.vl-bar-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.vl-act {
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+.vl-act.primary {
+  background: var(--vl-btn);
+  color: var(--vl-btn-fg);
+}
+.vl-act.quiet {
+  color: var(--vl-fg);
+  border: 1px solid var(--vl-line);
+  background: transparent;
+}
+.vl-account { position: relative; }
+.vl-account-btn {
+  min-height: 40px;
+  max-width: 220px;
+  padding: 4px 10px 4px 4px;
+  border-radius: 999px;
+  border: 1px solid var(--vl-line);
+  background: transparent;
+  color: var(--vl-fg);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.vl-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: var(--vl-btn);
+  color: var(--vl-btn-fg);
+  font-size: 13px;
+  font-weight: 700;
+}
+.vl-account-name {
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+}
+.vl-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  width: 240px;
+  padding: 6px;
+  border-radius: 16px;
+  border: 1px solid var(--vl-line);
+  background: var(--vl-card);
+  box-shadow: 0 16px 40px color-mix(in srgb, #000 28%, transparent);
+}
+.vl-menu-label {
+  margin: 0;
+  padding: 8px 10px 6px;
+  font-size: 11px;
+  color: var(--vl-faint);
+}
+.vl-menu button {
+  width: 100%;
+  min-height: 40px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--vl-fg);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  text-align: left;
+}
+.vl-menu button:hover { background: color-mix(in srgb, var(--vl-fg) 8%, transparent); }
+.vl-menu button.danger { color: #e11d48; }
+.vl-menu-check { margin-left: auto; }
+@media (max-width: 860px) {
+  .vl-bar-row { flex-wrap: wrap; gap: 10px; }
+  .vl-switch { order: 3; width: 100%; }
+  .vl-switch a { flex: 1; min-width: 0; }
+  .vl-switch a small { display: none; }
+  .vl-act.quiet span, .vl-account-name { display: none; }
+  .vl-bar-actions { margin-left: auto; }
+}
+
+/* The first-visit hero stays cinematic even in light mode. */
+.vl .vl-hero .bg-black { background-color: #000 !important; }
+.vl .vl-hero .text-black { color: #111 !important; }
+
+.vl .vl-report {
+  color: var(--vl-fg);
+  overflow-wrap: anywhere;
+}
+.vl .vl-report :where(h1, h2, h3, h4, h5, h6, strong),
+.vl .vl-report-title {
+  color: var(--vl-fg) !important;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+.vl .vl-report :where(h1, h2, h3, h4) {
+  margin: 1.1rem 0 0.35rem;
+  font-size: 1.05rem;
+  line-height: 1.3;
+}
+.vl .vl-report > :first-child {
+  margin-top: 0;
+}
+.vl .vl-report :where(p, li) {
+  color: var(--vl-muted);
+  margin: 0.45rem 0;
+}
+.vl .vl-report :where(ul, ol) {
+  margin: 0.35rem 0 0.7rem;
+  padding-left: 1.15rem;
+}
+.vl .vl-report :where(ul) { list-style: disc; }
+.vl .vl-report :where(ol) { list-style: decimal; }
+.vl .vl-report :where(li)::marker { color: var(--vl-faint); }
+.vl .vl-report :where(a) {
+  color: var(--vl-fg) !important;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.vl .vl-report :where(hr) {
+  margin: 0.8rem 0;
+  border: 0;
+  border-top: 1px solid var(--vl-line);
+}
+
+.vl[data-theme='light'] .rounded-2xl.border,
+.vl[data-theme='light'] .rounded-3xl.border {
+  box-shadow: 0 1px 2px rgba(22, 22, 22, 0.04);
+}
+
+/* Full-screen tool landing — fixed palette on the video (not theme tokens). */
+.vl-landing-screen .vl-landing-island {
+  background: color-mix(in srgb, #0a0a0a 42%, transparent);
+  backdrop-filter: blur(20px) saturate(1.35);
+  -webkit-backdrop-filter: blur(20px) saturate(1.35);
+  border: 1px solid color-mix(in srgb, #fff 22%, transparent);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, #000 35%, transparent),
+    0 12px 40px rgba(0, 0, 0, 0.35);
+}
+.vl-landing-screen .vl-landing-island__label {
+  color: #e1e0cc !important;
+}
+.vl-landing-screen .vl-landing-island__rule {
+  background: rgba(255, 255, 255, 0.28);
+}
+.vl-landing-screen .vl-landing-island__try {
+  border-radius: 9999px;
+  padding: 0.35rem 0.9rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.25;
+  background: #e1e0cc !important;
+  color: #111111 !important;
+  transition: transform 0.15s ease, background-color 0.15s ease;
+}
+@media (min-width: 768px) {
+  .vl-landing-screen .vl-landing-island__try {
+    padding: 0.45rem 1rem;
+    font-size: 0.875rem;
+  }
+}
+.vl-landing-screen .vl-landing-island__try:hover {
+  background: #f3f2ea !important;
+}
+.vl-landing-screen .vl-landing-island__try:active {
+  transform: scale(0.97);
+}
+.vl-landing-screen .vl-landing-cta {
+  background: #e1e0cc !important;
+  color: #111111 !important;
+}
+.vl-landing-screen .vl-landing-cta-icon {
+  background: #111111 !important;
+}
+.vl-landing-screen .vl-landing-copy-glass {
+  background: color-mix(in srgb, #0a0a0a 58%, transparent);
+  backdrop-filter: blur(22px) saturate(1.25);
+  -webkit-backdrop-filter: blur(22px) saturate(1.25);
+  border: 1px solid color-mix(in srgb, #fff 20%, transparent);
+  border-radius: 1.25rem;
+  padding: 1.125rem 1.25rem;
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, #000 40%, transparent),
+    0 18px 50px rgba(0, 0, 0, 0.45);
+}
+@media (min-width: 640px) {
+  .vl-landing-screen .vl-landing-copy-glass {
+    border-radius: 1.5rem;
+    padding: 1.35rem 1.5rem;
+  }
+}
+@media (min-width: 1024px) {
+  .vl-landing-screen .vl-landing-copy-glass {
+    padding: 1.5rem 1.65rem;
+  }
+}
+
+/* Sign-in / sign-up. Glows sit behind a frosted panel so the blur has something to catch. */
+.vl-auth-glow {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(70px);
+  pointer-events: none;
+}
+.vl-glass {
+  background: color-mix(in srgb, var(--vl-fg) 7%, transparent);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  border: 1px solid color-mix(in srgb, var(--vl-fg) 18%, transparent);
+  box-shadow: 0 24px 60px color-mix(in srgb, #000 22%, transparent);
+}
+.vl[data-theme='light'] .vl-glass {
+  background: color-mix(in srgb, #fff 58%, transparent);
+  border-color: color-mix(in srgb, #fff 72%, transparent);
+  box-shadow: 0 24px 60px rgba(22, 22, 22, 0.08);
+}
