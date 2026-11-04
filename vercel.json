@@ -1,8 +1,23 @@
 {
+  "redirects": [
+    {
+      "source": "/nodoubt",
+      "destination": "https://app.productica.in/nodoubt",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/((?!api/).*)",
       "destination": "/index.html"
     }
-  ]
+  ],
+  "functions": {
+    "api/idea/generate.ts": {
+      "maxDuration": 300
+    },
+    "api/grants/match.ts": {
+      "maxDuration": 300
+    }
+  }
 }

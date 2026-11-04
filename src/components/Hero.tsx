@@ -235,8 +235,8 @@ export default function Hero({ onVideoLoad }: { onVideoLoad?: () => void }) {
         >
           {/* Primary Button */}
           <a
-            href="#validate"
-            className="group relative z-20 flex flex-1 items-center justify-center gap-2.5 px-8 py-3.5 bg-white text-black text-[13px] font-medium rounded-full tracking-wide hover:bg-white/90 active:scale-[0.97] transition-all duration-300 shadow-lg shadow-white/10 whitespace-nowrap pointer-events-auto"
+            href="/idea"
+            className="group flex flex-1 items-center justify-center gap-2.5 px-8 py-3.5 bg-white text-black text-[13px] font-medium rounded-full tracking-wide hover:bg-white/90 active:scale-[0.97] transition-all duration-300 shadow-lg shadow-white/10 whitespace-nowrap cursor-pointer"
           >
             Validate Idea
             <svg
@@ -251,8 +251,10 @@ export default function Hero({ onVideoLoad }: { onVideoLoad?: () => void }) {
 
           {/* Secondary */}
           <a
-            href="#agents"
-            className="relative z-20 px-8 py-3.5 text-[13px] font-medium text-white/50 hover:text-white transition-colors duration-300 tracking-wide pointer-events-auto"
+            href="https://app.productica.in"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-8 py-3.5 text-[13px] font-medium text-white/50 hover:text-white transition-colors duration-300 tracking-wide"
           >
             Explore Productica →
           </a>
