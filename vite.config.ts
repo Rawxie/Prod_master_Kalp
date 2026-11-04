@@ -15,7 +15,11 @@ function apiDev(): Plugin {
       for (const [k, v] of Object.entries(env)) if (process.env[k] === undefined) process.env[k] = v
 
       server.middlewares.use('/api', async (req, res, next) => {
-        const name = (req.url || '').split('?')[0].replace(/^\/+|\/+$/g, '')
+        const rawUrl = req.url || ''
+        const qIndex = rawUrl.indexOf('?')
+        const pathPart = qIndex === -1 ? rawUrl : rawUrl.slice(0, qIndex)
+        const query = Object.fromEntries(new URLSearchParams(qIndex === -1 ? '' : rawUrl.slice(qIndex + 1)))
+        const name = pathPart.replace(/^\/+|\/+$/g, '')
         if (!/^[a-z0-9-]+(\/[a-z0-9-]+)*$/i.test(name) || name.split('/').some(p => p.startsWith('_'))) return next()
         const file = path.join(root, 'api', `${name}.ts`)
         if (!fs.existsSync(file)) return next()
@@ -36,7 +40,7 @@ function apiDev(): Plugin {
           }
           const mod = await server.ssrLoadModule(`/api/${name}.ts`)
           await mod.default(
-            { method: req.method, headers: req.headers, body },
+            { method: req.method, headers: req.headers, body, query, url: rawUrl },
             {
               status: (s: number) => ({ json: (p: unknown) => send(s, p), end: () => send(s) }),
               setHeader: (k: string, v: string) => res.setHeader(k, v),

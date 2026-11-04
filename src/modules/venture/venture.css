@@ -74,6 +74,182 @@
 .vl .focus\:border-white\/80:focus { border-color: var(--vl-fg) !important; }
 .vl .border-dashed { border-color: var(--vl-line) !important; }
 
+/* Command bar: two tools, one obvious next step, account tucked away. */
+.vl-bar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  border-bottom: 1px solid var(--vl-line);
+  background: color-mix(in srgb, var(--vl-bg) 90%, transparent);
+  backdrop-filter: blur(18px);
+}
+.vl-bar-row {
+  max-width: 1120px;
+  margin: 0 auto;
+  min-height: 68px;
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.vl-brand {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.05;
+  text-decoration: none;
+  color: var(--vl-fg);
+}
+.vl-brand span {
+  font-size: 10px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--vl-faint);
+}
+.vl-brand strong {
+  margin-top: 3px;
+  font-size: 16px;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+.vl-switch {
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 16px;
+  border: 1px solid var(--vl-line);
+  background: color-mix(in srgb, var(--vl-fg) 5%, transparent);
+}
+.vl-switch a {
+  min-width: 124px;
+  min-height: 44px;
+  padding: 6px 14px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-decoration: none;
+  color: var(--vl-muted);
+}
+.vl-switch a small {
+  font-size: 11px;
+  line-height: 1.2;
+  color: inherit;
+  opacity: 0.75;
+}
+.vl-switch-label {
+  font-size: 14px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+.vl-switch a.on {
+  background: var(--vl-btn);
+  color: var(--vl-btn-fg);
+}
+.vl-bar-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.vl-act {
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+.vl-act.primary {
+  background: var(--vl-btn);
+  color: var(--vl-btn-fg);
+}
+.vl-act.quiet {
+  color: var(--vl-fg);
+  border: 1px solid var(--vl-line);
+  background: transparent;
+}
+.vl-account { position: relative; }
+.vl-account-btn {
+  min-height: 40px;
+  max-width: 220px;
+  padding: 4px 10px 4px 4px;
+  border-radius: 999px;
+  border: 1px solid var(--vl-line);
+  background: transparent;
+  color: var(--vl-fg);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.vl-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: var(--vl-btn);
+  color: var(--vl-btn-fg);
+  font-size: 13px;
+  font-weight: 700;
+}
+.vl-account-name {
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+}
+.vl-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  width: 240px;
+  padding: 6px;
+  border-radius: 16px;
+  border: 1px solid var(--vl-line);
+  background: var(--vl-card);
+  box-shadow: 0 16px 40px color-mix(in srgb, #000 28%, transparent);
+}
+.vl-menu-label {
+  margin: 0;
+  padding: 8px 10px 6px;
+  font-size: 11px;
+  color: var(--vl-faint);
+}
+.vl-menu button {
+  width: 100%;
+  min-height: 40px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--vl-fg);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  text-align: left;
+}
+.vl-menu button:hover { background: color-mix(in srgb, var(--vl-fg) 8%, transparent); }
+.vl-menu button.danger { color: #e11d48; }
+.vl-menu-check { margin-left: auto; }
+@media (max-width: 860px) {
+  .vl-bar-row { flex-wrap: wrap; gap: 10px; }
+  .vl-switch { order: 3; width: 100%; }
+  .vl-switch a { flex: 1; min-width: 0; }
+  .vl-switch a small { display: none; }
+  .vl-act.quiet span, .vl-account-name { display: none; }
+  .vl-bar-actions { margin-left: auto; }
+}
+
 /* The first-visit hero stays cinematic even in light mode. */
 .vl .vl-hero .bg-black { background-color: #000 !important; }
 .vl .vl-hero .text-black { color: #111 !important; }

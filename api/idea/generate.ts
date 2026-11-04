@@ -51,6 +51,7 @@ export default async function handler(req: any, res: any) {
     const audience = clean(body.audience, 1500);
     const different = clean(body.different, 3000);
     const stage = clean(body.stage, 80);
+    const revenue = stage === 'Generating revenue' ? clean(body.revenue, 160) : '';
     const deckPath = clean(body.deckPath, 300);
     const deckName = clean(body.deckName, 200);
 
@@ -59,6 +60,9 @@ export default async function handler(req: any, res: any) {
     if (audience.length < 3) return res.status(400).json({ error: 'Tell us who the product is for.' });
     if (different.length < 5) return res.status(400).json({ error: 'Tell us what makes your solution different.' });
     if (!STAGES.includes(stage)) return res.status(400).json({ error: 'Pick your current stage.' });
+    if (stage === 'Generating revenue' && revenue.length < 2) {
+      return res.status(400).json({ error: 'Tell us roughly how much revenue you make.' });
+    }
     if (deckPath && !new RegExp(`^${user.id}/[A-Za-z0-9._-]+\\.(pdf|pptx)$`, 'i').test(deckPath)) {
       return res.status(400).json({ error: 'That pitch deck upload is not valid.' });
     }
@@ -90,14 +94,18 @@ export default async function handler(req: any, res: any) {
       return res.status(429).json({ error: `You can run ${DAILY_LIMIT} validations per day. Try again tomorrow.` });
     }
 
-    const { data: row, error: insertError } = await admin
-      .from('idea_reports')
-      .insert({
+    const insertRow = async (includeRevenue: boolean) => {
+      const payload: Record<string, unknown> = {
         user_id: user.id, status: 'running', startup_name: startupName, idea, audience, different, stage,
         deck_path: deckPath || null, deck_name: deckName || null,
-      })
-      .select('id')
-      .single();
+      };
+      if (includeRevenue) payload.revenue = revenue || null;
+      return admin.from('idea_reports').insert(payload).select('id').single();
+    };
+    let { data: row, error: insertError } = await insertRow(true);
+    if (insertError && /revenue/i.test(insertError.message || '') && /column/i.test(insertError.message || '')) {
+      ({ data: row, error: insertError } = await insertRow(false));
+    }
     if (insertError || !row) {
       if (isQuotaError(insertError)) {
         return res.status(429).json({ error: `You've used your ${FREE_LIMIT} free validations on this account.` });
@@ -106,7 +114,7 @@ export default async function handler(req: any, res: any) {
       return res.status(500).json({ error: 'Could not start your report. Please try again.' });
     }
 
-    const job = runReport(row.id, user.id, { startupName, idea, audience, different, stage, deckPath, deckName }).catch(e =>
+    const job = runReport(row.id, user.id, { startupName, idea, audience, different, stage, revenue, deckPath, deckName }).catch(e =>
       console.error('[idea/generate] unhandled job error', e),
     );
     try { waitUntil(job); } catch { /* not on Vercel: the promise simply keeps running */ }
@@ -125,7 +133,7 @@ export default async function handler(req: any, res: any) {
 async function runReport(
   id: string,
   userId: string,
-  a: { startupName: string; idea: string; audience: string; different: string; stage: string; deckPath: string; deckName: string },
+  a: { startupName: string; idea: string; audience: string; different: string; stage: string; revenue: string; deckPath: string; deckName: string },
 ) {
   const admin = getAdmin();
   const finish = async (patch: Record<string, unknown>) => {
@@ -143,20 +151,37 @@ async function runReport(
         if (error || !data) throw error || new Error('empty download');
         deckText = await extractDeckText(new Uint8Array(await data.arrayBuffer()), a.deckName || a.deckPath);
       } catch (e: any) {
-        console.error('[idea/generate] deck read failed (continuing without it)', e?.message);
+        console.error('[idea/generate] deck read failed', e?.message);
+        throw new UserFacingError('The pitch deck was attached, but its text could not be read. Export it as a text-based PDF or PowerPoint and try again.');
+      }
+      if (!deckText) {
+        throw new UserFacingError('The pitch deck was attached, but it has no readable text. Export a text-based PDF or PowerPoint and try again.');
       }
     }
 
-    const message = [
+    const lines = [
       `Name of your startup: ${a.startupName}`,
       `Describe your startup idea: ${a.idea}`,
       `Who is this product for?: ${a.audience}`,
       `What makes your solution different?: ${a.different}`,
       `What is your current stage?: ${a.stage}`,
-      deckText ? `\nPitch deck provided by the founder (text extracted from "${a.deckName}"; treat it as founder-stated claims, not verified evidence):\n${deckText}` : '',
-    ].filter(Boolean).join('\n');
+      a.revenue ? `How much revenue do you make?: ${a.revenue}` : '',
+      deckText
+        ? `Pitch deck: the founder attached "${a.deckName}". Read this extracted slide text and use it as founder-stated claims, not verified evidence.\n${deckText}`
+        : 'Pitch deck: none attached.',
+    ].filter(Boolean);
+    const message = lines.join('\n');
+    const inputs: Record<string, string> = {
+      'Name of your startup': a.startupName,
+      'Describe your startup idea': a.idea,
+      'Who is this product for?': a.audience,
+      'What makes your solution different?': a.different,
+      'What is your current stage?': a.stage,
+      'Pitch deck': deckText || 'No pitch deck attached.',
+    };
+    if (a.revenue) inputs['How much revenue do you make?'] = a.revenue;
 
-    const markdown = await completePickaxe(process.env.PICKAXE_DEPLOYMENT_ID, message, userId, PICKAXE_TIMEOUT_MS);
+    const markdown = await completePickaxe(process.env.PICKAXE_DEPLOYMENT_ID, message, userId, PICKAXE_TIMEOUT_MS, inputs);
     const meta = readMeta(markdown);
     await finish({ status: 'done', markdown, title: meta.title || a.startupName, verdict: meta.verdict, iq: meta.iq, error: null });
   } catch (e: any) {

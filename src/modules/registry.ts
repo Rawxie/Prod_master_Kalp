@@ -32,6 +32,12 @@ export const modules: AppModule[] = [
     landing: 'grants',
     load: () => import('./grants/GrantsModule'),
   },
+  {
+    path: '/report',
+    title: 'Shared report',
+    requiresAuth: false,
+    load: () => import('./report/PublicReport'),
+  },
 ];
 
 export const findModule = (pathname: string) =>
