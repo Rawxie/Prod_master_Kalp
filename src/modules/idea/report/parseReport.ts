@@ -30,13 +30,13 @@ const SECTION_TITLES: [string, RegExp][] = [
   ['3', /sharpened/i],
   ['4', /productica lens|(?:^|\b)the lens\b/i],
   ['5', /who buys|ideal customer|segments/i],
-  ['6', /market size|^market\b/i],
+  ['6', /market size|without the hype/i],
   ['7', /competition|who you.?re up against/i],
   ['8', /lean canvas/i],
   ['9', /pre-?mortem|riskiest|risks?\s*&/i],
   ['10', /readiness|3r/i],
   ['11', /scorecard|final score|operator verdict/i],
-  ['12', /^sources?\b|references/i],
+  ['sources', /^sources?\b|references/i],
 ];
 
 function unwrapMarkdown(md: string) {
@@ -68,8 +68,10 @@ function splitSections(md: string) {
       const bare = line.match(/^(#{1,4})\s+(?:\*\*)?(.+?)(?:\*\*)?\s*$/);
       if (bare) {
         const title = strip(bare[2]).replace(/^\d+\s*[.):\-]\s*/, '');
-        const hit = SECTION_TITLES.find(([, re]) => re.test(title));
-        if (hit) n = hit[0];
+        if (!/quotient/i.test(title)) {
+          const hit = SECTION_TITLES.find(([, re]) => re.test(title));
+          if (hit) n = hit[0];
+        }
       }
     }
     if (n && !marks.some(m => m.n === n)) {
@@ -200,7 +202,7 @@ function parseBlocks(section: string): Block[] {
     if ((m = line.match(/^#{3,4}\s+(.+)$/))) {
       close();
       cur = { heading: strip(m[1]), level: 3, parts: [] };
-    } else if ((m = line.match(/^\*\*(Breakpoint|Condition to prove|Venture Signature|Venture fit|Next test|Claims|Evidence register):\*\*\s*(.*)$/i))) {
+    } else if ((m = line.match(/^\*\*(Breakpoint|Condition to prove|Venture Signature|Venture fit|Next test|Claims|Evidence register|Your primary archetype|Secondary archetype):\*\*\s*(.*)$/i))) {
       close();
       cur = { heading: m[1], level: 4, parts: [] };
       if (m[2]) buf.push(m[2]);
@@ -257,6 +259,7 @@ export function parseIdeaReport(md: string): ParsedIdeaReport {
     D.sub = kv(s, 'Summary') || kv(text, 'Summary');
     const today = firstNum(
       kv(s, 'Syncoro IQ today'),
+      kv(s, 'Syncoro IQ'),
       kv(s, 'IQ today'),
       kv(text, 'Syncoro IQ today'),
       (s.match(/Syncoro IQ today[^0-9\n]{0,24}([\d.]+)/i) || [])[1],
@@ -329,7 +332,9 @@ export function parseIdeaReport(md: string): ParsedIdeaReport {
     D.lens = { blocks, raw };
     const bl = (b: Block) => b.parts.flatMap(p => (p.type === 'bullets' ? p.items : []));
     const getv = (items: [string, string][], re: RegExp) => (items.find(x => re.test(x[0])) || [])[1] || '';
-    const archB = blocks.find(b => /archetype/i.test(b.heading));
+    const archB = blocks.find(b => /primary archetype|^archetype/i.test(b.heading) && !/secondary/i.test(b.heading))
+      || blocks.find(b => /archetype/i.test(b.heading) && !/secondary/i.test(b.heading));
+    const arch2B = blocks.find(b => /secondary/i.test(b.heading));
     const sigB = blocks.find(b => /venture signature/i.test(b.heading));
     const archItems = archB ? bl(archB) : [];
     const sigItems = sigB ? bl(sigB) : [];
@@ -342,8 +347,10 @@ export function parseIdeaReport(md: string): ParsedIdeaReport {
         watch: getv(archItems, /watch|risk/i),
         kpi: getv(archItems, /metric|kpi/i),
       };
-      const second = getv(archItems, /secondary/i);
-      if (second) D.arch2 = { n: second };
+      const second = getv(archItems, /secondary/i)
+        || (arch2B && (bl(arch2B)[0]?.[1] || (arch2B.parts.find(p => p.type === 'text') as { text?: string } | undefined)?.text || arch2B.heading))
+        || '';
+      if (second) D.arch2 = { n: String(second).replace(/,?\s*use as a supporting.*/i, '').trim() };
     } else if (sigItems.length) {
       const n = getv(sigItems, /primary value/i);
       if (n) {
@@ -356,11 +363,16 @@ export function parseIdeaReport(md: string): ParsedIdeaReport {
         };
       }
     }
+    if (!D.arch2 && arch2B) {
+      const lead2 = arch2B.parts.find(p => p.type === 'text');
+      const raw2 = (lead2 && lead2.type === 'text' ? lead2.text : '') || getv(bl(arch2B), /./) || '';
+      if (raw2) D.arch2 = { n: raw2.replace(/,?\s*use as a supporting.*/i, '').trim() };
+    }
     const fitB = blocks.find(b => /venture fit/i.test(b.heading) && b.parts.some(p => p.type === 'table'));
     const ft = fitB && fitB.parts.find(p => p.type === 'table');
     if (ft && ft.type === 'table') {
       const ix = (re: RegExp) => ft.head.findIndex(h => re.test(h));
-      const iD = ix(/dimension|test/i), iSc = ix(/score/i), iSi = ix(/signal/i), iF = ix(/finding|why|reason/i), iE = ix(/evidence/i), iA = ix(/action|next/i);
+      const iD = ix(/dimension|test/i), iSc = ix(/score/i), iSi = ix(/signal|status/i), iF = ix(/finding|why|reason|note/i), iE = ix(/evidence/i), iA = ix(/action|next/i);
       if (iD > -1 && (iSc > -1 || iSi > -1)) {
         D.fit = ft.rows.map(r => {
           const score = iSc > -1 ? num(r[iSc], NaN) : NaN;
@@ -380,12 +392,19 @@ export function parseIdeaReport(md: string): ParsedIdeaReport {
     D.segTable = (t?.rows || []).map(r => ({ name: r[0], desc: r[1], pain: num(r[2]), pay: num(r[3]), reach: num(r[4]), role: r[5], roleType: rt(r[5] || '') }));
   });
 
-  // 6. MARKET
+  // 6. MARKET — TAM / SAM / SOM only. Never the IQ "Market Quotient" factor table.
   safe('market', () => {
     const s = S['6'] || '';
-    const t = parseTables(s)[0];
+    const isTam = (t: Table) => {
+      const blob = [...t.head, ...t.rows.flat()].join(' ');
+      const labels = t.rows.map(r => `${r[0]} ${r[1]}`);
+      const named = labels.filter(x => /\bTAM\b|\bSAM\b|\bSOM\b|addressable|serviceable/i.test(x)).length;
+      if (/reachable market|access\s*\/\s*sales|competitive intensity/i.test(blob)) return false;
+      return named >= 2;
+    };
+    const t = [...parseTables(s), ...parseTables(text)].find(isTam);
     D.mkt = (t?.rows || []).map(r => [r[0], r[1], r[2], r[3]]);
-    D.mktNote = kv(s, 'Reality check');
+    D.mktNote = kv(s, 'Reality check') || kv(s, 'Note') || kv(s, 'Market note');
     D.mktCalc = kv(s, 'Calculation');
   });
 
@@ -403,6 +422,7 @@ export function parseIdeaReport(md: string): ParsedIdeaReport {
     }
     const cac = parseTables(after(s, 'Cost to win one customer'))[0];
     D.cac = (cac?.rows || []).map(r => [r[0], r[1], num(r[2]), /direct paid/i.test(r[0]) ? 1 : 0]);
+    D.cacNote = strip((s.match(/Relative levels only[^\n*]*/i) || [])[0] || '');
     const moat = parseTables(after(s, 'Your moat today'))[0];
     D.moat = (moat?.rows || []).map(r => [r[0], num(r[1]), `${r[2]} — ${r[3] || ''}`]);
     D.path = kv(s, 'The only defensible path');
@@ -426,7 +446,7 @@ export function parseIdeaReport(md: string): ParsedIdeaReport {
     D.riskLead = strip((s.match(/^\*\*(Two|Three|One|The)[^\n]*\*\*\s*$/m) || [])[0] || '');
     const t = parseTables(s)[0];
     D.assume = (t?.rows || []).map(r => [r[1], r[2], r[3], r[4]]);
-    D.stories = [...s.matchAll(/\*\*Story\s+\d+\s*[—-]\s*(.+?)\*\*\s*\n([\s\S]*?)\*\*Prevent:\*\*\s*([^\n]+)/g)].map(m => [strip(m[1]), strip(m[2]), strip(m[3])]);
+    D.stories = [...s.matchAll(/\*\*Story\s+\d+\s*[—\-:]+\s*(.+?)\*\*\s*\n([\s\S]*?)\*\*Prevent:\*\*\s*([^\n]+)/g)].map(m => [strip(m[1]), strip(m[2]), strip(m[3])]);
   });
 
   // 10. READINESS
@@ -442,27 +462,37 @@ export function parseIdeaReport(md: string): ParsedIdeaReport {
     };
   });
 
-  // 12. SOURCES (numbered list or table) feeding the [n] citation badges
+  // SOURCES: numbered list or table. Feeds the [n] hover cards beside each figure.
   safe('sources', () => {
-    const s = S['12'] || '';
+    const fromHeading = text.split(/^#{1,4}\s+SOURCES\s*$/im)[1] || '';
+    const s = [S['sources'], fromHeading, (!/how productica|grants/i.test(S['12'] || '') ? S['12'] : '')].find(x => (x || '').trim()) || '';
     if (!s.trim()) return;
     const out: string[][] = [];
     const t = parseTables(s)[0];
-    if (t) {
+    if (t && t.rows.length) {
       for (const r of t.rows) {
         const url = r.find(c => /^https?:\/\//i.test(c)) || '';
-        out.push([r[0] || '', r[1] || '', r.find((c, i) => i > 1 && c !== url) || '', url]);
+        const rest = r.filter(c => c !== url);
+        out.push([rest[0] || '', rest[1] || '', rest.find((_, i) => i > 1) || '', url]);
       }
-    } else {
+    }
+    if (!out.length) {
+      const items: string[] = [];
       for (const raw of s.split('\n')) {
-        const m = raw.trim().match(/^(?:\[?\d+[.\]):]\s*|[-*]\s+)(.+)$/);
+        const line = raw.trim();
+        if (!line || /^#{1,4}\s/.test(line) || /^sources$/i.test(line) || /^\(used for/i.test(line)) continue;
+        if (/^(?:\[?\d+[.\])]:?\s+|[-*]\s+)/.test(line)) items.push(line);
+        else if (items.length && !/^\|/.test(line)) items[items.length - 1] += ' ' + line;
+      }
+      for (const raw of items) {
+        const m = raw.match(/^(?:\[?\d+[.\])]:?\s+|[-*]\s+)(.+)$/);
         if (!m) continue;
         const line = strip(m[1]);
         const url = (line.match(/https?:\/\/[^\s)>\]]+/) || [''])[0];
         const date = (line.match(/\(([^)]*\d{4}[^)]*)\)/) || [])[1] || '';
-        const rest = line.replace(url, '').replace(/\([^)]*\d{4}[^)]*\)/, '').replace(/[()\s—–-]+$/g, '').trim();
-        const parts = rest.split(/\s+[—–]\s+|:\s+/);
-        out.push([parts[0] || '', parts.slice(1).join(' — '), date, url]);
+        const rest = line.replace(url, '').replace(/\([^)]*\d{4}[^)]*\)/, '').replace(/[()\s.—–-]+$/g, '').trim();
+        const named = rest.match(/^(.+?):\s+(.+)$/);
+        out.push(named ? [named[1], named[2], date, url] : [rest, '', date, url]);
       }
     }
     if (out.length) D.sources = out;
@@ -480,7 +510,7 @@ export function parseIdeaReport(md: string): ParsedIdeaReport {
       .map(([k, v]) => [k.replace('’', "'"), v, /^do$/i.test(k) ? 'good' : /^don/i.test(k) ? 'bad' : 'up']);
     const sb = kv(s, 'Syncoro Soundboard');
     D.soundboard = /^s*locked/i.test(sb) ? 'locked' : /^s*(eligible|unlocked|open)/i.test(sb) ? 'eligible' : '';
-    D.unlockTarget = (sb.match(/Target to unlock:\s*(.+)$/i) || [])[1] || '';
+    D.unlockTarget = strip((sb.match(/Target to unlock:\s*(.+?)(?:\.?\s*Link:|$)/i) || [])[1] || '');
   });
 
   const missing = ['q', 'why', 'clar', 'segTable', 'mkt', 'comp', 'leanCanvas', 'assume', 'score'].filter(k => !D[k] || (Array.isArray(D[k]) && !D[k].length));

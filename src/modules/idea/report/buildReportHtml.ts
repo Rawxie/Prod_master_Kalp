@@ -78,7 +78,21 @@ export function buildReportBody(R, opts = {}) {
   const V = norm[vRaw] || (vRaw ? cap(vRaw) : Vcalc); // the agent's verdict wins; computed only when absent
   const vc = /^build/.test(V.toLowerCase()) ? 'good' : /^test/.test(V.toLowerCase()) ? 'up' : 'bad';
   const vchip = vc == 'good' ? 'g' : vc == 'up' ? 'u' : 'b';
-  const SC = (D.score && D.score.length) ? D.score : [];
+  const fx = (qi, fi) => (q[qi] && q[qi][4] && q[qi][4][fi] ? +q[qi][4][fi][1] : null);
+  const fitRows0 = D.fit || [];
+  const fv0 = n => { const r = fitRows0.find(r => String(r[0]).toLowerCase().startsWith(n)); return r ? +r[1] : null; };
+  const fitAvg = av(fitRows0.map(r => +r[1]));
+  const rnd = x => Math.round(x + 1e-9);
+  const msV0 = rnd(av([fx(2, 0), fx(4, 1), fv0('tailwind')]));
+  const cdV0 = Math.max(1, Math.min(10, 11 - (fx(2, 2) ?? 6)));
+  const mcV0 = rnd(av([fx(1, 2), fx(3, 0), fv0('price')]));
+  const spV0 = rnd(av([a, fitAvg, mcV0]));
+  const SC = (D.score && D.score.length) ? D.score : [
+    ['Survival Probability', spV0],
+    ['Market Strength', msV0],
+    ['Competition Danger', cdV0, 1],
+    ['Monetization Clarity', mcV0],
+  ];
   const dateStr = D.date || new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
   const hero = `<header class="hero"><div class="wrap"><div><span class="pill ${vc}">Verdict: ${V}</span><h1>${D.name}</h1><p class="th">${D.sub || ''}</p></div>
@@ -116,9 +130,9 @@ export function buildReportBody(R, opts = {}) {
     const norm = x => String(x || '').toLowerCase().replace(/^the\s+/, '').trim();
     const primary = norm(A.n), secondary = norm((D.arch2 || {}).n);
     const mark = r => { const n = r[1].toLowerCase(); return n === primary ? 'PRIMARY' : (secondary && n === secondary) ? 'SECONDARY' : ''; };
-    const arch = A.n ? `<div class="lens-top"><div class="hero-arch-card"><div class="h-arch-kicker"><span class="eyebrow" style="color:var(--up)">Your primary archetype</span></div><h3>${A.n}</h3><p class="h-arch-desc">${A.d || ''}</p><div class="h-arch-grid">${A.win ? `<div><small>What drives success</small><b>${A.win}</b></div>` : ''}${A.watch ? `<div><small>What to watch</small><b>${A.watch}</b></div>` : ''}${A.kpi ? `<div><small>Key metric</small><b>${A.kpi}</b></div>` : ''}${(D.arch2 || {}).n ? `<div><small>Secondary archetype</small><b>${D.arch2.n}</b></div>` : ''}</div></div>
+    const arch = A.n ? `<div class="lens-top"><div class="hero-arch-card"><div class="h-arch-kicker"><span class="eyebrow" style="color:var(--up)">Your primary archetype</span></div><h3>${A.n}</h3><p class="h-arch-desc">${A.d || ''}</p><div class="h-arch-grid">${A.win ? `<div><small>What drives success</small><b>${A.win}</b></div>` : ''}${A.watch ? `<div><small>What to watch</small><b>${A.watch}</b></div>` : ''}${A.kpi ? `<div><small>Key metric</small><b>${A.kpi}</b></div>` : ''}${(D.arch2 || {}).n ? `<div><small>Secondary archetype</small><b>${D.arch2.n}. Use as a supporting pattern, not the core thesis.</b></div>` : `<div><small>Secondary archetype</small><b>Use as a supporting pattern, not the core thesis</b></div>`}</div></div>
 <div class="arch-list">${archetypes.map(r => { const m = mark(r); return `<div class="arch-item ${m ? 'active' : ''}"><span class="letter">${r[0]}</span><div><h4>${r[1]}</h4><p>${r[2]}</p></div><span class="mark">${m || '○'}</span></div>`; }).join('')}</div></div>` : '';
-    const fitHtml = fitRows.length ? `<div class="fit-panel"><div class="fit-head"><div><span class="eyebrow">Venture Fit</span><h3>How well does the idea fit its buyers?</h3><p class="sm">Five tests scored 0 to 10. The point is not the average, it is knowing what to test next.</p></div></div>${fitRows.map(r => { const v = Math.max(0, Math.min(10, +r[1] || 0)); const [tag, label, note] = st(v); return `<div class="vf-row"><b>${short(r[0])}</b><div class="vf-bar"><i style="--fit:${v * 10}%"></i></div><span class="vf-score">${v}/10</span><span class="${tag}">${label}</span><span class="vf-note">${r[2] || note}${r[3] ? `<em>${r[3]}</em>` : ''}${r[4] ? `<em><b>Next:</b> ${r[4]}</em>` : ''}</span></div>`; }).join('')}</div>` : '';
+    const fitHtml = fitRows.length ? `<div class="fit-panel"><div class="fit-head"><div><span class="eyebrow">Venture Fit</span><h3>How well does the idea fit its buyers?</h3><p class="sm">Five tests scored 0 to 10. The point is not the average, it is knowing what to test next.</p></div></div>${fitRows.map(r => { const v = Math.max(0, Math.min(10, +r[1] || 0)); const [tag, label, note] = st(v); return `<div class="vf-row"><b>${short(r[0])}</b><div class="vf-bar"><i style="--fit:${v * 10}%"></i></div><span class="vf-score">${v}/10</span><span class="${tag}">${label}</span><span class="vf-note">${note}${r[3] && r[3] !== note ? `<em>${r[3]}</em>` : ''}${r[4] ? `<em><b>Next:</b> ${r[4]}</em>` : ''}</span></div>`; }).join('')}</div>` : '';
     const raw = !arch && !fitHtml && D.lens && D.lens.raw ? `<div class="card"><p class="raw-lens">${D.lens.raw}</p></div>` : '';
     return sec('lens', 'The Productica Lens', 'Two views that sit beside the score and work for any idea, in any market. <b>Venture Archetype</b> shows which pattern your venture follows and what that pattern needs to succeed. <b>Venture Fit</b> shows how well the idea matches the way its buyers decide.', `<div class="lens-shell">${arch}${fitHtml}${raw}</div>`);
   });
@@ -132,16 +146,18 @@ export function buildReportBody(R, opts = {}) {
   // 6. MARKET
   if (D.mkt && D.mkt.length) S.push(() => {
     const M = D.mkt.slice(0, 4), n = M.length, st = n > 1 ? 106 / (n - 1) : 0, R = i => 146 - i * st, col = i => i == n - 1 ? 'var(--up)' : 'var(--tc)';
+    const citesOf = s => [...String(s || '').matchAll(/\[(\d{1,2})\]/g)].map(x => `[${x[1]}]`);
+    const sizeOf = s => String(s || '').replace(/\s*\[\d{1,2}\]/g, '').trim();
     const svg = M.map((m, i) => { const r = R(i), cy = 296 - r, inner = i == n - 1, top = 296 - 2 * r, y1 = inner ? cy - 3 : top + 26, y2 = inner ? cy + 14 : top + 44;
-      return `<g class="nc ${inner ? 'mk-in' : ''}" style="--d:${i * 0.25}s"><circle cx="150" cy="${cy}" r="${r}" fill="${col(i)}" fill-opacity="${inner ? 1 : 0.1 + i * 0.1}" stroke="var(--tc)" stroke-opacity=".5"/><text x="150" y="${y1}" text-anchor="middle" class="mk-ab">${m[0]}</text><text x="150" y="${y2}" text-anchor="middle" class="mk-v">${m[2]}</text></g>`; }).join('');
-    return sec('market', 'Market size, without the hype', '', `<div class="card mk2"><svg class="mk-svg" viewBox="0 0 300 300" role="img" aria-label="Nested market sizes: ${M.map(m => m[0] + ' ' + m[2]).join(', ')}">${svg}</svg><div>${M.map((m, i) => `<div class="mk-row"><span class="mk-chip" style="--c:${col(i)}">${m[0]}</span><div><b>${m[1]}</b><small>${m[3] || ''}</small></div><b class="mk-val cn">${m[2]}</b></div>`).join('')}<p class="sm" style="margin-top:6px">Circles are stepped for readability, not to scale.</p>${D.mktCalc ? `<div class="mk-note"><b>Calculation:</b> ${D.mktCalc}</div>` : ''}${D.mktNote ? `<div class="mk-note">${D.mktNote}</div>` : ''}</div></div>`);
+      return `<g class="nc ${inner ? 'mk-in' : ''}" style="--d:${i * 0.25}s"><circle cx="150" cy="${cy}" r="${r}" fill="${col(i)}" fill-opacity="${inner ? 1 : 0.1 + i * 0.1}" stroke="var(--tc)" stroke-opacity=".5"/><text x="150" y="${y1}" text-anchor="middle" class="mk-ab">${m[0]}</text><text x="150" y="${y2}" text-anchor="middle" class="mk-v">${sizeOf(m[2])}</text></g>`; }).join('');
+    return sec('market', 'Market size, without the hype', '', `<div class="card mk2"><svg class="mk-svg" viewBox="0 0 300 300" role="img" aria-label="Nested market sizes: ${M.map(m => m[0] + ' ' + sizeOf(m[2])).join(', ')}">${svg}</svg><div>${M.map((m, i) => { const marks = [...new Set([...citesOf(m[2]), ...citesOf(m[3])])].join(''); return `<div class="mk-row"><span class="mk-chip" style="--c:${col(i)}">${m[0]}</span><div><b>${m[1]}</b><small>${m[3] || ''}</small></div><b class="mk-val"><span class="cn">${sizeOf(m[2])}</span>${marks}</b></div>`; }).join('')}<p class="sm" style="margin-top:6px">Circles are stepped for readability, not to scale.</p>${D.mktCalc ? `<div class="mk-note"><b>Calculation:</b> ${D.mktCalc}</div>` : ''}${D.mktNote ? `<div class="mk-note">${D.mktNote}</div>` : ''}</div></div>`);
   });
 
   // 7. COMPETITION
   if (D.comp && D.comp.rows && D.comp.rows.length) S.push(() => {
     const C = D.comp, T = ['<span class="tick t-no" title="No">✗</span>', '<span class="tick t-mid" title="Partly">◐</span>', '<span class="tick t-yes" title="Yes">✓</span>'];
     return sec('competition', "Who you're up against", D.compLead || '', `<div class="ts"><table class="tbl-compare comp-tbl"><thead><tr><th>Competitor</th>${C.cols.map(c => `<th style="text-align:center">${c}</th>`).join('')}</tr></thead><tbody>${C.rows.map(r => `<tr class="${r[3] ? 'us' : ''}"><td><b>${r[0]}</b><br><small style="color:var(--mu)">${r[1]}</small></td>${r[2].map(v => `<td style="text-align:center">${T[v] || ''}</td>`).join('')}</tr>`).join('')}</tbody></table></div><p class="sm">✓ Does this well · ◐ Partly · ✗ Doesn't do it</p>` + gx([
-      (D.cac && D.cac.length) ? card(`<h3>Cost to win one customer</h3>${D.cac.map((r, i) => `<div class="sbar"><div class="sbar-top"><span>${r[0]}</span><b>${r[1]}</b></div><div class="t"><i class="${r[3] ? 'c2' : 'c1'}" style="--p:${r[2]}%;--d:${i * 0.12}s"></i></div></div>`).join('')}`) : '',
+      (D.cac && D.cac.length) ? card(`<h3>Cost to win one customer</h3>${D.cacNote ? `<p class="sm">${D.cacNote}</p>` : '<p class="sm">Relative levels only. There is no measured acquisition cost data yet.</p>'}${D.cac.map((r, i) => `<div class="sbar"><div class="sbar-top"><span>${r[0]}</span><b>${r[1]}</b></div><div class="t"><i class="${r[3] ? 'c2' : 'c1'}" style="--p:${r[2]}%;--d:${i * 0.12}s"></i></div></div>`).join('')}`) : '',
       (D.moat && D.moat.length) ? card(`<h3>Your moat today</h3>${D.moat.map(r => { const [st, ...d] = String(r[2]).split(' — '); return `<div class="mrow"><b>${r[0]}</b>${dots(r[1])}<small><span class="chip ${r[1] >= 4 ? 'g' : r[1] <= 1 ? 'b' : 'u'}">${st}</span> ${d.join(' — ')}</small></div>`; }).join('')}`) : '',
     ], 'w') + (D.path ? `<div class="call"><b>The Only Defensible Path:</b> ${D.path}</div>` : ''));
   });
@@ -155,7 +171,7 @@ export function buildReportBody(R, opts = {}) {
   // 9. RISKS & PRE-MORTEM
   if ((D.assume && D.assume.length) || (D.stories && D.stories.length)) S.push(() => {
     const sv = { critical: 'bad', high: 'up', medium: 'tc' };
-    return sec('risks', 'Riskiest assumptions & premortem', D.riskLead || '', `<div class="as-list">${(D.assume || []).map((r, i) => `<div class="as-row" style="--sc:var(--${sv[String(r[2]).toLowerCase()] || 'mu'})"><span class="as-n">${i + 1}</span><div><b>${r[0]}</b><small>${r[1]}</small></div><span class="as-sev">${r[2]}</span><span class="as-ev">Evidence ${r[3]}</span></div>`).join('')}</div>
+    return sec('risks', 'Riskiest assumptions & premortem', D.riskLead ? `${D.riskLead}${D.riskLeadB ? ` <b>${D.riskLeadB}</b>` : ''}` : '', `<div class="as-list">${(D.assume || []).map((r, i) => `<div class="as-row" style="--sc:var(--${sv[String(r[2]).toLowerCase()] || 'mu'})"><span class="as-n">${i + 1}</span><div><b>${r[0]}</b><small>${r[1]}</small></div><span class="as-sev">${r[2]}</span><span class="as-ev">Evidence ${r[3]}</span></div>`).join('')}</div>
 <h3 class="pm-h">Premortem</h3>
 <div class="pm-explain"><span class="pm-q">?</span><p><b>What is a premortem?</b> A postmortem asks why something failed after the fact. A premortem asks the same question before you start: imagine it is 18 months from now and the venture has not worked out, then write down the most likely reasons. Psychologist Gary Klein designed it to surface risks that optimism hides, while there is still time to prevent them. Here are the three most likely stories for this idea, each with its prevention.</p></div>
 <div class="pm-grid">${(D.stories || []).map((s, i) => `<div class="pm-card"><span class="pm-k">Story ${i + 1}</span><h4>${s[0]}</h4><p>${s[1]}</p><div class="pm-prev"><b>Prevent:</b> ${s[2]}</div></div>`).join('')}</div>`);
@@ -191,7 +207,7 @@ export function buildReportBody(R, opts = {}) {
 <p style="font-size:14px;color:var(--tx);line-height:1.5">${eligible
         ? 'Your venture meets the qualification standard (Syncoro IQ ≥ 6.5 or Proof Level ≥ E3). You are eligible to book a 60-minute venture stress-test session with Syncoro partners and advisors.'
         : `The Syncoro Soundboard is reserved for ventures at <strong>Proof Level E3 (Paid pilots)</strong> or <strong>Syncoro IQ 6.5+</strong>. Your current standing: <strong>${a.toFixed(1)} / 6.5 IQ</strong> and <strong>Proof Level E${pf}</strong>. Prove demand with paying customers to unlock partner advisory.`}</p>
-${eligible ? '<a class="sb-btn" href="https://gtm.syncoro.com" target="_blank" rel="noopener">Apply for Syncoro Soundboard →</a>' : `<div class="sm" style="color:var(--mu);font-weight:600">Target to unlock: ${D.unlockTarget || 'reach Proof Level E3 with paying customers.'}</div>`}
+${eligible ? '<a class="sb-btn" href="https://gtm.syncoro.com" target="_blank" rel="noopener">Apply for Syncoro Soundboard →</a>' : `<div class="sm" style="color:var(--mu);font-weight:600">Target to unlock: ${D.unlockTarget || 'reach Proof Level E3 with paying customers.'}</div><a class="sb-link" href="https://gtm.syncoro.com" target="_blank" rel="noopener">Learn more about Syncoro Soundboard →</a>`}
 </div>`);
   });
 
@@ -212,19 +228,22 @@ ${eligible ? '<a class="sb-btn" href="https://gtm.syncoro.com" target="_blank" r
   });
 
   // 13. GRANTS & FUNDING
-  if (opts.grantsHref) S.push(() => {
+  S.push(() => {
+    const grantsHref = opts.grantsHref || '/grants';
     const how = [['Match', 'Grants you may qualify for'], ['Autofill', 'Applications prefilled from this report'], ['Review', 'You check and submit']];
-    return sec('grants', 'Grants & Funding', '', `<div class="gr"><div><span class="gr-tag">Productica Autofill</span><h3>Apply to grants in minutes.</h3><p class="gr-sub">We find grants you may qualify for and prefill the applications. You review and submit.</p><a class="gr-btn" href="${E(opts.grantsHref)}" target="_top">View grants →</a></div><ol class="gr-how">${how.map((h, i) => `<li><span class="gr-n">${i + 1}</span><div><b>${h[0]}</b><small>${h[1]}</small></div></li>`).join('')}</ol></div>`);
+    return sec('grants', 'Grants & Funding', '', `<div class="gr"><div><span class="gr-tag">Productica Autofill</span><h3>Apply to grants in minutes.</h3><p class="gr-sub">We find grants you may qualify for and prefill the applications. You review and submit.</p><a class="gr-btn" href="${E(grantsHref)}" target="_top">View grants →</a></div><ol class="gr-how">${how.map((h, i) => `<li><span class="gr-n">${i + 1}</span><div><b>${h[0]}</b><small>${h[1]}</small></div></li>`).join('')}</ol></div>`);
   });
 
   const body = S.map(fn => { try { return fn(); } catch (e) { console.error('[idea-report] section failed', e); return ''; } }).join('');
-  // inline citations: every [n] marker becomes a click-to-expand source badge
+  // [n] beside a figure becomes a hoverable source badge. Missing source rows still get a badge.
   const host = u => { try { return new URL(u).hostname.replace(/^www\./, ''); } catch (e) { return u; } };
   const cite = html => html.replace(/\[(\d{1,2})\](?!\()/g, (m, n) => {
     const src = D.sources && D.sources[+n - 1];
-    if (!src) return m;
-    const url = /^https?:\/\//i.test(String(src[3] || '').replace(/&amp;/g, '&')) ? src[3] : '';
-    return `<span class="cite"><button class="cite-b" type="button" aria-expanded="false" aria-label="Show source ${n}">${n}</button><span class="cite-card"><b>${src[0] || ''}</b>: ${src[1] || ''}${src[2] ? ` (${src[2]})` : ''}. ${url ? `<a href="${url}" target="_blank" rel="noopener">${E(host(url.replace(/&amp;/g, '&')))} ↗</a>` : ''}</span></span>`;
+    const url = src && /^https?:\/\//i.test(String(src[3] || '').replace(/&amp;/g, '&')) ? src[3] : '';
+    const card = src
+      ? `<b>${src[0] || 'Source ' + n}</b>${src[1] ? ': ' + src[1] : ''}${src[2] ? ` (${src[2]})` : ''}${url ? `. <a href="${url}" target="_blank" rel="noopener">${E(host(url.replace(/&amp;/g, '&')))} ↗</a>` : ''}`
+      : `<b>Source ${n}</b> listed in the report sources.`;
+    return `<span class="cite"><button class="cite-b" type="button" aria-expanded="false" aria-label="Source ${n}">${n}</button><span class="cite-card">${card}</span></span>`;
   });
   return { name: D.name, hero: cite(hero), body: cite(body) };
 }
@@ -234,7 +253,7 @@ const RUNTIME = `
 (function(){
 var rm=matchMedia('(prefers-reduced-motion:reduce)').matches;
 function q(s,c){return Array.prototype.slice.call((c||document).querySelectorAll(s))}
-function cu(e){var s=e.dataset.t||(e.dataset.t=e.textContent),t0=performance.now();if(rm)return;
+function cu(e){if(e.querySelector&&e.querySelector('.cite'))return;var s=e.dataset.t||(e.dataset.t=e.textContent),t0=performance.now();if(rm)return;
 setTimeout(function(){e.textContent=s},1600);
 (function f(){var p=Math.min((performance.now()-t0)/1400,1),k=1-Math.pow(1-p,3);
 e.textContent=s.replace(/\\d[\\d,]*\\.?\\d*/g,function(m){var n=parseFloat(m.replace(/,/g,'')),d=(m.split('.')[1]||'').length,v=(n*k).toFixed(d);return m.indexOf(',')>-1?(+v).toLocaleString('en-US',{maximumFractionDigits:d}):v});
@@ -243,15 +262,25 @@ var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isInter
 q('header,section').forEach(function(x){io.observe(x)});
 addEventListener('scroll',function(){var h=document.documentElement,p=document.getElementById('pr');if(p)p.style.width=h.scrollTop/Math.max(1,h.scrollHeight-h.clientHeight)*100+'%'},{passive:true});
 document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('.qm');if(!b)return;var o=b.getAttribute('aria-expanded')!='true';b.setAttribute('aria-expanded',o);document.getElementById(b.getAttribute('aria-controls')).classList.toggle('open',o)});
-var cp=null,cb=null;
-function cc(){if(cp){cp.remove();cp=null}if(cb){cb.setAttribute('aria-expanded','false');cb=null}}
+var cp=null,cb=null,hideT=null,pin=false;
+function cc(){if(hideT){clearTimeout(hideT);hideT=null}if(cp){cp.remove();cp=null}if(cb){cb.setAttribute('aria-expanded','false');cb=null}pin=false}
+function placeCite(b){
+  if(cb===b&&cp)return cp;
+  cc();
+  var d=document.createElement('div');d.className='cite-pop';d.innerHTML=b.nextElementSibling.innerHTML;document.body.appendChild(d);
+  var r=b.getBoundingClientRect(),l=Math.min(r.left,innerWidth-d.offsetWidth-12),t=r.bottom+6;
+  if(t+d.offsetHeight>innerHeight-12)t=r.top-d.offsetHeight-6;
+  d.style.left=Math.max(12,l)+'px';d.style.top=Math.max(12,t)+'px';b.setAttribute('aria-expanded','true');cp=d;cb=b;return d;
+}
+function wantCite(n){return n&&n.closest&&(n.closest('.cite')||n.closest('.cite-pop'))}
+document.addEventListener('pointerover',function(e){
+  if(e.target.closest&&e.target.closest('.cite-pop')){if(hideT){clearTimeout(hideT);hideT=null}return}
+  var b=e.target.closest&&e.target.closest('.cite-b');if(!b)return;if(hideT){clearTimeout(hideT);hideT=null}placeCite(b)
+});
+document.addEventListener('pointerout',function(e){if(pin)return;if(wantCite(e.relatedTarget))return;hideT=setTimeout(cc,180)});
 document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('.cite-b');
 if(!b){if(!(e.target.closest&&e.target.closest('.cite-pop')))cc();return}
-var was=b===cb;cc();if(was)return;
-var d=document.createElement('div');d.className='cite-pop';d.innerHTML=b.nextElementSibling.innerHTML;document.body.appendChild(d);
-var r=b.getBoundingClientRect(),l=Math.min(r.left,innerWidth-d.offsetWidth-12),t=r.bottom+6;
-if(t+d.offsetHeight>innerHeight-12)t=r.top-d.offsetHeight-6;
-d.style.left=Math.max(12,l)+'px';d.style.top=Math.max(12,t)+'px';b.setAttribute('aria-expanded','true');cp=d;cb=b});
+e.preventDefault();var was=b===cb&&pin;placeCite(b);pin=!was;if(was)cc()});
 addEventListener('scroll',cc,{passive:true});addEventListener('resize',cc);addEventListener('keydown',function(e){if(e.key=='Escape')cc()});
 addEventListener('beforeprint',function(){cc();q('header,section').forEach(function(x){x.classList.add('on')});q('.qx').forEach(function(x){x.classList.add('open')});q('details').forEach(function(x){x.open=true})});
 })();`;
