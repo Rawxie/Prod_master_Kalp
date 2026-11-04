@@ -14,7 +14,8 @@ interface Props {
   onSubmit: (answers: IdeaAnswers, deck: File | null) => void;
 }
 
-const MIN = { startupName: 2, idea: 20, audience: 3, different: 5 } as const;
+const MIN = { startupName: 2, idea: 20, audience: 3, different: 5, revenue: 2 } as const;
+const REVENUE_STAGE = 'Generating revenue';
 
 function Field({ n, label, hint, optional, children }: { n: string; label: string; hint: string; optional?: boolean; children: ReactNode }) {
   return (
@@ -37,7 +38,7 @@ const underline =
 
 // Startup name, the four validation questions, and the optional pitch deck live in one window.
 export default function IdeaForm({ initial, busy, error, blocked, onSubmit }: Props) {
-  const [a, setA] = useState<IdeaAnswers>({ startupName: '', idea: '', audience: '', different: '', stage: '', ...initial });
+  const [a, setA] = useState<IdeaAnswers>({ startupName: '', idea: '', audience: '', different: '', stage: '', revenue: '', ...initial });
   const [deck, setDeck] = useState<File | null>(null);
   const [touched, setTouched] = useState(false);
   const disabled = busy !== null || Boolean(blocked);
@@ -49,8 +50,10 @@ export default function IdeaForm({ initial, busy, error, blocked, onSubmit }: Pr
     audience: a.audience.trim().length < MIN.audience ? 'Tell us who this is for.' : '',
     different: a.different.trim().length < MIN.different ? 'Tell us what makes it different.' : '',
     stage: a.stage ? '' : 'Pick your current stage.',
+    revenue: a.stage === REVENUE_STAGE && (a.revenue || '').trim().length < MIN.revenue ? 'Add a rough revenue figure, and say if it is monthly or yearly.' : '',
   };
   const valid = !Object.values(problems).some(Boolean);
+  const earning = a.stage === REVENUE_STAGE;
 
   const submit = (e?: FormEvent) => {
     e?.preventDefault();
@@ -62,6 +65,7 @@ export default function IdeaForm({ initial, busy, error, blocked, onSubmit }: Pr
       audience: a.audience.trim(),
       different: a.different.trim(),
       stage: a.stage,
+      revenue: earning ? (a.revenue || '').trim() : '',
     }, deck);
   };
 
@@ -124,9 +128,32 @@ export default function IdeaForm({ initial, busy, error, blocked, onSubmit }: Pr
         {showErr('stage')}
       </Field>
 
-      <Field n="06" label="Pitch deck" hint="Optional. Used in the report if you add one." optional>
+      {earning && (
+        <Field n="05b" label="How much revenue?" hint="Only asked once customers are paying. A rough number is enough. Say if it is monthly or yearly.">
+          <input
+            value={a.revenue || ''} onChange={e => set('revenue')(e.target.value)} disabled={disabled} maxLength={160}
+            placeholder="e.g. ₹8 lakh a month" className={underline} autoFocus
+          />
+          {showErr('revenue')}
+        </Field>
+      )}
+
+      <Field n="06" label="Pitch deck" hint="Optional. The file is sent with your answers so the report can read your slides." optional>
         <DeckDropzone file={deck} onChange={setDeck} disabled={disabled} />
       </Field>
+
+      <div className="rounded-2xl border border-white/10 bg-black/20 px-4 py-4 text-sm">
+        <p className="text-[10px] font-mono uppercase tracking-[0.22em] text-white/35">What will be sent</p>
+        <dl className="mt-3 grid gap-2">
+          <Recap label="Startup" value={a.startupName} />
+          <Recap label="Idea" value={a.idea} />
+          <Recap label="Audience" value={a.audience} />
+          <Recap label="Difference" value={a.different} />
+          <Recap label="Stage" value={a.stage} />
+          {earning && <Recap label="Revenue" value={a.revenue || ''} />}
+          <Recap label="Pitch deck" value={deck ? deck.name : 'None attached'} />
+        </dl>
+      </div>
 
       <div className="flex flex-wrap items-center gap-x-6 gap-y-3 pt-2">
         <button
@@ -145,5 +172,15 @@ export default function IdeaForm({ initial, busy, error, blocked, onSubmit }: Pr
 
       {error && <p role="alert" className="text-sm text-red-500 -mt-4">{error}</p>}
     </form>
+  );
+}
+
+function Recap({ label, value }: { label: string; value: string }) {
+  const text = value.trim();
+  return (
+    <div className="grid grid-cols-[96px_minmax(0,1fr)] gap-3">
+      <dt className="text-white/35">{label}</dt>
+      <dd className={`min-w-0 break-words ${text ? 'text-white/80' : 'text-white/25'}`}>{text || 'Not added yet'}</dd>
+    </div>
   );
 }

@@ -132,9 +132,28 @@ export function buildReportBody(R, opts = {}) {
   // 6. MARKET
   if (D.mkt && D.mkt.length) S.push(() => {
     const M = D.mkt.slice(0, 4), n = M.length, st = n > 1 ? 106 / (n - 1) : 0, R = i => 146 - i * st, col = i => i == n - 1 ? 'var(--up)' : 'var(--tc)';
-    const svg = M.map((m, i) => { const r = R(i), cy = 296 - r, inner = i == n - 1, top = 296 - 2 * r, y1 = inner ? cy - 3 : top + 26, y2 = inner ? cy + 14 : top + 44;
-      return `<g class="nc ${inner ? 'mk-in' : ''}" style="--d:${i * 0.25}s"><circle cx="150" cy="${cy}" r="${r}" fill="${col(i)}" fill-opacity="${inner ? 1 : 0.1 + i * 0.1}" stroke="var(--tc)" stroke-opacity=".5"/><text x="150" y="${y1}" text-anchor="middle" class="mk-ab">${m[0]}</text><text x="150" y="${y2}" text-anchor="middle" class="mk-v">${m[2]}</text></g>`; }).join('');
-    return sec('market', 'Market size, without the hype', '', `<div class="card mk2"><svg class="mk-svg" viewBox="0 0 300 300" role="img" aria-label="Nested market sizes: ${M.map(m => m[0] + ' ' + m[2]).join(', ')}">${svg}</svg><div>${M.map((m, i) => `<div class="mk-row"><span class="mk-chip" style="--c:${col(i)}">${m[0]}</span><div><b>${m[1]}</b><small>${m[3] || ''}</small></div><b class="mk-val cn">${m[2]}</b></div>`).join('')}<p class="sm" style="margin-top:6px">Circles are stepped for readability, not to scale.</p>${D.mktCalc ? `<div class="mk-note"><b>Calculation:</b> ${D.mktCalc}</div>` : ''}${D.mktNote ? `<div class="mk-note">${D.mktNote}</div>` : ''}</div></div>`);
+    const clip = (s, n) => { const t = String(s || '').trim(); return t.length > n ? `${t.slice(0, n - 1)}…` : t; };
+    const long = s => String(s || '').trim().length > 56;
+    const numeric = s => /^\d+(?:\.\d+)?$/.test(String(s || '').trim());
+    const parts = m => {
+      const label = String(m[0] || '').trim();
+      const second = String(m[1] || '').trim();
+      const third = String(m[2] || '').trim();
+      const note = String(m[3] || '').trim();
+      let metric = '';
+      let title = '';
+      const body = [];
+      if (third && !long(third)) metric = third; else if (third) body.push(third);
+      if (numeric(second) && !metric) metric = second;
+      else if (second && !long(second)) title = second;
+      else if (second) body.unshift(second);
+      if (note) body.push(note);
+      return { label, metric, title, body: body.join(' ') };
+    };
+    const svg = M.map((m, i) => { const bit = parts(m); const r = R(i), cy = 296 - r, inner = i == n - 1, top = 296 - 2 * r, y1 = inner ? cy - 3 : top + 26, y2 = inner ? cy + 14 : top + 44;
+      return `<g class="nc ${inner ? 'mk-in' : ''}" style="--d:${i * 0.25}s"><circle cx="150" cy="${cy}" r="${r}" fill="${col(i)}" fill-opacity="${inner ? 1 : 0.1 + i * 0.1}" stroke="var(--tc)" stroke-opacity=".5"/><text x="150" y="${y1}" text-anchor="middle" class="mk-ab">${clip(bit.label, 18)}</text><text x="150" y="${y2}" text-anchor="middle" class="mk-v">${clip(bit.metric || bit.title, 18)}</text></g>`; }).join('');
+    const rows = M.map((m, i) => { const bit = parts(m); return `<div class="mk-row"><div class="mk-top"><span class="mk-chip" style="--c:${col(i)}">${bit.label}</span>${bit.metric ? `<b class="mk-val cn">${bit.metric}</b>` : ''}</div><div class="mk-copy">${bit.title ? `<b>${bit.title}</b>` : ''}${bit.body ? `<p>${bit.body}</p>` : ''}</div></div>`; }).join('');
+    return sec('market', 'Market size, without the hype', '', `<div class="card mk2"><svg class="mk-svg" viewBox="0 0 300 300" role="img" aria-label="Nested market sizes">${svg}</svg><div class="mk-list">${rows}<p class="sm" style="margin-top:6px">Circles are stepped for readability, not to scale.</p>${D.mktCalc ? `<div class="mk-note"><b>Calculation:</b> ${D.mktCalc}</div>` : ''}${D.mktNote ? `<div class="mk-note">${D.mktNote}</div>` : ''}</div></div>`);
   });
 
   // 7. COMPETITION

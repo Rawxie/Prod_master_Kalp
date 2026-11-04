@@ -41,7 +41,7 @@ export default function DeckDropzone({ file, onChange, disabled }: Props) {
           <span className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center flex-none"><FileText size={18} /></span>
           <span className="min-w-0 flex-1 overflow-hidden">
             <span className="block truncate text-sm font-semibold">{file.name}</span>
-            <span className="block text-xs text-white/40">{prettySize(file.size)}</span>
+            <span className="block text-xs text-white/40">Attached · {prettySize(file.size)} · sent with your answers</span>
           </span>
           <button
             type="button" disabled={disabled} onClick={() => { onChange(null); setError(''); }} aria-label="Remove pitch deck"
@@ -61,7 +61,7 @@ export default function DeckDropzone({ file, onChange, disabled }: Props) {
         >
           <Upload size={20} className="text-white/50" />
           <span className="max-w-full text-sm text-white/80">Drop your pitch deck here, or <span className="underline underline-offset-4">browse</span></span>
-          <span className="max-w-full text-xs text-white/40 break-words">PDF or PowerPoint (.pptx) · up to 10 MB · we read the text of your slides</span>
+          <span className="max-w-full text-xs text-white/40 break-words">PDF or PowerPoint (.pptx) · up to 10 MB · the file is attached to this validation</span>
         </button>
       )}
 

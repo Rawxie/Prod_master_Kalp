@@ -93,5 +93,19 @@ export default function ReportView({ id, onBack, onRetry }: Props) {
     return <Message title="We couldn’t finish this report" body={report.error || 'Please try again.'} onBack={onBack} action={{ label: 'Edit and try again', run: () => onRetry(answers) }} />;
   }
 
-  return <ReportFrame markdown={report.markdown} grantsHref={`/grants?idea=${report.id}`} onBack={onBack} />;
+  const submitted = {
+    ...answers,
+    revenue: report.revenue || '',
+    deckName: report.deck_name,
+  };
+  return (
+    <ReportFrame
+      markdown={report.markdown}
+      answers={submitted}
+      reportId={report.id}
+      grantsHref={`/grants?idea=${report.id}`}
+      onBack={onBack}
+      canShare
+    />
+  );
 }

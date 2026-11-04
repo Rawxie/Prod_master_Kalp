@@ -4,6 +4,8 @@ export interface IdeaAnswers {
   audience: string;
   different: string;
   stage: string;
+  /** Only collected when stage is "Generating revenue". */
+  revenue?: string;
 }
 
 export type ReportStatus = 'running' | 'done' | 'failed';
@@ -19,6 +21,9 @@ export interface IdeaReportSummary {
   stage: string;
   startup_name: string;
   idea: string;
+  audience?: string;
+  different?: string;
+  revenue?: string | null;
   deck_name: string | null;
   error: string | null;
 }

@@ -2,7 +2,7 @@ import { getSupabase } from '../../lib/supabase';
 import { DECK_MAX_BYTES, type IdeaAnswers, type IdeaReport, type IdeaReportSummary } from './types';
 
 const BUCKET = 'pitch-decks';
-const SUMMARY_COLUMNS = 'id,created_at,status,title,verdict,iq,stage,startup_name,idea,deck_name,error';
+const SUMMARY_COLUMNS = 'id,created_at,status,title,verdict,iq,stage,startup_name,idea,audience,different,deck_name,error';
 
 const DECK_TYPES: Record<string, string> = {
   pdf: 'application/pdf',
@@ -28,8 +28,11 @@ export interface UploadedDeck {
 // Writes happen on the server (api/idea/generate) so users cannot forge reports or skip the limits.
 export const ideaApi = {
   async list(): Promise<IdeaReportSummary[]> {
-    const { data, error } = await getSupabase()
-      .from('idea_reports').select(SUMMARY_COLUMNS).order('created_at', { ascending: false }).limit(100);
+    const supabase = getSupabase();
+    const run = (columns: string) =>
+      supabase.from('idea_reports').select(columns).order('created_at', { ascending: false }).limit(100);
+    let { data, error } = await run(`${SUMMARY_COLUMNS},revenue`);
+    if (error && /revenue/i.test(error.message)) ({ data, error } = await run(SUMMARY_COLUMNS));
     if (error) throw new Error(error.message);
     return (data ?? []) as unknown as IdeaReportSummary[];
   },
@@ -96,4 +99,39 @@ export const ideaApi = {
     if (!r.ok || !json.id) throw new Error(json.error || 'Something went wrong starting your report.');
     return { id: json.id as string };
   },
+
+  /** A public link for a finished report. Anyone with the link can read it. */
+  async share(id: string): Promise<{ url: string }> {
+    const { data } = await getSupabase().auth.getSession();
+    const token = data.session?.access_token;
+    if (!token) throw new Error('Your session has expired. Please sign in again.');
+    const r = await fetch('/api/idea/share', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ id }),
+    });
+    const json = await r.json().catch(() => ({}));
+    if (!r.ok || !json.token) throw new Error(json.error || 'Could not create a share link.');
+    return { url: `${window.location.origin}/report/${json.token}` };
+  },
 };
+
+export interface SharedReport {
+  markdown: string;
+  title: string | null;
+  startupName: string;
+  idea: string;
+  audience: string;
+  different: string;
+  stage: string;
+  revenue: string | null;
+  deckName: string | null;
+  createdAt: string;
+}
+
+export async function loadSharedReport(token: string): Promise<SharedReport> {
+  const r = await fetch(`/api/idea/share?token=${encodeURIComponent(token)}`);
+  const json = await r.json().catch(() => ({}));
+  if (!r.ok || !json.markdown) throw new Error(json.error || 'This report link is not available.');
+  return json as SharedReport;
+}

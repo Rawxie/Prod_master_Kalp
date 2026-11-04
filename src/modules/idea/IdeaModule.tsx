@@ -178,10 +178,15 @@ export default function IdeaModule() {
 
   return (
     <div className="min-h-screen bg-black text-white selection:bg-white selection:text-black">
-      <ToolChrome active="idea" account={displayName} onSignOut={() => void signOut()}>
-        <a href="#validate" className="text-white/40 hover:text-white transition-colors">New validation</a>
-        <a href="#history" className="text-white/40 hover:text-white transition-colors">History</a>
-      </ToolChrome>
+      <ToolChrome
+        active="idea"
+        account={displayName}
+        onSignOut={() => void signOut()}
+        actions={[
+          { href: '#validate', label: 'New validation', tone: 'primary' },
+          { href: '#history', label: 'History', tone: 'quiet' },
+        ]}
+      />
 
       <main className="max-w-6xl mx-auto px-6 md:px-12 pt-8 pb-28">
         <section className="grid items-stretch gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(280px,360px)]">
@@ -305,11 +310,13 @@ function HistoryRow({ r, grantsHref, grantsDone, onOpen, onDelete }: { r: IdeaRe
   return (
     <div className="border-b border-white/10 py-3 last:border-b-0">
       <div className="flex items-start gap-3">
-        <button onClick={onOpen} className="flex-1 min-w-0 text-left">
+        <div className="flex-1 min-w-0">
+          <button onClick={onOpen} className="w-full min-w-0 text-left">
           <span className="block text-base font-semibold tracking-tight">{title}</span>
           <span className="mt-1 flex items-center gap-2 text-xs text-white/40">
             <span className="truncate">
               {new Date(r.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })} · {r.stage}
+              {r.revenue ? ` · ${r.revenue}` : ''}
             </span>
             {r.deck_name && <FileText size={12} className="flex-none" aria-label="Includes pitch deck" />}
           </span>
@@ -327,7 +334,20 @@ function HistoryRow({ r, grantsHref, grantsDone, onOpen, onDelete }: { r: IdeaRe
             )}
             {status === 'failed' && <span className="text-[10px] font-mono uppercase tracking-widest text-red-400 border border-red-400/30 rounded-md px-2 py-1">Failed · doesn’t use a free validation</span>}
           </span>
-        </button>
+          </button>
+          {(r.idea || r.audience || r.different) && (
+            <details className="mt-2">
+              <summary className="cursor-pointer text-[10px] font-mono uppercase tracking-widest text-white/35">Inputs you submitted</summary>
+              <div className="mt-2 grid gap-1 text-xs text-white/55">
+                <p className="break-words"><span className="text-white/35">Idea. </span>{r.idea}</p>
+                {r.audience && <p className="break-words"><span className="text-white/35">Audience. </span>{r.audience}</p>}
+                {r.different && <p className="break-words"><span className="text-white/35">Difference. </span>{r.different}</p>}
+                {r.revenue && <p className="break-words"><span className="text-white/35">Revenue. </span>{r.revenue}</p>}
+                {r.deck_name && <p className="break-words"><span className="text-white/35">Deck. </span>{r.deck_name}</p>}
+              </div>
+            </details>
+          )}
+        </div>
         <div className="flex flex-col items-end gap-2">
           {grantsHref && (
             <a href={grantsHref} onClick={e => { e.stopPropagation(); markWorkspaceOpen(); }} className="text-[10px] font-mono uppercase tracking-widest text-white/50 hover:text-white transition-colors">

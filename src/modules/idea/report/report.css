@@ -255,17 +255,22 @@ footer b{font:800 22px var(--hd)}footer p{opacity:.75;max-width:74ch;margin-top:
 .hero-gauge .iq-legend{gap:12px;font-size:12px;margin-top:8px}
 
 /* MARKET */
-.mk2{display:grid;grid-template-columns:minmax(0,300px) 1fr;gap:28px;align-items:center}
-.mk-svg{width:100%;max-width:300px;display:block;margin:auto}
-.mk-ab{font:800 14px var(--hd);letter-spacing:.08em;fill:var(--ink)}
-.mk-v{font:600 12px var(--bd);fill:var(--ink);opacity:.8}
+.mk2{display:grid;grid-template-columns:minmax(0,280px) minmax(0,1fr);gap:28px;align-items:start}
+.mk-svg{width:100%;max-width:280px;display:block;margin:auto}
+.mk-list{min-width:0}
+.mk-ab,.mk-v{font:700 11px var(--hd)}
+.mk-ab{letter-spacing:.04em;fill:var(--ink)}
+.mk-v{font-weight:600;fill:var(--ink);opacity:.85}
 .mk-in .mk-ab,.mk-in .mk-v{fill:#1b1b1b;opacity:1}
-.mk-row{display:grid;grid-template-columns:62px minmax(0,1fr) auto;gap:14px;align-items:center;padding:12px 0;border-bottom:1px solid var(--ln)}
+.mk-row{display:block;min-width:0;padding:14px 0;border-bottom:1px solid var(--ln)}
 .mk-row:last-of-type{border-bottom:0}
-.mk-chip{display:grid;place-items:center;height:30px;border-radius:8px;font:800 12px var(--hd);letter-spacing:.06em;background:color-mix(in srgb,var(--c) 20%,transparent);color:var(--ink);border:1px solid color-mix(in srgb,var(--c) 45%,transparent)}
-.mk-row b{color:var(--ink);font-size:14.5px}.mk-row small{display:block;margin-top:1px}
-.mk-row .mk-val{font:800 22px var(--hd);text-align:right;white-space:nowrap}
-.mk-note{margin-top:10px;font-size:13.5px;line-height:1.5;padding:10px 14px;border-radius:10px;background:var(--so);color:var(--ink)}
+.mk-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;min-width:0;flex-wrap:wrap}
+.mk-chip{display:inline-flex;align-items:center;flex:1 1 8rem;min-width:0;max-width:100%;height:auto;min-height:28px;padding:4px 8px;border-radius:8px;font:800 12px/1.25 var(--hd);letter-spacing:.02em;white-space:normal;overflow-wrap:anywhere;text-align:left;background:color-mix(in srgb,var(--c) 20%,transparent);color:var(--ink);border:1px solid color-mix(in srgb,var(--c) 45%,transparent)}
+.mk-copy{min-width:0;margin-top:8px;font-size:14.5px;line-height:1.55;color:var(--tx);overflow-wrap:anywhere}
+.mk-copy b{display:block;color:var(--ink);font-size:15px}
+.mk-copy p{margin:4px 0 0}
+.mk-row .mk-val{flex:none;max-width:46%;font:800 18px/1.25 var(--hd);text-align:right;white-space:normal;overflow-wrap:anywhere;color:var(--ink)}
+.mk-note{margin-top:10px;font-size:13.5px;line-height:1.5;padding:10px 14px;border-radius:10px;background:var(--so);color:var(--ink);overflow-wrap:anywhere}
 
 /* COMPETITOR TABLE */
 .comp-tbl{min-width:820px}
